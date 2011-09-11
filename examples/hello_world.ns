@@ -1,0 +1,22 @@
+myvar = 'hello world'
+johnny = 4000
+
+def foo(johnny=3)
+ 34 + johnny * 3
+end
+
+def bar(johnny=3)
+ (34 + johnny) * 3
+end
+
+print('Negative johnny is', -johnny)
+
+print(foo())
+print(foo(242))
+
+print(bar())
+print(bar(242))
+
+print('Johnny is still', johnny)
+
+print(myvar)

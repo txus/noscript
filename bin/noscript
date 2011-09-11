@@ -1,0 +1,44 @@
+#!/usr/bin/env ruby
+
+begin
+  require 'noscript'
+rescue LoadError
+  require_relative '../lib/noscript'
+end
+
+require 'pp'
+
+parser = Noscript::Parser.new
+
+filename = ARGV.shift
+if filename && code = File.read(filename)
+  code.strip!
+else
+  puts "No input file provided. Bye!"
+  exit(1)
+end
+
+args = ARGV
+
+ast = parser.scan_str(code)
+
+if args.any?{|a| a =~ '--tokens'}
+  puts "-----TOKENS-----"
+  lexer = Noscript::Parser.new
+  lexer.load_file filename
+  while token = rex.next_token
+    p token
+  end
+end
+
+if args.any?{|a| a =~ '--ast'}
+  puts "-----AST-----"
+  pp ast
+end
+
+result = ast.compile(Noscript::Context.generate)
+
+if args.any?{|a| a =~ '--return'}
+  puts "-----RETURN VALUE-----"
+  pp result
+end
