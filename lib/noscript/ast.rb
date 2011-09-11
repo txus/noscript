@@ -17,7 +17,7 @@ module Noscript
 
     class Identifier < Struct.new(:name)
       def compile(context)
-        context.lookup_var(name) || raise("Undefined local variable: #{name}")
+        context.lookup_var(name)
       end
       def to_s
         name
@@ -50,11 +50,7 @@ module Noscript
 
     class MethodCall < Struct.new(:name, :args)
       def compile(context)
-        if method = context.lookup_method(name)
-          method.call(context, *args)
-        else
-          raise "Undefined procedure: #{name}"
-        end
+        context.lookup_method(name).call(context, *args)
       end
     end
 
