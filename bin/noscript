@@ -26,7 +26,7 @@ if args.any?{|a| a =~ '--tokens'}
   puts "-----TOKENS-----"
   lexer = Noscript::Parser.new
   lexer.load_file filename
-  while token = rex.next_token
+  while token = lexer.next_token
     p token
   end
 end
