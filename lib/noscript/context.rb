@@ -11,12 +11,12 @@ module Noscript
       ctx
     end
 
-    attr_accessor :lvars, :functions
+    attr_accessor :lvars, :methods
 
     def initialize(parent_context = nil)
       @parent = parent_context
       @lvars = {}
-      @functions = {}
+      @methods = {}
     end
 
     def lookup_var(symbol)
@@ -30,18 +30,18 @@ module Noscript
     end
 
     def lookup_method(symbol)
-      result = @functions[symbol.to_s] ||
+      result = @methods[symbol.to_s] ||
         (@parent.lookup_method(symbol.to_s) if @parent)
-      return result || raise("Undefined procedure: #{symbol}")
+      return result || raise("Undefined method: #{symbol}")
     end
 
     def store_method(symbol, params, body)
-      @functions[symbol.to_s] = Method.new(params, body)
+      @methods[symbol.to_s] = Method.new(params, body)
     end
 
     def store_ruby_method(symbol, &body)
       raise "Body must be a ruby proc" unless body.is_a?(Proc)
-      @functions[symbol.to_s] = body
+      @methods[symbol.to_s] = body
     end
   end
 end

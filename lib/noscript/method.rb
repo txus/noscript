@@ -1,5 +1,6 @@
 module Noscript
   class Method
+    attr_reader :params, :body
     def initialize(params, body)
       @params = params
       @body = body
