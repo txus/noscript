@@ -39,10 +39,10 @@ module Noscript
 
     class String < Struct.new(:val)
       def compile(context)
-        val.to_s
+        self
       end
       def to_s
-        "'#{val.to_s}'"
+        "#{val.to_s}"
       end
     end
 

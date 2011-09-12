@@ -360,42 +360,42 @@ module_eval(<<'.,.,', 'noscript.racc', 16)
 
 module_eval(<<'.,.,', 'noscript.racc', 18)
   def _reduce_4(val, _values, result)
-     result = AST::DefMethod.new(val[1], val[3], val[6])
+     result = AST::DefMethod.new(val[1], val[3], val[6]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 20)
   def _reduce_5(val, _values, result)
-     result = AST::IfNode.new(val[1], val[3], val[6])
+     result = AST::IfNode.new(val[1], val[3], val[6]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 21)
   def _reduce_6(val, _values, result)
-     result = AST::IfNode.new(val[1], val[3])
+     result = AST::IfNode.new(val[1], val[3]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 23)
   def _reduce_7(val, _values, result)
-     result = AST::Identifier.new(val[0])
+     result = AST::Identifier.new(val[0]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 25)
   def _reduce_8(val, _values, result)
-     result = AST::Digit.new(val[0])
+     result = AST::Digit.new(val[0]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 26)
   def _reduce_9(val, _values, result)
-     result = AST::String.new(val[0])
+     result = AST::String.new(val[0]) 
     result
   end
 .,.,
@@ -465,63 +465,63 @@ module_eval(<<'.,.,', 'noscript.racc', 45)
 
 module_eval(<<'.,.,', 'noscript.racc', 47)
   def _reduce_24(val, _values, result)
-     result = AST::EqualityExpression.new(val[0], val[2])
+     result = AST::EqualityExpression.new(val[0], val[2]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 48)
   def _reduce_25(val, _values, result)
-     result = AST::InequalityExpression.new(val[0], val[2])
+     result = AST::InequalityExpression.new(val[0], val[2]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 49)
   def _reduce_26(val, _values, result)
-     result = AST::GtExpression.new(val[0], val[2])
+     result = AST::GtExpression.new(val[0], val[2]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 50)
   def _reduce_27(val, _values, result)
-     result = AST::GteExpression.new(val[0], val[2])
+     result = AST::GteExpression.new(val[0], val[2]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 51)
   def _reduce_28(val, _values, result)
-     result = AST::LtExpression.new(val[0], val[2])
+     result = AST::LtExpression.new(val[0], val[2]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 52)
   def _reduce_29(val, _values, result)
-     result = AST::LteExpression.new(val[0], val[2])
+     result = AST::LteExpression.new(val[0], val[2]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 53)
   def _reduce_30(val, _values, result)
-     result = AST::True.new
+     result = AST::True.new 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 54)
   def _reduce_31(val, _values, result)
-     result = AST::False.new
+     result = AST::False.new 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 55)
   def _reduce_32(val, _values, result)
-     result = AST::Nil.new
+     result = AST::Nil.new 
     result
   end
 .,.,
@@ -600,14 +600,14 @@ module_eval(<<'.,.,', 'noscript.racc', 80)
 
 module_eval(<<'.,.,', 'noscript.racc', 82)
   def _reduce_54(val, _values, result)
-     result = AST::Nodes.new([])
+     result = AST::Nodes.new([]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 83)
   def _reduce_55(val, _values, result)
-     result = AST::Nodes.new([val[0]])
+     result = AST::Nodes.new([val[0]]) 
     result
   end
 .,.,
