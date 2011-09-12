@@ -11,7 +11,7 @@ prechigh
 preclow
 
 rule
-  target : statements { result = AST::Nodes.new(val[0]) }
+  target : statements
          | /* none */ { 0 }
 
   assignment : identifier ASSIGN statement { result = AST::AssignNode.new(val[0], val[2]) }
@@ -80,8 +80,8 @@ rule
             | LPAREN op_member RPAREN { result = val[1] }
             | '-' op_member  =UMINUS { result = AST::UnaryMinus.new(val[1]) }
 
-  statements : { result = [] }
-             | statement { result = [val[0]] }
+  statements : { result = AST::Nodes.new([]) }
+             | statement { result = AST::Nodes.new([val[0]]) }
              | statements statement { result.push(val[1]) }
 
   end_of_statement : SEMICOLON | NEWLINE

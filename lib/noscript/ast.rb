@@ -1,6 +1,10 @@
 module Noscript
   module AST
     class Nodes < Struct.new(:nodes)
+      def push(element)
+        nodes << element
+      end
+
       def compile(context)
         nodes.map do |node|
           node.compile(context)
