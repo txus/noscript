@@ -54,6 +54,24 @@ module Noscript
       end
     end
 
+    class Boolean
+      def self.from(ruby_bool)
+        !!ruby_bool ? True.new : False.new
+      end
+      def compile(context)
+        self
+      end
+    end
+
+    class True < Boolean; end;
+    class False < Boolean; end;
+
+    class Nil
+      def compile(context)
+        self
+      end
+    end
+
     ## ARITHMETIC
 
     class Digit < Struct.new(:val)
@@ -88,6 +106,32 @@ module Noscript
       def to_i
         val.to_i
       end
+
+      # Boolean comparisons
+
+      def <(num)
+        Boolean.from(to_i < num.to_i)
+      end
+
+      def >(num)
+        Boolean.from(to_i > num.to_i)
+      end
+
+      def >=(num)
+        Boolean.from(to_i >= num.to_i)
+      end
+
+      def <=(num)
+        Boolean.from(to_i <= num.to_i)
+      end
+
+      def ==(num)
+        Boolean.from(to_i == num.to_i)
+      end
+
+      def !=(num)
+        Boolean.from(to_i != num.to_i)
+      end
     end
 
     class AddNode < Struct.new(:lhs, :rhs)
@@ -119,5 +163,44 @@ module Noscript
         -(val.compile(context))
       end
     end
+
+    # Boolean expressions
+
+    class EqualityExpression < Struct.new(:lhs, :rhs)
+      def compile(context)
+        lhs.compile(context) == rhs.compile(context)
+      end
+    end
+
+    class InequalityExpression < Struct.new(:lhs, :rhs)
+      def compile(context)
+        lhs.compile(context) != rhs.compile(context)
+      end
+    end
+
+    class GtExpression < Struct.new(:lhs, :rhs)
+      def compile(context)
+        lhs.compile(context) > rhs.compile(context)
+      end
+    end
+
+    class GteExpression < Struct.new(:lhs, :rhs)
+      def compile(context)
+        lhs.compile(context) >= rhs.compile(context)
+      end
+    end
+
+    class LtExpression < Struct.new(:lhs, :rhs)
+      def compile(context)
+        lhs.compile(context) < rhs.compile(context)
+      end
+    end
+
+    class LteExpression < Struct.new(:lhs, :rhs)
+      def compile(context)
+        lhs.compile(context) <= rhs.compile(context)
+      end
+    end
+
   end
 end

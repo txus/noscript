@@ -51,6 +51,23 @@ class LexerTest < MiniTest::Unit::TestCase
     tokenizes "end", [[:END, 'end']]
   end
 
+  # Boolean operators
+
+  def test_boolean_operators
+    tokenizes "==", [[:EQUALS, '==']]
+    tokenizes "!=", [[:NEQUALS, '!=']]
+    tokenizes "<", [[:LT_OP, '<']]
+    tokenizes "<=", [[:LTE_OP, '<=']]
+    tokenizes ">", [[:GT_OP, '>']]
+    tokenizes ">=", [[:GTE_OP, '>=']]
+  end
+
+  def test_booleans
+    tokenizes "true", [[:TRUE, 'true']]
+    tokenizes "false", [[:FALSE, 'false']]
+    tokenizes "nil", [[:NIL, 'nil']]
+  end
+
   def test_identifier
     tokenizes "hello", [[:IDENTIFIER, 'hello']]
     tokenizes "hello_world", [[:IDENTIFIER, 'hello_world']]

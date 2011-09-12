@@ -42,7 +42,21 @@ rule
                  | parameter { result = [val[0]] }
                  | parameter_list COMMA parameter { result.push(val[2]) }
 
+  boolean_exp : op_member EQUALS op_member { result = AST::EqualityExpression.new(val[0], val[2]) }
+              | op_member NEQUALS op_member { result = AST::InequalityExpression.new(val[0], val[2]) }
+              | op_member GT_OP op_member { result = AST::GtExpression.new(val[0], val[2]) }
+              | op_member GTE_OP op_member { result = AST::GteExpression.new(val[0], val[2]) }
+              | op_member LT_OP op_member { result = AST::LtExpression.new(val[0], val[2]) }
+              | op_member LTE_OP op_member { result = AST::LteExpression.new(val[0], val[2]) }
+              | TRUE { result = AST::True.new }
+              | FALSE { result = AST::False.new }
+              | NIL { result = AST::Nil.new }
+
+  expression : boolean_exp
+             | LPAREN expression RPAREN
+
   statement : assignment
+            | expression
             | operation
             | method_call
             | digit

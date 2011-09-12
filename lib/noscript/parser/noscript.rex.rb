@@ -72,6 +72,33 @@ class Parser < Racc::Parser
       when (text = @ss.scan(/\d+/))
          action { [:DIGIT, text.to_i] }
 
+      when (text = @ss.scan(/==/))
+         action { [:EQUALS, text] }
+
+      when (text = @ss.scan(/!=/))
+         action { [:NEQUALS, text] }
+
+      when (text = @ss.scan(/>=/))
+         action { [:GTE_OP, text] }
+
+      when (text = @ss.scan(/<=/))
+         action { [:LTE_OP, text] }
+
+      when (text = @ss.scan(/</))
+         action { [:LT_OP, text] }
+
+      when (text = @ss.scan(/>/))
+         action { [:GT_OP, text] }
+
+      when (text = @ss.scan(/true/))
+         action { [:TRUE, text] }
+
+      when (text = @ss.scan(/false/))
+         action { [:FALSE, text] }
+
+      when (text = @ss.scan(/nil/))
+         action { [:NIL, text] }
+
       when (text = @ss.scan(/=/))
          action { [:ASSIGN, text] }
 
