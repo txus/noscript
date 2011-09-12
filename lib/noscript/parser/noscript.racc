@@ -16,7 +16,10 @@ rule
 
   assignment : identifier ASSIGN statement { result = AST::AssignNode.new(val[0], val[2]) }
 
-  method_definition : DEF IDENTIFIER LPAREN parameter_list RPAREN end_of_statement statements END { result = AST::DefMethod.new(val[1], val[3], AST::Nodes.new(val[6])) }
+  method_definition : DEF IDENTIFIER LPAREN parameter_list RPAREN end_of_statement statements END { result = AST::DefMethod.new(val[1], val[3], val[6]) }
+
+  if_else : IF expression end_of_statement statements ELSE end_of_statement statements END { result = AST::IfNode.new(val[1], val[3], val[6]) }
+          | IF expression end_of_statement statements END { result = AST::IfNode.new(val[1], val[3]) }
 
   identifier : IDENTIFIER { result = AST::Identifier.new(val[0]) }
 
@@ -62,6 +65,7 @@ rule
             | digit
             | string
             | method_definition
+            | if_else
             | statement end_of_statement
 
   op_member : digit

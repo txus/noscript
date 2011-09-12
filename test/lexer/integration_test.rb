@@ -56,4 +56,34 @@ class LexerIntegrationTest < MiniTest::Unit::TestCase
     ]
   end
 
+  def test_if
+    tokenizes "if foo == 3\n 'lorem'\n end", [
+      [:IF, 'if'],
+      [:IDENTIFIER, 'foo'],
+      [:EQUALS, '=='],
+      [:DIGIT, 3],
+      [:NEWLINE, "\n "],
+      [:STRING, 'lorem'],
+      [:NEWLINE, "\n "],
+      [:END, 'end'],
+    ]
+  end
+
+  def test_if_else
+    tokenizes "if foo == 3\n 'lorem'\n else\n 'ipsum'\n end", [
+      [:IF, 'if'],
+      [:IDENTIFIER, 'foo'],
+      [:EQUALS, '=='],
+      [:DIGIT, 3],
+      [:NEWLINE, "\n "],
+      [:STRING, 'lorem'],
+      [:NEWLINE, "\n "],
+      [:ELSE, 'else'],
+      [:NEWLINE, "\n "],
+      [:STRING, 'ipsum'],
+      [:NEWLINE, "\n "],
+      [:END, 'end'],
+    ]
+  end
+
 end

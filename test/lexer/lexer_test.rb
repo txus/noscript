@@ -51,6 +51,14 @@ class LexerTest < MiniTest::Unit::TestCase
     tokenizes "end", [[:END, 'end']]
   end
 
+  def test_if
+    tokenizes "if", [[:IF, 'if']]
+  end
+
+  def test_else
+    tokenizes "else", [[:ELSE, 'else']]
+  end
+
   # Boolean operators
 
   def test_boolean_operators

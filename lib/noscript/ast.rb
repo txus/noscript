@@ -72,6 +72,19 @@ module Noscript
       end
     end
 
+    class IfNode < Struct.new(:expression, :body, :else_body)
+      def compile(context)
+        result = expression.compile(context)
+        if result.is_a?(True)
+          body.compile(context)
+        elsif result.is_a?(False) || result.is_a?(Nil)
+          else_body.compile(context)
+        else
+          raise "Expression must return either true, false or nil"
+        end
+      end
+    end
+
     ## ARITHMETIC
 
     class Digit < Struct.new(:val)

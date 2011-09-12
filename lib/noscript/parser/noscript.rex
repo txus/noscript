@@ -29,6 +29,8 @@ rule
   \(            { [:LPAREN, text] }
   \)            { [:RPAREN, text] }
   end           { [:END, text] }
+  if            { [:IF, text] }
+  else          { [:ELSE, text] }
 
   \w+           { [:IDENTIFIER, text] }
   .             { [text, text] }

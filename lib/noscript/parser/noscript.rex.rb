@@ -123,6 +123,12 @@ class Parser < Racc::Parser
       when (text = @ss.scan(/end/))
          action { [:END, text] }
 
+      when (text = @ss.scan(/if/))
+         action { [:IF, text] }
+
+      when (text = @ss.scan(/else/))
+         action { [:ELSE, text] }
+
       when (text = @ss.scan(/\w+/))
          action { [:IDENTIFIER, text] }
 
