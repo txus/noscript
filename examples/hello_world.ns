@@ -14,8 +14,15 @@ print('Negative johnny is', -johnny)
 print(foo())
 print(foo(242))
 
-print(bar())
-print(bar(242))
+if bar() == 111
+  print(bar())
+end
+
+if bar(242) == 728
+  print('wrong!')
+else
+  print('cool!')
+end
 
 print('Johnny is still', johnny)
 
