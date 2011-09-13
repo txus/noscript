@@ -79,6 +79,8 @@ class LexerTest < MiniTest::Unit::TestCase
   def test_identifier
     tokenizes "hello", [[:IDENTIFIER, 'hello']]
     tokenizes "hello_world", [[:IDENTIFIER, 'hello_world']]
+    tokenizes "hello world", [[:IDENTIFIER, 'hello world']]
+    tokenizes "goodbye cruel world", [[:IDENTIFIER, 'goodbye cruel world']]
     tokenizes "_hey", [[:IDENTIFIER, '_hey']]
   end
 

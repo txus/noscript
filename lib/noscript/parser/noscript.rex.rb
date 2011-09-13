@@ -66,9 +66,6 @@ class Parser < Racc::Parser
       when (text = @ss.scan(/[\n]+[\s]*/))
          action { [:NEWLINE, text] }
 
-      when (text = @ss.scan(/\s/))
-        ;
-
       when (text = @ss.scan(/\d+/))
          action { [:DIGIT, text.to_i] }
 
@@ -129,8 +126,11 @@ class Parser < Racc::Parser
       when (text = @ss.scan(/else/))
          action { [:ELSE, text] }
 
-      when (text = @ss.scan(/\w+/))
-         action { [:IDENTIFIER, text] }
+      when (text = @ss.scan(/\w[\s\w]*/))
+         action { [:IDENTIFIER, text.strip] }
+
+      when (text = @ss.scan(/\s/))
+        ;
 
       when (text = @ss.scan(/./))
          action { [text, text] }

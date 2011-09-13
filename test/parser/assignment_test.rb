@@ -15,6 +15,17 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     end
   end
 
+  def test_simple_assignment_with_whitespace_identifier
+    parses "oh my lord = 'foo'" do |nodes|
+      assignment = nodes.first
+
+      assert_kind_of AssignNode, assignment
+
+      assert_equal Identifier.new('oh my lord'), assignment.lhs
+      assert_equal String.new('foo'), assignment.rhs
+    end
+  end
+
   def test_operation_assignment
     parses 'a = (3 + 3) * 4' do |nodes|
       assignment = nodes.first

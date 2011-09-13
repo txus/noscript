@@ -14,6 +14,7 @@ class NoscriptTest < MiniTest::Unit::TestCase
       "cool!",
       "Johnny is still",
       "4000",
+      "lord",
       "hello world",
     ], output
   end

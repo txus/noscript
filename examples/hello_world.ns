@@ -1,5 +1,6 @@
 myvar = 'hello world'
 johnny = 4000
+oh my god = 'lord'
 
 def foo(johnny=3)
  34 + johnny * 3
@@ -25,5 +26,7 @@ else
 end
 
 print('Johnny is still', johnny)
+
+print(oh my god)
 
 print(myvar)

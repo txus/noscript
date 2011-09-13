@@ -7,7 +7,6 @@ module Noscript
 class Parser
 rule
   [\n]+[\s]*    { [:NEWLINE, text] }
-  \s
   \d+           { [:DIGIT, text.to_i] }
 
   ==            { [:EQUALS, text] }
@@ -32,7 +31,8 @@ rule
   if            { [:IF, text] }
   else          { [:ELSE, text] }
 
-  \w+           { [:IDENTIFIER, text] }
+  \w[\s\w]*     { [:IDENTIFIER, text.strip] }
+  \s
   .             { [text, text] }
 end
 end
