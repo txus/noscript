@@ -21,6 +21,8 @@ rule
   if_else : IF expression end_of_statement statements ELSE end_of_statement statements END { result = AST::IfNode.new(val[1], val[3], val[6]) }
           | IF expression end_of_statement statements END { result = AST::IfNode.new(val[1], val[3]) }
 
+  while   : WHILE expression end_of_statement statements END { result = AST::WhileNode.new(val[1], val[3]) }
+
   identifier : IDENTIFIER { result = AST::Identifier.new(val[0]) }
 
   digit : DIGIT { result = AST::Digit.new(val[0]) }
@@ -66,6 +68,8 @@ rule
             | string
             | method_definition
             | if_else
+            | while
+            | op_member
             | statement end_of_statement
 
   op_member : digit

@@ -90,6 +90,14 @@ module Noscript
       end
     end
 
+    class WhileNode < Struct.new(:expression, :body)
+      def compile(context)
+        while expression.compile(context).is_a?(True)
+          body.compile(context)
+        end
+      end
+    end
+
     ## ARITHMETIC
 
     class Digit < Struct.new(:val)

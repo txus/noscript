@@ -25,6 +25,11 @@ else
   print('cool!')
 end
 
+foo = 30
+while foo > 0
+  foo = foo - 5
+end
+
 print('Johnny is still', johnny)
 
 print(oh my god)

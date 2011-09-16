@@ -30,6 +30,7 @@ rule
   end           { [:END, text] }
   if            { [:IF, text] }
   else          { [:ELSE, text] }
+  while         { [:WHILE, text] }
 
   \w[\s\w]*     { [:IDENTIFIER, text.strip] }
   \s

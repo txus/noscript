@@ -75,4 +75,22 @@ class NoscriptTest < MiniTest::Unit::TestCase
     end
   end
 
+  def test_while
+    [
+      """
+        foo = 3
+
+        while foo > 0
+          foo = foo - 1
+        end
+
+        foo
+      """
+    ].each do |code|
+      compiles(code) do |retval|
+        assert_equal Noscript::AST::Digit.new('1'), retval
+      end
+    end
+  end
+
 end

@@ -59,6 +59,10 @@ class LexerTest < MiniTest::Unit::TestCase
     tokenizes "else", [[:ELSE, 'else']]
   end
 
+  def test_while
+    tokenizes "while", [[:WHILE, 'while']]
+  end
+
   # Boolean operators
 
   def test_boolean_operators

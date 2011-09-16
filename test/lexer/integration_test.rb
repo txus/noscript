@@ -86,4 +86,17 @@ class LexerIntegrationTest < MiniTest::Unit::TestCase
     ]
   end
 
+  def test_while
+    tokenizes "while foo > 3\n 'lorem'\n end", [
+      [:WHILE, 'while'],
+      [:IDENTIFIER, 'foo'],
+      [:GT_OP, '>'],
+      [:DIGIT, 3],
+      [:NEWLINE, "\n "],
+      [:STRING, 'lorem'],
+      [:NEWLINE, "\n "],
+      [:END, 'end'],
+    ]
+  end
+
 end
