@@ -106,4 +106,16 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     end
   end
 
+  def test_assignment_with_expression
+    parses "a = a - 3\n " do |nodes|
+      assignment = nodes.first
+      assert_kind_of AssignNode, assignment
+
+      assert_equal Identifier.new('a'), assignment.lhs
+      assert_equal SubtractNode.new(
+        Identifier.new('a'),
+        Digit.new(3)
+      ), assignment.rhs
+    end
+  end
 end

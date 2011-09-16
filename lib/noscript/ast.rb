@@ -14,8 +14,9 @@ module Noscript
 
     class AssignNode < Struct.new(:lhs, :rhs)
       def compile(context)
-        context.store_var(lhs, rhs)
-        rhs
+        val = rhs.compile(context)
+        context.store_var(lhs, val)
+        val
       end
     end
 
