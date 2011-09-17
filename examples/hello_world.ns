@@ -30,6 +30,10 @@ while foo > 0
   foo = foo - 5
 end
 
+add_fun = -> a, b
+  a + b
+end
+
 print('Johnny is still', johnny)
 
 print(oh my god)
