@@ -84,6 +84,9 @@ class Parser < Racc::Parser
       when (text = @ss.scan(/</))
          action { [:LT_OP, text] }
 
+      when (text = @ss.scan(/->/))
+         action { [:FUN, text] }
+
       when (text = @ss.scan(/>/))
          action { [:GT_OP, text] }
 
@@ -129,7 +132,7 @@ class Parser < Racc::Parser
       when (text = @ss.scan(/while/))
          action { [:WHILE, text] }
 
-      when (text = @ss.scan(/\w[\s\w]*/))
+      when (text = @ss.scan(/\w[[ ]\w]*/))
          action { [:IDENTIFIER, text.strip] }
 
       when (text = @ss.scan(/\s/))

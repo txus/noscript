@@ -89,9 +89,13 @@ class LexerTest < MiniTest::Unit::TestCase
   end
 
   def test_everything_else
-    %w(+ - * / ^ &).each do |symbol|
+    %w(+ - * / ^ & { } [ ]).each do |symbol|
       tokenizes symbol, [[symbol, symbol]]
     end
+  end
+
+  def test_fun
+    tokenizes "->", [[:FUN, '->']]
   end
 
 end

@@ -5,6 +5,8 @@
 #
 module Noscript
 class Parser
+macro
+  BLANK         [\ ]
 rule
   [\n]+[\s]*    { [:NEWLINE, text] }
   \d+           { [:DIGIT, text.to_i] }
@@ -14,6 +16,7 @@ rule
   >=            { [:GTE_OP, text] }
   <=            { [:LTE_OP, text] }
   <             { [:LT_OP, text] }
+  ->            { [:FUN, text] }
   >             { [:GT_OP, text] }
 
   true          { [:TRUE, text] }
@@ -32,7 +35,8 @@ rule
   else          { [:ELSE, text] }
   while         { [:WHILE, text] }
 
-  \w[\s\w]*     { [:IDENTIFIER, text.strip] }
+  \w[{BLANK}\w]* { [:IDENTIFIER, text.strip] }
+
   \s
   .             { [text, text] }
 end

@@ -99,4 +99,17 @@ class LexerIntegrationTest < MiniTest::Unit::TestCase
     ]
   end
 
+  def test_fun
+    tokenizes "-> foo, my bar\n 'lorem'\n end", [
+      [:FUN, '->'],
+      [:IDENTIFIER, 'foo'],
+      [:COMMA, ','],
+      [:IDENTIFIER, 'my bar'],
+      [:NEWLINE, "\n "],
+      [:STRING, 'lorem'],
+      [:NEWLINE, "\n "],
+      [:END, 'end'],
+    ]
+  end
+
 end
