@@ -20,25 +20,33 @@ end
 
 args = ARGV
 
-ast = parser.scan_str(code)
+begin
+  ast = parser.scan_file(filename)
+rescue
+  $stderr.printf  "Syntax error\n\t%s:%d:%s\n", parser.filename, parser.lineno, $!.message
+end
 
-if args.any?{|a| a =~ '--tokens'}
+if args.any?{|a| a =~ /--tokens/}
   puts "-----TOKENS-----"
   lexer = Noscript::Parser.new
   lexer.load_file filename
   while token = lexer.next_token
     p token
   end
+  puts
 end
 
-if args.any?{|a| a =~ '--ast'}
-  puts "-----AST-----"
-  pp ast
-end
+if ast
+  if args.any?{|a| a =~ /--ast/}
+    puts "-----AST-----"
+    pp ast
+    puts
+  end
 
-result = ast.compile(Noscript::Context.generate)
+  result = ast.compile(Noscript::Context.generate)
 
-if args.any?{|a| a =~ '--return'}
-  puts "-----RETURN VALUE-----"
-  pp result
+  if args.any?{|a| a =~ /--return/}
+    puts "-----RETURN VALUE-----"
+    pp result
+  end
 end
