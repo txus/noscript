@@ -47,6 +47,14 @@ module Noscript
       end
     end
 
+    class Tuple < Struct.new(:body)
+      def compile(context)
+        body.inject({}) do |a,e|
+          a.update(e.first.to_sym => e.last.compile(context))
+        end
+      end
+    end
+
     class FunNode < Struct.new(:arguments, :body)
       def compile(context)
         Method.new(arguments, body)

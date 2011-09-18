@@ -4,7 +4,7 @@ benchmark(<<CODE)
 
   bar = 100
 
-  def foo(bar)
+  foo = -> bar
     if bar == 0
 
     else

@@ -34,13 +34,4 @@ class ContextTest < MiniTest::Unit::TestCase
     assert_equal 3, @context.lvars['baz']
   end
 
-  def test_store_ruby_method
-    @context.store_ruby_method(:amet) do
-      'consectetur'
-    end
-
-    method = @context.methods['amet']
-    assert_equal 'consectetur', method.call
-  end
-
 end

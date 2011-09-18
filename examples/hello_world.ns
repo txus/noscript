@@ -2,11 +2,12 @@ myvar = 'hello world'
 johnny = 4000
 oh my god = 'lord'
 
-def foo(johnny=3)
+
+foo = -> johnny=3
  34 + johnny * 3
 end
 
-def bar(johnny=3)
+bar = -> johnny=3
  (34 + johnny) * 3
 end
 

@@ -27,16 +27,17 @@ rule
 
   digit : DIGIT { result = AST::Digit.new(val[0]) }
   string : STRING { result = AST::String.new(val[0]) }
-  tuple : '{' tuple_elements '}'
+  tuple : '{' tuple_elements '}' { result = AST::Tuple.new(val[1]) }
 
-  tuple_element : IDENTIFIER ':' literal
+  tuple_element : IDENTIFIER ':' literal { result = {val[0] => val[2]} }
 
   tuple_elements : { result = {} }
-                 | tuple_element { result.update!(val[0]) }
-                 | tuple_elements COMMA tuple_element { result.update!(val[2]) }
+                 | tuple_element { result.merge!(val[0]) }
+                 | tuple_elements COMMA tuple_element { result.merge!(val[2]) }
 
   literal : digit
           | string
+          | tuple
           | fun_definition
           | operation
 
@@ -70,11 +71,8 @@ rule
 
   statement : assignment
             | expression
-            | operation
             | fun_call
-            | digit
-            | string
-            | fun_definition
+            | literal
             | if_else
             | while
             | op_member
