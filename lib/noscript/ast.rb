@@ -57,7 +57,7 @@ module Noscript
     class Tuple < Struct.new(:body)
       def compile(context)
         body.inject({}) do |a,e|
-          a.update(e.first.to_sym => e.last.compile(context))
+          a.update(e.first.to_s => e.last.compile(context))
         end
       end
     end

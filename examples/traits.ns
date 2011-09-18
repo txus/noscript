@@ -1,0 +1,10 @@
+Runnable = trait({
+  run: -> speed
+    print('running with traits at speed:', speed)
+  end
+})
+
+person = Object.clone()
+person.uses(Runnable)
+
+person.run(10)

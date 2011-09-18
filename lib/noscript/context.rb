@@ -8,6 +8,10 @@ module Noscript
         puts *(args.map! {|a| a.compile(context).to_s })
       })
 
+      ctx.store_var('trait', lambda { |context, *args|
+        Trait.new(args.first.compile(context))
+      })
+
       ctx.store_var('Object', Object.new)
 
       ctx

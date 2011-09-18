@@ -30,6 +30,15 @@ class NoscriptTest < MiniTest::Unit::TestCase
     ], output
   end
 
+  def test_traits
+    output = `./bin/noscript examples/traits.ns`.split("\n")
+
+    assert_equal [
+      "running with traits at speed:",
+      "10"
+    ], output
+  end
+
   def test_conditionals
     [
       """

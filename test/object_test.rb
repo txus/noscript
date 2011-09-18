@@ -8,11 +8,20 @@ class ObjectTest < MiniTest::Unit::TestCase
   end
 
   def test_clone
-    @object.slots['hey'] = 3
     child = @object.send('clone').call(@context)
 
     assert_equal(@object, child.parent)
-    assert_equal(['clone'], child.slots.keys)
+    assert_includes(child.slots.keys, 'clone')
+  end
+
+  def test_uses
+    trait = Noscript::Trait.new({
+      'foo' => lambda { |*| Noscript::AST::Digit.new(3) }
+    })
+    @context.store_var('FooTrait', trait)
+    @object.send('uses').call(@context, Noscript::AST::Identifier.new('FooTrait'))
+
+    assert_equal Noscript::AST::Digit.new(3), @object.send('foo').call(@context)
   end
 
   def test_send_matches_child
