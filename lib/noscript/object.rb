@@ -6,12 +6,12 @@ module Noscript
     def initialize
       @parent = nil
       @slots  = {}
-    end
 
-    def clone
-      child = Object.new
-      child.parent = self
-      child
+      add_slot('clone', lambda { |context, *args|
+        child = Object.new
+        child.parent = self
+        child
+      })
     end
 
     def send(message, *arguments, &block)

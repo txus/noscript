@@ -1,51 +1,57 @@
 require 'test_helper'
 
-class FunCallTest < MiniTest::Unit::TestCase
+class MessageTest < MiniTest::Unit::TestCase
 
   include Noscript::AST
 
-  def test_call_method_without_args
+  def test_call_message_without_args
     parses "foo()" do |nodes|
-      fun_call = nodes.first
+      message = nodes.first
 
-      assert_kind_of FunCall, fun_call
-      assert_equal 'foo', fun_call.name
-      assert_equal [], fun_call.args
+      assert_kind_of Message, message
+      refute message.receiver
+      assert_equal Identifier.new('foo'), message.name
+      assert_equal [], message.arguments
     end
   end
 
-  def test_call_method_with_args
+  def test_call_message_with_args
     parses "foo('hey', 34)" do |nodes|
-      fun_call = nodes.first
+      message = nodes.first
 
-      assert_kind_of FunCall, fun_call
-      assert_equal 'foo', fun_call.name
-      assert_equal [String.new('hey'), Digit.new(34)], fun_call.args
+      assert_kind_of Message, message
+      refute message.receiver
+      assert_equal Identifier.new('foo'), message.name
+      assert_equal [String.new('hey'), Digit.new(34)], message.arguments
     end
   end
 
-  def test_call_method_with_other_fun_calls
-    parses "foo('hey', bar())" do |nodes|
-      fun_call = nodes.first
-
-      assert_kind_of FunCall, fun_call
-      assert_equal 'foo', fun_call.name
-      assert_equal [String.new('hey'), FunCall.new('bar', [])], fun_call.args
-    end
-  end
-
-  def test_call_method_with_arithmetic
+  def test_call_message_with_arithmetic
     parses "foo(3 * 2, 9)" do |nodes|
-      fun_call = nodes.first
+      message = nodes.first
 
-      assert_kind_of FunCall, fun_call
+      assert_kind_of Message, message
+      refute message.receiver
+
+      assert_equal Identifier.new('foo'), message.name
       assert_equal [
         MultiplicationNode.new(
           Digit.new(3),
           Digit.new(2)
         ),
         Digit.new(9)
-      ], fun_call.args
+      ], message.arguments
+    end
+  end
+
+  def test_call_message_with_receiver
+    parses "bar.foo('hey')" do |nodes|
+      message = nodes.first
+
+      assert_kind_of Message, message
+      assert_equal Identifier.new('bar'), message.receiver
+      assert_equal Identifier.new('foo'), message.name
+      assert_equal [String.new('hey')], message.arguments
     end
   end
 

@@ -61,9 +61,40 @@ module Noscript
       end
     end
 
-    class FunCall < Struct.new(:name, :args)
+    class FunCall < Struct.new(:name, :arguments)
       def compile(context)
-        context.lookup_var(name).call(context, *args)
+        self
+      end
+    end
+
+    class Message < Struct.new(:receiver, :slot)
+      def compile(context)
+        if receiver
+          # rcv.foo() looks up the message in the receiver slots
+          rcv = receiver.compile(context)
+          retval = rcv.send(name)
+        else
+          # foo() looks up a function in the global context
+          retval = context.lookup_var(name)
+        end
+
+        if call?
+          retval.call(context, *arguments)
+        else
+          retval
+        end
+      end
+
+      def name
+        slot.name
+      end
+
+      def arguments
+        slot.arguments
+      end
+
+      def call?
+        slot.is_a?(FunCall)
       end
     end
 

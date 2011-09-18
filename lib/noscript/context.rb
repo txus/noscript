@@ -8,6 +8,8 @@ module Noscript
         puts *(args.map! {|a| a.compile(context).to_s })
       })
 
+      ctx.store_var('Object', Object.new)
+
       ctx
     end
 

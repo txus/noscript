@@ -18,6 +18,10 @@ rule
 
   fun_definition : FUN parameter_list end_of_statement statements END { result = AST::FunNode.new(val[1], val[3]) }
 
+  message : identifier '.' identifier { result = AST::Message.new(val[0], val[2]) }
+          | identifier '.' fun_call { result = AST::Message.new(val[0], val[2]) }
+          | fun_call { result = AST::Message.new(nil, val[0]) }
+
   if_else : IF expression end_of_statement statements ELSE end_of_statement statements END { result = AST::IfNode.new(val[1], val[3], val[6]) }
           | IF expression end_of_statement statements END { result = AST::IfNode.new(val[1], val[3]) }
 
@@ -43,7 +47,7 @@ rule
 
   argument : identifier
            | literal
-           | fun_call
+           | message
 
   argument_list : { result = [] }
                 | argument  { result = [val[0]] }
@@ -71,7 +75,7 @@ rule
 
   statement : assignment
             | expression
-            | fun_call
+            | message
             | literal
             | if_else
             | while
@@ -80,7 +84,7 @@ rule
 
   op_member : digit
             | identifier
-            | fun_call
+            | message
             | operation
 
   operation : op_member '+' op_member { result = AST::AddNode.new(val[0], val[2]) }
@@ -96,7 +100,7 @@ rule
 
   end_of_statement : SEMICOLON | NEWLINE
 
-  fun_call : IDENTIFIER LPAREN argument_list RPAREN
+  fun_call : identifier LPAREN argument_list RPAREN
              {
                result = AST::FunCall.new(val[0], val[2])
              }

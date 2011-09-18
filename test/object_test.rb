@@ -4,14 +4,15 @@ class ObjectTest < MiniTest::Unit::TestCase
 
   def setup
     @object = Noscript::Object.new
+    @context = Noscript::Context.new
   end
 
   def test_clone
     @object.slots['hey'] = 3
-    child = @object.clone
+    child = @object.send('clone').call(@context)
 
     assert_equal(@object, child.parent)
-    assert_equal({}, child.slots)
+    assert_equal(['clone'], child.slots.keys)
   end
 
   def test_send_matches_child

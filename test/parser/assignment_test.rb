@@ -58,15 +58,15 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     end
   end
 
-  def test_assignment_with_fun_call
+  def test_assignment_with_message
     parses 'a = foo()' do |nodes|
       assignment = nodes.first
       assert_kind_of AssignNode, assignment
       assert_equal Identifier.new('a'), assignment.lhs
 
-      fun_call = assignment.rhs
-      assert_kind_of FunCall, fun_call
-      assert_equal FunCall.new('foo', []), fun_call
+      message = assignment.rhs
+      assert_kind_of Message, message
+      assert_equal Message.new(nil, FunCall.new(Identifier.new('foo'), [])), message
     end
   end
 
