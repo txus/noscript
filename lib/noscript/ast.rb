@@ -50,8 +50,19 @@ module Noscript
     end
 
     class String < Struct.new(:val)
+      INTERPOLATION_REGEX = /\#{([^}]*)\}/
+
       def compile(context)
-        self
+        if val.scan(INTERPOLATION_REGEX)
+          parser = Noscript::Parser.new
+          interpolated = val.gsub(/\#{([^}]*)\}/) do
+            parser.scan_str($1).compile(context).to_s
+          end
+
+          String.new(interpolated)
+        else
+          self
+        end
       end
       def to_s
         "#{val.to_s}"
@@ -123,10 +134,22 @@ module Noscript
       def compile(context)
         self
       end
+      def ==(other)
+        Boolean.from(other.class == self.class)
+      end
     end
 
-    class True < Boolean; end;
-    class False < Boolean; end;
+    class True < Boolean
+      def !@
+        False.new
+      end
+    end
+
+    class False < Boolean
+      def !@
+        True.new
+      end
+    end
 
     class Nil
       def compile(context)
@@ -139,8 +162,9 @@ module Noscript
         result = expression.compile(context)
         if result.is_a?(True)
           body.compile(context)
-        elsif result.is_a?(False) || result.is_a?(Nil)
+        elsif result.is_a?(False) && else_body
           else_body.compile(context)
+        elsif result.is_a?(False)
         else
           raise "Expression must return either true, false or nil"
         end
@@ -257,7 +281,7 @@ module Noscript
 
     class InequalityExpression < Struct.new(:lhs, :rhs)
       def compile(context)
-        lhs.compile(context) != rhs.compile(context)
+        !(lhs.compile(context) == rhs.compile(context))
       end
     end
 

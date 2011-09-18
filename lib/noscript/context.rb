@@ -12,6 +12,10 @@ module Noscript
         Trait.new(args.first.compile(context))
       })
 
+      ctx.store_var('raise', lambda { |context, *args|
+        raise(RuntimeError, args.first.compile(context).to_s)
+      })
+
       ctx.store_var('Object', Object.new)
 
       ctx

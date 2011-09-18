@@ -47,6 +47,7 @@ rule
           | string
           | tuple
           | fun_definition
+          | boolean_literal
           | operation
 
   argument : identifier
@@ -70,9 +71,11 @@ rule
               | op_member GTE_OP op_member { result = AST::GteExpression.new(val[0], val[2]) }
               | op_member LT_OP op_member { result = AST::LtExpression.new(val[0], val[2]) }
               | op_member LTE_OP op_member { result = AST::LteExpression.new(val[0], val[2]) }
-              | TRUE { result = AST::True.new }
-              | FALSE { result = AST::False.new }
-              | NIL { result = AST::Nil.new }
+              | boolean_literal
+
+  boolean_literal : TRUE { result = AST::True.new }
+                  | FALSE { result = AST::False.new }
+                  | NIL { result = AST::Nil.new }
 
   expression : boolean_exp
              | LPAREN expression RPAREN
@@ -88,6 +91,7 @@ rule
 
   op_member : digit
             | identifier
+            | boolean_literal
             | message
             | operation
 

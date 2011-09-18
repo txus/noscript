@@ -7,4 +7,17 @@ require_relative 'noscript/method'
 require_relative 'noscript/trait'
 
 module Noscript
+  def self.bootstrap
+    # Generate top-level context
+    ctx = Context.generate
+
+    parser = Noscript::Parser.new
+
+    # Compile files in /kernel
+    Dir['kernel/*.ns'].each do |file|
+      parser.scan_file(file).compile(ctx)
+    end
+
+    ctx
+  end
 end

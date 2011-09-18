@@ -1,0 +1,13 @@
+Test = Object.clone()
+
+Test.assert = -> value
+  if value != true
+    raise('Expected true, got #{value}.')
+  end
+end
+
+Test.assert equal = -> expected, actual
+  if expected != actual
+    raise('Expected #{expected}, got #{actual}.')
+  end
+end

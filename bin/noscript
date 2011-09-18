@@ -43,7 +43,7 @@ if ast
     puts
   end
 
-  result = ast.compile(Noscript::Context.generate)
+  result = ast.compile(Noscript.bootstrap)
 
   if args.any?{|a| a =~ /--return/}
     puts "-----RETURN VALUE-----"
