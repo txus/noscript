@@ -34,7 +34,7 @@ rule
   string : STRING { result = AST::String.new(val[0]) }
   tuple : '{' tuple_elements '}' { result = AST::Tuple.new(val[1]) }
 
-  tuple_element : IDENTIFIER ':' literal { result = {val[0] => val[2]} }
+  tuple_element : IDENTIFIER ':' argument { result = {val[0] => val[2]} }
 
   tuple_elements : { result = {} }
                  | tuple_element { result.merge!(val[0]) }

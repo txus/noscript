@@ -37,12 +37,13 @@ end
 
 cool object = Object.clone()
 cool object.foo = 'bar'
-cool object.bar = ->
+cool object.bar = -> a
+  { foo: a, bar: 'baz' }
   'baz'
 end
 
 print(cool object.foo)
-print(cool object.bar())
+print(cool object.bar(3))
 
 print('Johnny is still', johnny)
 
