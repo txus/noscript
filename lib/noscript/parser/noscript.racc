@@ -35,6 +35,8 @@ rule
   tuple : '{' tuple_elements '}' { result = AST::Tuple.new(val[1]) }
 
   tuple_element : IDENTIFIER ':' argument { result = {val[0] => val[2]} }
+                | end_of_statement tuple_element { result = val[1] }
+                | tuple_element end_of_statement { result = val[0]}
 
   tuple_elements : { result = {} }
                  | tuple_element { result.merge!(val[0]) }

@@ -40,4 +40,16 @@ class TupleTest < MiniTest::Unit::TestCase
     end
   end
 
+  def test_tuple_multiline
+    parses "{
+      a: foo,
+      b: bar
+    }" do |nodes|
+      tuple = nodes.first
+
+      assert_kind_of Tuple, tuple
+      assert_equal({'a' => Identifier.new('foo'), 'b' => Identifier.new('bar')}, tuple.body)
+    end
+  end
+
 end
