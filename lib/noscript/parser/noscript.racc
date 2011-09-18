@@ -29,6 +29,7 @@ rule
   while   : WHILE expression end_of_statement statements END { result = AST::WhileNode.new(val[1], val[3]) }
 
   identifier : IDENTIFIER { result = AST::Identifier.new(val[0]) }
+             | DEREF { result = AST::Identifier.new(val[0], true)}
 
   digit : DIGIT { result = AST::Digit.new(val[0]) }
   string : STRING { result = AST::String.new(val[0]) }

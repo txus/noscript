@@ -17,12 +17,11 @@ module Noscript
       ctx
     end
 
-    attr_accessor :lvars, :methods
+    attr_accessor :lvars, :current_receiver
 
     def initialize(parent_context = nil)
       @parent = parent_context
       @lvars = {}
-      @methods = {}
     end
 
     def lookup_var(symbol)

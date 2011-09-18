@@ -4,6 +4,8 @@ module Noscript
       raise_argument_error(args) if args.size > params.size
 
       ctx = Context.new(context)
+      ctx.current_receiver = context.current_receiver
+
       params.each_with_index do |param, idx|
         if passed_value = args[idx]
           ctx.store_var(param.name, passed_value.compile(ctx))

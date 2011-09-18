@@ -5,7 +5,6 @@ class ContextTest < MiniTest::Unit::TestCase
   def setup
     @context = Noscript::Context.new
     @context.lvars   = { 'foo' => 3 }
-    @context.methods = { 'lorem' => proc { 'ipsum' } }
   end
 
   # Local variable lookup and storage

@@ -95,4 +95,8 @@ class LexerTest < MiniTest::Unit::TestCase
     tokenizes "->", [[:FUN, '->']]
   end
 
+  def test_deref
+    tokenizes "@name", [[:DEREF, 'name']]
+  end
+
 end

@@ -129,6 +129,9 @@ class Parser < Racc::Parser
       when (text = @ss.scan(/while/))
          action { [:WHILE, text] }
 
+      when (text = @ss.scan(/@\w[[ ]\w]*/))
+         action { [:DEREF, text.strip[1..-1]] }
+
       when (text = @ss.scan(/\w[[ ]\w]*/))
          action { [:IDENTIFIER, text.strip] }
 

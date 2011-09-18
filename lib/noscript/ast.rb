@@ -27,9 +27,13 @@ module Noscript
       end
     end
 
-    class Identifier < Struct.new(:name)
+    class Identifier < Struct.new(:name, :deref)
       def compile(context)
-        context.lookup_var(name)
+        if deref
+          context.current_receiver.slots[name]
+        else
+          context.lookup_var(name)
+        end
       end
       def to_s
         name
@@ -76,9 +80,16 @@ module Noscript
 
     class Message < Struct.new(:receiver, :slot)
       def compile(context)
+        ctx = Context.new(context)
+        ctx.current_receiver = context.current_receiver
+
         if receiver
           # rcv.foo() looks up the message in the receiver slots
           rcv = receiver.compile(context)
+
+          # Save a reference to the current receiver
+          ctx.current_receiver = rcv
+
           retval = rcv.send(name)
         else
           # foo() looks up a function in the global context
@@ -86,7 +97,7 @@ module Noscript
         end
 
         if call?
-          retval.call(context, *arguments)
+          retval.call(ctx, *arguments)
         else
           retval
         end
