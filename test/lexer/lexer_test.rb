@@ -80,6 +80,7 @@ class LexerTest < MiniTest::Unit::TestCase
     tokenizes "hello", [[:IDENTIFIER, 'hello']]
     tokenizes "hello_world", [[:IDENTIFIER, 'hello_world']]
     tokenizes "hello world", [[:IDENTIFIER, 'hello world']]
+    tokenizes "My constant", [[:IDENTIFIER, 'My constant']]
     tokenizes "goodbye cruel world", [[:IDENTIFIER, 'goodbye cruel world']]
     tokenizes "_hey", [[:IDENTIFIER, '_hey']]
   end
