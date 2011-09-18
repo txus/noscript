@@ -12,10 +12,21 @@ class NoscriptTest < MiniTest::Unit::TestCase
       "760",
       "111",
       "cool!",
+      "bar",
+      "baz",
       "Johnny is still",
       "4000",
       "lord",
       "hello world",
+    ], output
+  end
+
+  def test_objects
+    output = `./bin/noscript examples/objects.ns`.split("\n")
+
+    assert_equal [
+      "running!",
+      "10",
     ], output
   end
 

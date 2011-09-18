@@ -1,0 +1,9 @@
+vehicle = Object.clone()
+vehicle.speed = 10
+vehicle.run = ->
+  print('running!')
+end
+
+car = vehicle.clone()
+car.run()
+print(car.speed)

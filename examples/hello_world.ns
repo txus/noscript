@@ -35,6 +35,15 @@ add_fun = -> a, b
   a + b
 end
 
+cool object = Object.clone()
+cool object.foo = 'bar'
+cool object.bar = ->
+  'baz'
+end
+
+print(cool object.foo)
+print(cool object.bar())
+
 print('Johnny is still', johnny)
 
 print(oh my god)

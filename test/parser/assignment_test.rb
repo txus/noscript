@@ -117,4 +117,15 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
       ), assignment.rhs
     end
   end
+
+  def test_slot_assignment
+    parses "foo.a = 3\n " do |nodes|
+      assignment = nodes.first
+      assert_kind_of AssignNode, assignment
+
+      assert_equal Identifier.new('foo'), assignment.receiver
+      assert_equal Identifier.new('a'), assignment.lhs
+      assert_equal Digit.new(3), assignment.rhs
+    end
+  end
 end

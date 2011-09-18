@@ -12,10 +12,17 @@ module Noscript
       end
     end
 
-    class AssignNode < Struct.new(:lhs, :rhs)
+    class AssignNode < Struct.new(:receiver, :lhs, :rhs)
       def compile(context)
         val = rhs.compile(context)
-        context.store_var(lhs, val)
+        if receiver
+          # rcv.a = 3 sets a slot on rcv to 3
+          rcv = receiver.compile(context)
+          rcv.add_slot(lhs.name, val)
+        else
+          # a = 3 stores a local var
+          context.store_var(lhs, val)
+        end
         val
       end
     end

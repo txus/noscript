@@ -14,7 +14,8 @@ rule
   target : statements
          | /* none */ { 0 }
 
-  assignment : identifier ASSIGN statement { result = AST::AssignNode.new(val[0], val[2]) }
+  assignment : identifier '.' identifier ASSIGN statement { result = AST::AssignNode.new(val[0], val[2], val[4]) }
+             | identifier ASSIGN statement { result = AST::AssignNode.new(nil, val[0], val[2]) }
 
   fun_definition : FUN parameter_list end_of_statement statements END { result = AST::FunNode.new(val[1], val[3]) }
 

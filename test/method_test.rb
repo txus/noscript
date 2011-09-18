@@ -23,6 +23,7 @@ class MethodTest < MiniTest::Unit::TestCase
       # BODY
       Noscript::AST::Nodes.new([
         Noscript::AST::AssignNode.new(
+          nil,
           Noscript::AST::Identifier.new('a'),
           Noscript::AST::Digit.new(3)
         ),
