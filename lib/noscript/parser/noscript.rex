@@ -27,7 +27,6 @@ rule
   ,             { [:COMMA, text] }
   ;             { [:SEMICOLON, text] }
   '[^']*'       { [:STRING, text[1..-2]] }
-  def           { [:DEF, text] }
   \(            { [:LPAREN, text] }
   \)            { [:RPAREN, text] }
   end           { [:END, text] }

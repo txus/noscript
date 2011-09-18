@@ -35,10 +35,6 @@ class LexerTest < MiniTest::Unit::TestCase
     tokenizes "'foo'", [[:STRING, 'foo']]
   end
 
-  def test_def
-    tokenizes "def", [[:DEF, 'def']]
-  end
-
   def test_lparen
     tokenizes "(", [[:LPAREN, '(']]
   end

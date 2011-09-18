@@ -29,16 +29,6 @@ module Noscript
       @lvars[symbol.to_s] = value
     end
 
-    def lookup_method(symbol)
-      result = @methods[symbol.to_s] ||
-        (@parent.lookup_method(symbol.to_s) if @parent)
-      return result || raise("Undefined method: #{symbol}")
-    end
-
-    def store_method(symbol, params, body)
-      @methods[symbol.to_s] = Method.new(params, body)
-    end
-
     def store_ruby_method(symbol, &body)
       raise "Body must be a ruby proc" unless body.is_a?(Proc)
       @methods[symbol.to_s] = body

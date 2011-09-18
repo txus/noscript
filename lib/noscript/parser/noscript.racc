@@ -16,8 +16,6 @@ rule
 
   assignment : identifier ASSIGN statement { result = AST::AssignNode.new(val[0], val[2]) }
 
-  method_definition : DEF IDENTIFIER LPAREN parameter_list RPAREN end_of_statement statements END { result = AST::DefMethod.new(val[1], val[3], val[6]) }
-
   fun_definition : FUN parameter_list end_of_statement statements END { result = AST::FunNode.new(val[1], val[3]) }
 
   if_else : IF expression end_of_statement statements ELSE end_of_statement statements END { result = AST::IfNode.new(val[1], val[3], val[6]) }
@@ -29,14 +27,22 @@ rule
 
   digit : DIGIT { result = AST::Digit.new(val[0]) }
   string : STRING { result = AST::String.new(val[0]) }
+  tuple : '{' tuple_elements '}'
+
+  tuple_element : IDENTIFIER ':' literal
+
+  tuple_elements : { result = {} }
+                 | tuple_element { result.update!(val[0]) }
+                 | tuple_elements COMMA tuple_element { result.update!(val[2]) }
 
   literal : digit
           | string
+          | fun_definition
           | operation
 
   argument : identifier
            | literal
-           | method_call
+           | fun_call
 
   argument_list : { result = [] }
                 | argument  { result = [val[0]] }
@@ -65,10 +71,9 @@ rule
   statement : assignment
             | expression
             | operation
-            | method_call
+            | fun_call
             | digit
             | string
-            | method_definition
             | fun_definition
             | if_else
             | while
@@ -77,7 +82,7 @@ rule
 
   op_member : digit
             | identifier
-            | method_call
+            | fun_call
             | operation
 
   operation : op_member '+' op_member { result = AST::AddNode.new(val[0], val[2]) }
@@ -93,10 +98,10 @@ rule
 
   end_of_statement : SEMICOLON | NEWLINE
 
-  method_call : IDENTIFIER LPAREN argument_list RPAREN
-                {
-                  result = AST::MethodCall.new(val[0], val[2])
-                }
+  fun_call : IDENTIFIER LPAREN argument_list RPAREN
+             {
+               result = AST::FunCall.new(val[0], val[2])
+             }
 
 
 ---- header ----

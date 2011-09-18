@@ -47,21 +47,15 @@ module Noscript
       end
     end
 
-    class DefMethod < Struct.new(:name, :params, :body)
-      def compile(context)
-        context.store_method(name, params, body)
-      end
-    end
-
     class FunNode < Struct.new(:arguments, :body)
       def compile(context)
         Method.new(arguments, body)
       end
     end
 
-    class MethodCall < Struct.new(:name, :args)
+    class FunCall < Struct.new(:name, :args)
       def compile(context)
-        context.lookup_method(name).call(context, *args)
+        context.lookup_var(name).call(context, *args)
       end
     end
 

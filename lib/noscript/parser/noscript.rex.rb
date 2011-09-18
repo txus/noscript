@@ -111,9 +111,6 @@ class Parser < Racc::Parser
       when (text = @ss.scan(/'[^']*'/))
          action { [:STRING, text[1..-2]] }
 
-      when (text = @ss.scan(/def/))
-         action { [:DEF, text] }
-
       when (text = @ss.scan(/\(/))
          action { [:LPAREN, text] }
 

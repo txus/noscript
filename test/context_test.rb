@@ -34,35 +34,6 @@ class ContextTest < MiniTest::Unit::TestCase
     assert_equal 3, @context.lvars['baz']
   end
 
-  # Method lookup and storage
-
-  def test_lookup_method
-    assert_equal 'ipsum', @context.lookup_method('lorem').call
-  end
-
-  def test_lookup_method_fails
-    assert_raises RuntimeError, 'Undefined method: dolor' do
-      @context.lookup_method('dolor')
-    end
-  end
-
-  def test_lookup_method_climbs_up_the_scope_chain
-    parent_context = Noscript::Context.new
-    parent_context.methods = { 'sit' => proc { 'amet' } }
-
-    child_context = Noscript::Context.new(parent_context)
-
-    assert_equal 'amet', child_context.lookup_method('sit').call
-  end
-
-  def test_store_method
-    @context.store_method(:sit, [:bar, :baz], proc { 'amet' })
-
-    method = @context.methods['sit']
-    assert_equal [:bar, :baz], method.params
-    assert_equal 'amet', method.body.call
-  end
-
   def test_store_ruby_method
     @context.store_ruby_method(:amet) do
       'consectetur'

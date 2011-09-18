@@ -5,9 +5,9 @@ class MethodTest < MiniTest::Unit::TestCase
   def setup
     @context = Noscript::Context.new
 
-    # Define this method:
+    # Define this function:
     #
-    # def foo(bar=23)
+    # -> bar=23
     #   a = 3
     #   74
     # end
@@ -83,22 +83,22 @@ class MethodTest < MiniTest::Unit::TestCase
   end
 
   def test_method_with_too_few_arguments
-    # def bar()
+    # -> bar
     # end
     @method = Noscript::Method.new(
-      # PARAMS
+      # ARGUMENTS
       [ Noscript::AST::Identifier.new('bar') ],
 
       # BODY
       Noscript::AST::Nodes.new([])
     )
-    assert_raises RuntimeError, "This method expected 1 arguments, not 0" do
+    assert_raises RuntimeError, "This function expected 1 arguments, not 0" do
       @method.call(@context)
     end
   end
 
   def test_method_with_too_many_arguments
-    assert_raises RuntimeError, "This method expected 1 arguments, not 2" do
+    assert_raises RuntimeError, "This function expected 1 arguments, not 2" do
       @method.call(@context, Noscript::AST::Digit.new(10), Noscript::AST::Digit.new(9))
     end
   end

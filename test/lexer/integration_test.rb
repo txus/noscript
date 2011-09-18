@@ -24,38 +24,6 @@ class LexerIntegrationTest < MiniTest::Unit::TestCase
     ]
   end
 
-  def test_def_single_line
-    tokenizes "def foo(bar, baz); 'lorem'; end", [
-      [:DEF, 'def'],
-      [:IDENTIFIER, 'foo'],
-      [:LPAREN, '('],
-      [:IDENTIFIER, 'bar'],
-      [:COMMA, ','],
-      [:IDENTIFIER, 'baz'],
-      [:RPAREN, ')'],
-      [:SEMICOLON, ';'],
-      [:STRING, "lorem"],
-      [:SEMICOLON, ';'],
-      [:END, "end"],
-    ]
-  end
-
-  def test_def_multiline
-    tokenizes "def foo(bar, baz)\n 'lorem'\n end", [
-      [:DEF, 'def'],
-      [:IDENTIFIER, 'foo'],
-      [:LPAREN, '('],
-      [:IDENTIFIER, 'bar'],
-      [:COMMA, ','],
-      [:IDENTIFIER, 'baz'],
-      [:RPAREN, ')'],
-      [:NEWLINE, "\n "],
-      [:STRING, "lorem"],
-      [:NEWLINE, "\n "],
-      [:END, "end"],
-    ]
-  end
-
   def test_if
     tokenizes "if foo == 3\n 'lorem'\n end", [
       [:IF, 'if'],

@@ -19,7 +19,7 @@ module Noscript
     private
 
     def raise_argument_error(args)
-      raise "This method expected #{params.size} arguments, not #{args.size}"
+      raise "This function expected #{params.size} arguments, not #{args.size}"
     end
   end
 end

@@ -58,30 +58,29 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     end
   end
 
-  def test_assignment_with_method_call
+  def test_assignment_with_fun_call
     parses 'a = foo()' do |nodes|
       assignment = nodes.first
       assert_kind_of AssignNode, assignment
       assert_equal Identifier.new('a'), assignment.lhs
 
-      method_call = assignment.rhs
-      assert_kind_of MethodCall, method_call
-      assert_equal MethodCall.new('foo', []), method_call
+      fun_call = assignment.rhs
+      assert_kind_of FunCall, fun_call
+      assert_equal FunCall.new('foo', []), fun_call
     end
   end
 
-  def test_assignment_with_method_definition
-    parses 'a = def foo(); 3; end;' do |nodes|
+  def test_assignment_with_function_definition
+    parses 'a = -> b, c; 3; end;' do |nodes|
       assignment = nodes.first
       assert_kind_of AssignNode, assignment
       assert_equal Identifier.new('a'), assignment.lhs
 
-      def_method = assignment.rhs
-      assert_kind_of DefMethod, def_method
-      assert_equal 'foo', def_method.name
-      assert_equal [], def_method.params
+      fun_node = assignment.rhs
+      assert_kind_of FunNode, fun_node
+      assert_equal [Identifier.new('b'), Identifier.new('c')], fun_node.arguments
 
-      body = def_method.body.nodes
+      body = fun_node.body.nodes
       assert_equal [Digit.new(3)], body
     end
   end
