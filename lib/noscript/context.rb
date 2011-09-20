@@ -34,9 +34,10 @@ module Noscript
     end
 
     def lookup_var(symbol)
-      result = @lvars[symbol.to_s] ||
-        (@parent.lookup_var(symbol.to_s) if @parent)
-      return result || raise("Undefined local variable: #{symbol}")
+      return @lvars[symbol.to_s] if !@lvars[symbol.to_s].nil?
+      return @parent.lookup_var(symbol.to_s) if @parent && !@parent.lookup_var(symbol.to_s).nil?
+
+      raise("Undefined local variable: #{symbol}")
     end
 
     def store_var(symbol, value)

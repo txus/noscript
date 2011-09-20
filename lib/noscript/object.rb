@@ -19,7 +19,7 @@ module Noscript
         tuple = args.shift
 
         if context && tuple
-          tuple.compile(context).each do |k, v|
+          tuple.compile(context).body.each do |k, v|
             child.slots[k] = v
           end
         end
@@ -33,7 +33,7 @@ module Noscript
       })
 
       add_slot('each', lambda { |context, fun|
-        yieldable = self.slots.delete_if do |k,v|
+        yieldable = self.slots.dup.delete_if do |k,v|
           Object::PROTECTED_SLOTS.include?(k)
         end
 
@@ -70,7 +70,7 @@ module Noscript
       trait = @traits.find do |trait|
         trait.implements?(message)
       end
-      trait.slots[message] if trait
+      trait.slots.body[message] if trait
     end
   end
 end

@@ -34,6 +34,7 @@ rule
   digit : DIGIT { result = AST::Digit.new(val[0]) }
   string : STRING { result = AST::String.new(val[0]) }
   tuple : '{' tuple_elements '}' { result = AST::Tuple.new(val[1]) }
+  array : '[' array_elements ']' { result = AST::Array.new(val[1]) }
 
   tuple_element : IDENTIFIER ':' argument { result = {val[0] => val[2]} }
                 | end_of_statement tuple_element { result = val[1] }
@@ -43,9 +44,18 @@ rule
                  | tuple_element { result.merge!(val[0]) }
                  | tuple_elements COMMA tuple_element { result.merge!(val[2]) }
 
+  array_element : argument { result = val[0] }
+                | end_of_statement array_element { result = val[1] }
+                | array_element end_of_statement { result = val[0]}
+
+  array_elements : { result = [] }
+                 | array_element { result = [].push(val[0]) }
+                 | array_elements COMMA array_element { result.push(val[2]) }
+
   literal : digit
           | string
           | tuple
+          | array
           | fun_definition
           | boolean_literal
           | operation

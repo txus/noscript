@@ -33,7 +33,7 @@ module Noscript
     class Identifier < Struct.new(:name, :deref)
       def compile(context)
         if deref
-          context.current_receiver.slots[name]
+          context.current_receiver.send(name)
         else
           context.lookup_var(name)
         end
@@ -86,15 +86,44 @@ module Noscript
       end
 
       def to_s
-        "#{val.to_s}"
+        eval("\"#{val}\"")
       end
     end
 
     class Tuple < Struct.new(:body)
       def compile(context)
-        body.inject({}) do |a,e|
+        Tuple.new(body.inject({}) do |a,e|
           a.update(e.first.to_s => e.last.compile(context))
-        end
+        end)
+      end
+    end
+
+    class Array < Struct.new(:body)
+      def compile(context)
+        Array.new(body.map do |element|
+          element.compile(context)
+        end)
+      end
+
+      def send(message)
+        __send__ message.name
+      end
+
+      define_method('push') do
+        lambda {|context, *args|
+          element = args.first
+          body.push(element.compile(context))
+        }
+      end
+
+      define_method('each') do
+        lambda { |context, fun|
+          method = fun.compile(context)
+
+          body.each do |element|
+            method.call(context, element)
+          end
+        }
       end
     end
 

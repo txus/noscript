@@ -23,17 +23,17 @@ class TraitTest < MiniTest::Unit::TestCase
       ])
     )
 
-    @trait = Noscript::Trait.new({
+    @trait = Noscript::Trait.new(Noscript::AST::Tuple.new({
       'foo' => @method_foo,
       'bar' => @method_bar
-    })
+    }))
   end
 
   def test_initialize
-    assert_equal({
+    assert_equal(Noscript::AST::Tuple.new({
       'foo' => @method_foo,
       'bar' => @method_bar
-    }, @trait.slots)
+    }), @trait.slots)
   end
 
   def test_implements

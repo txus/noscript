@@ -29,9 +29,9 @@ class ObjectTest < MiniTest::Unit::TestCase
   end
 
   def test_uses
-    trait = Noscript::Trait.new({
+    trait = Noscript::Trait.new(Noscript::AST::Tuple.new({
       'foo' => lambda { |*| Noscript::AST::Digit.new(3) }
-    })
+    }))
     @context.store_var('FooTrait', trait)
     @object.send('uses').call(@context, Noscript::AST::Identifier.new('FooTrait'))
 

@@ -6,11 +6,16 @@ module Noscript
       ctx = Context.new(context)
       ctx.current_receiver = context.current_receiver
 
+
       params.each_with_index do |param, idx|
-        if passed_value = args[idx]
+        if !(passed_value = args[idx]).nil?
 
           # Try to get the value from the context, or from the current receiver
-          compiled_value = passed_value.compile(ctx) || ctx.current_receiver.send(passed_value)
+          if !passed_value.compile(ctx).nil?
+            compiled_value = passed_value.compile(ctx)
+          else
+            compiled_value = ctx.current_receiver.send(passed_value)
+          end
 
           ctx.store_var(param.name, compiled_value)
         elsif param.is_a?(AST::DefaultParameter)

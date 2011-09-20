@@ -7,7 +7,7 @@ module Noscript
     end
 
     def implements?(message)
-      @slots.key?(message)
+      @slots.body.key?(message)
     end
   end
 end
