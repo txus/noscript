@@ -8,7 +8,11 @@ module Noscript
 
       params.each_with_index do |param, idx|
         if passed_value = args[idx]
-          ctx.store_var(param.name, passed_value.compile(ctx))
+
+          # Try to get the value from the context, or from the current receiver
+          compiled_value = passed_value.compile(ctx) || ctx.current_receiver.send(passed_value)
+
+          ctx.store_var(param.name, compiled_value)
         elsif param.is_a?(AST::DefaultParameter)
           ctx.store_var(param.name, param.value)
         else
@@ -16,6 +20,10 @@ module Noscript
         end
       end
       body.compile(ctx)
+    end
+
+    def compile(context)
+      self
     end
 
     private

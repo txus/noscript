@@ -19,6 +19,9 @@ module Noscript
           # rcv.a = 3 sets a slot on rcv to 3
           rcv = receiver.compile(context)
           rcv.add_slot(lhs.name, val)
+        elsif context.current_receiver && lhs.deref
+          # @foo = 'bar' sets a slot on the current receiver.foo to 'bar'
+          context.current_receiver.add_slot(lhs.name, val)
         else
           # a = 3 stores a local var
           context.store_var(lhs, val)
@@ -65,6 +68,19 @@ module Noscript
         end
       end
 
+      def send(message)
+        __send__ message.name
+      end
+
+      # Native methods must return an object that responds to #call.
+      # TOOD: Refactor this into something nicer.
+      define_method('starts with') do
+        lambda {|context, *args|
+          str = args.first
+          val =~ /^#{str.val}/
+        }
+      end
+
       def ==(other)
         val == other.val
       end
@@ -107,6 +123,8 @@ module Noscript
           ctx.current_receiver = rcv
 
           retval = rcv.send(name)
+        elsif ctx.current_receiver && name.deref
+          retval = ctx.current_receiver.send(name)
         else
           # foo() looks up a function in the global context
           retval = context.lookup_var(name)
@@ -124,7 +142,11 @@ module Noscript
       end
 
       def arguments
-        slot.arguments
+        if slot.respond_to?(:arguments)
+          slot.arguments
+        else
+          []
+        end
       end
 
       def call?

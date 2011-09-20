@@ -121,4 +121,23 @@ class MethodTest < MiniTest::Unit::TestCase
     assert_equal Noscript::AST::Digit.new(123), @method.call(@context)
   end
 
+  def test_method_with_dereferencing_on_the_call
+    # foo = -> bar=23
+    #   a = 3
+    #   74
+    #   bar
+    # end
+    #
+    # foo(@baz)
+    @method.body.nodes.push(
+      Noscript::AST::Identifier.new('bar')
+    )
+    object = Noscript::Object.new
+    object.add_slot('baz', Noscript::AST::Digit.new(123))
+
+    @context.current_receiver = object
+
+    assert_equal Noscript::AST::Digit.new(123), @method.call(@context, Noscript::AST::Identifier.new('baz', true))
+  end
+
 end

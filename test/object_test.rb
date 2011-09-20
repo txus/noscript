@@ -38,6 +38,20 @@ class ObjectTest < MiniTest::Unit::TestCase
     assert_equal Noscript::AST::Digit.new(3), @object.send('foo').call(@context)
   end
 
+  def test_each
+    results = {}
+    @fun = lambda { |ctx, k, v| results[k.to_s] = v.to_i * 2 }
+    def @fun.compile(*); self; end
+
+    @object.add_slot('foo', Noscript::AST::Digit.new(90))
+    @object.add_slot('bar', Noscript::AST::Digit.new(20))
+
+    @object.send('each').call(@context, @fun)
+
+    assert_equal 180, results['foo']
+    assert_equal 40, results['bar']
+  end
+
   def test_send_matches_child
     child = @object.clone
     child.slots['foo'] = 'bar'

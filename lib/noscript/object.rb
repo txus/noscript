@@ -4,6 +4,8 @@ module Noscript
     attr_accessor :slots
     attr_accessor :traits
 
+    PROTECTED_SLOTS = ['clone', 'uses', 'each']
+
     def initialize
       @parent = nil
       @slots  = {}
@@ -13,7 +15,10 @@ module Noscript
         child = Object.new
         child.parent = self
 
-        if context = args[0] && tuple = args[1]
+        context = args.shift
+        tuple = args.shift
+
+        if context && tuple
           tuple.compile(context).each do |k, v|
             child.slots[k] = v
           end
@@ -25,6 +30,18 @@ module Noscript
       add_slot('uses', lambda { |context, trait_name|
         trait = trait_name.compile(context)
         use_trait(trait)
+      })
+
+      add_slot('each', lambda { |context, fun|
+        yieldable = self.slots.delete_if do |k,v|
+          Object::PROTECTED_SLOTS.include?(k)
+        end
+
+        method = fun.compile(context)
+
+        yieldable.each do |slot|
+          method.call(context, AST::String.new(slot.first), slot.last)
+        end
       })
     end
 
