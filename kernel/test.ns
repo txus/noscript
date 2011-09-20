@@ -1,17 +1,55 @@
-Test = Object.clone()
+TestCase = Object.clone({
+  setup:    ->; end,
+  teardown: ->; end,
 
-Test.assert = -> value
-  if value != true
-    raise('Expected true, got #{value}.')
-  else
-    true
-  end
-end
+  errors: [],
 
-Test.assert equal = -> expected, actual
-  if expected != actual
-    raise('Expected #{expected}, got #{actual}.')
-  else
-    true
+  tests: 0,
+  assertions: 0,
+  failures: 0,
+
+  assert: -> value
+    if value != false
+      print('\e[32m.')
+    else
+      print('\e[31mF')
+      @errors.push('Expected #{value} to be truthy.')
+      @failures = @failures + 1
+    end
+    @assertions = @assertions + 1
+  end,
+
+  assert equal: -> expected, actual
+    if expected == actual
+      print('\e[32m.')
+    else
+      print('\e[31mF')
+      @errors.push('Expected #{expected}, got #{actual}.')
+      @failures = @failures + 1
+    end
+    @assertions = @assertions + 1
+  end,
+
+  print report: ->
+    puts('\n\n\e[0m#{@tests} tests, #{@assertions} assertions, #{@failures} failures')
+    puts('  Failure report:')
+    @errors.each(-> error
+      puts('    * #{error}')
+    end)
+  end,
+
+  run: ->
+    @setup()
+
+    @each(-> name, test
+      if name.starts with('it')
+        test()
+        @tests = @tests + 1
+      end
+    end)
+
+    @teardown()
+
+    @print report()
   end
-end
+})

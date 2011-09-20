@@ -2,41 +2,40 @@ require 'test_helper'
 
 class TestTest < MiniTest::Unit::TestCase
 
-  def test_assert_returns_true
+  def test_test
     code = <<-CODE
-    foo = true
-    Test.assert(foo)
+
+  MyTestCase = TestCase.clone({
+
+    setup: ->
+      @foo = 'bar'
+    end,
+
+    it does foo things: ->
+      @assert equal(@foo, 'bar')
+    end,
+
+    it does bar things: ->
+      @assert(true)
+    end,
+
+    it can fail too: ->
+      @assert(false)
+    end,
+
+    teardown: ->
+      @foo = nil
+    end
+
+  })
+
+  MyTestCase.run()
 CODE
 
-    assert_equal Noscript::AST::True.new, compiles(code)
-  end
-
-  def test_assert_raises
-    code = <<-CODE
-    foo = false
-    Test.assert(foo)
-CODE
-
-    assert_raises Noscript::AST::Exception do
+    expected = "\e[32m.\e[32m.\e[31mF\n\n\e[0m3 tests, 3 assertions, 1 failures\n  Failure report:\n    * Expected false to be truthy.\n"
+    assert_output expected do
       compiles(code)
     end
   end
 
-  def test_assert_equal_returns_true
-    code = <<-CODE
-    Test.assert equal(1, 1)
-CODE
-
-    assert_equal Noscript::AST::True.new, compiles(code)
-  end
-
-  def test_assert_equal_raises
-    code = <<-CODE
-    Test.assert equal(3, 2)
-CODE
-
-    assert_raises Noscript::AST::Exception do
-      compiles(code)
-    end
-  end
 end
