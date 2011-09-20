@@ -157,6 +157,9 @@ module Noscript
       end
     end
 
+    class Exception < StandardError
+    end
+
     class IfNode < Struct.new(:expression, :body, :else_body)
       def compile(context)
         result = expression.compile(context)

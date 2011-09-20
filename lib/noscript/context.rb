@@ -13,7 +13,7 @@ module Noscript
       })
 
       ctx.store_var('raise', lambda { |context, *args|
-        raise(RuntimeError, args.first.compile(context).to_s)
+        raise(AST::Exception, args.first.compile(context).to_s)
       })
 
       ctx.store_var('Object', Object.new)

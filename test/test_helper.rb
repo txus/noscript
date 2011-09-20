@@ -34,7 +34,7 @@ class MiniTest::Unit::TestCase
 
     parser = Noscript::Parser.new
     ast = parser.scan_str(input.strip)
-    result = ast.compile(Noscript::Context.bootstrap)
+    result = ast.compile(Noscript.bootstrap)
     if block_given?
       block.call(result)
     else
