@@ -9,9 +9,16 @@ module Noscript
       @slots  = {}
       @traits = []
 
-      add_slot('clone', lambda { |*|
+      add_slot('clone', lambda { |*args|
         child = Object.new
         child.parent = self
+
+        if context = args[0] && tuple = args[1]
+          tuple.compile(context).each do |k, v|
+            child.slots[k] = v
+          end
+        end
+
         child
       })
 

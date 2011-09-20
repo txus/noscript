@@ -14,6 +14,20 @@ class ObjectTest < MiniTest::Unit::TestCase
     assert_includes(child.slots.keys, 'clone')
   end
 
+  def test_clone_with_tuple
+    tuple = Noscript::AST::Tuple.new({
+      'foo' => Noscript::AST::Digit.new(99),
+      'bar' => Noscript::AST::String.new('hey'),
+    })
+    child = @object.send('clone').call(@context, tuple)
+
+    assert_equal(@object, child.parent)
+    assert_includes(child.slots.keys, 'clone')
+
+    assert_equal Noscript::AST::Digit.new(99), child.send('foo')
+    assert_equal Noscript::AST::String.new('hey'), child.send('bar')
+  end
+
   def test_uses
     trait = Noscript::Trait.new({
       'foo' => lambda { |*| Noscript::AST::Digit.new(3) }

@@ -27,6 +27,8 @@ class NoscriptTest < MiniTest::Unit::TestCase
     assert_equal [
       "running!",
       "10",
+      "vroom",
+      "99",
     ], output
   end
 

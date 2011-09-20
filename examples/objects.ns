@@ -4,6 +4,13 @@ vehicle.run = ->
   print('running!')
 end
 
-car = vehicle.clone()
+car = vehicle.clone({
+  sound: 'vroom',
+  price: 99
+})
+
 car.run()
+
 print(car.speed)
+print(car.sound)
+print(car.price)
