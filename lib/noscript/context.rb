@@ -1,11 +1,16 @@
 module Noscript
   class Context
+    attr_reader :parent
     def self.generate
       ctx = new
 
       # Define native ruby methods
-      ctx.store_var('print', lambda { |context, *args|
+      ctx.store_var('puts', lambda { |context, *args|
         puts *(args.map! {|a| a.compile(context).to_s })
+      })
+
+      ctx.store_var('print', lambda { |context, *args|
+        print *(args.map! {|a| a.compile(context).to_s }).join(' ')
       })
 
       ctx.store_var('trait', lambda { |context, *args|

@@ -11,19 +11,19 @@ bar = -> johnny=3
  (34 + johnny) * 3
 end
 
-print('Negative johnny is', -johnny)
+puts('Negative johnny is', -johnny)
 
-print(foo())
-print(foo(242))
+puts(foo())
+puts(foo(242))
 
 if bar() == 111
-  print(bar())
+  puts(bar())
 end
 
 if bar(242) == 728
-  print('wrong!')
+  puts('wrong!')
 else
-  print('cool!')
+  puts('cool!')
 end
 
 foo = 30
@@ -42,11 +42,11 @@ cool object.bar = -> a
   'baz'
 end
 
-print(cool object.foo)
-print(cool object.bar(3))
+puts(cool object.foo)
+puts(cool object.bar(3))
 
-print('Johnny is still', johnny)
+puts('Johnny is still', johnny)
 
-print(oh my god)
+puts(oh my god)
 
-print(myvar)
+puts(myvar)

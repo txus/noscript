@@ -1,6 +1,6 @@
 Runnable = trait({
   run: -> speed
-    print(@name, 'is running with traits at speed:', speed)
+    print(@name, 'is running with traits at speed', speed)
   end
 })
 
