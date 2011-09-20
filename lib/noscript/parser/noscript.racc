@@ -73,11 +73,12 @@ rule
               | op_member LTE_OP op_member { result = AST::LteExpression.new(val[0], val[2]) }
               | boolean_literal
 
-  boolean_literal : TRUE { result = AST::True.new }
-                  | FALSE { result = AST::False.new }
-                  | NIL { result = AST::Nil.new }
+  boolean_literal : TRUE { result = true }
+                  | FALSE { result = false }
+                  | NIL { result = nil }
 
   expression : boolean_exp
+             | message
              | LPAREN expression RPAREN
 
   statement : assignment

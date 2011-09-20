@@ -111,7 +111,7 @@ class NoscriptTest < MiniTest::Unit::TestCase
       """
     ].each do |code|
       compiles(code) do |retval|
-        assert_equal Noscript::AST::Digit.new('1'), retval
+        assert_equal Noscript::AST::Digit.new(0), retval
       end
     end
   end

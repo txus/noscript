@@ -64,6 +64,11 @@ module Noscript
           self
         end
       end
+
+      def ==(other)
+        val == other.val
+      end
+
       def to_s
         "#{val.to_s}"
       end
@@ -127,56 +132,23 @@ module Noscript
       end
     end
 
-    class Boolean
-      def self.from(ruby_bool)
-        !!ruby_bool ? True.new : False.new
-      end
-      def compile(context)
-        self
-      end
-      def ==(other)
-        Boolean.from(other.class == self.class)
-      end
-    end
-
-    class True < Boolean
-      def !@
-        False.new
-      end
-    end
-
-    class False < Boolean
-      def !@
-        True.new
-      end
-    end
-
-    class Nil
-      def compile(context)
-        self
-      end
-    end
-
     class Exception < StandardError
     end
 
     class IfNode < Struct.new(:expression, :body, :else_body)
       def compile(context)
         result = expression.compile(context)
-        if result.is_a?(True)
+        if result
           body.compile(context)
-        elsif result.is_a?(False) && else_body
+        elsif else_body
           else_body.compile(context)
-        elsif result.is_a?(False)
-        else
-          raise "Expression must return either true, false or nil"
         end
       end
     end
 
     class WhileNode < Struct.new(:expression, :body)
       def compile(context)
-        while expression.compile(context).is_a?(True)
+        while expression.compile(context)
           body.compile(context)
         end
       end
@@ -220,27 +192,27 @@ module Noscript
       # Boolean comparisons
 
       def <(num)
-        Boolean.from(to_i < num.to_i)
+        to_i < num.to_i
       end
 
       def >(num)
-        Boolean.from(to_i > num.to_i)
+        to_i > num.to_i
       end
 
       def >=(num)
-        Boolean.from(to_i >= num.to_i)
+        to_i >= num.to_i
       end
 
       def <=(num)
-        Boolean.from(to_i <= num.to_i)
+        to_i <= num.to_i
       end
 
       def ==(num)
-        Boolean.from(to_i == num.to_i)
+        to_i == num.to_i
       end
 
       def !=(num)
-        Boolean.from(to_i != num.to_i)
+        to_i != num.to_i
       end
     end
 
@@ -314,3 +286,7 @@ module Noscript
 
   end
 end
+
+class TrueClass; def compile(context); self; end; end;
+class FalseClass; def compile(context); self; end; end;
+class NilClass; def compile(context); self; end; end;
