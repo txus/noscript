@@ -35,12 +35,12 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
       multiplication = assignment.rhs
       assert_kind_of MultiplicationNode, multiplication
 
-      assert_equal Digit.new(4), multiplication.rhs
+      assert_equal Integer.new(4), multiplication.rhs
 
       parens_op = multiplication.lhs
       assert_kind_of AddNode, parens_op
-      assert_equal Digit.new(3), parens_op.lhs
-      assert_equal Digit.new(3), parens_op.rhs
+      assert_equal Integer.new(3), parens_op.lhs
+      assert_equal Integer.new(3), parens_op.rhs
     end
   end
 
@@ -54,7 +54,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
       assert_kind_of Assignment, other_assignment
 
       assert_equal Identifier.new('b'), other_assignment.lhs
-      assert_equal Digit.new(3), other_assignment.rhs
+      assert_equal Integer.new(3), other_assignment.rhs
     end
   end
 
@@ -66,7 +66,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
 
       message = assignment.rhs
       assert_kind_of Message, message
-      assert_equal Message.new(nil, FunCall.new(Identifier.new('foo'), [])), message
+      assert_equal Message.new(nil, FunctionCall.new(Identifier.new('foo'), [])), message
     end
   end
 
@@ -81,7 +81,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
       assert_equal [Identifier.new('b'), Identifier.new('c')], function.params
 
       body = function.body.nodes
-      assert_equal [Digit.new(3)], body
+      assert_equal [Integer.new(3)], body
     end
   end
 
@@ -91,7 +91,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
       assert_kind_of Assignment, assignment
 
       assert_equal Identifier.new('a'), assignment.lhs
-      assert_equal Digit.new(3), assignment.rhs
+      assert_equal Integer.new(3), assignment.rhs
     end
   end
 
@@ -101,7 +101,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
       assert_kind_of Assignment, assignment
 
       assert_equal Identifier.new('a'), assignment.lhs
-      assert_equal Digit.new(3), assignment.rhs
+      assert_equal Integer.new(3), assignment.rhs
     end
   end
 
@@ -113,7 +113,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
       assert_equal Identifier.new('a'), assignment.lhs
       assert_equal SubtractNode.new(
         Identifier.new('a'),
-        Digit.new(3)
+        Integer.new(3)
       ), assignment.rhs
     end
   end
@@ -125,7 +125,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
 
       assert_equal Identifier.new('foo'), assignment.receiver
       assert_equal Identifier.new('a'), assignment.lhs
-      assert_equal Digit.new(3), assignment.rhs
+      assert_equal Integer.new(3), assignment.rhs
     end
   end
 end

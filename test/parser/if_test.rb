@@ -13,9 +13,9 @@ class IfTest < MiniTest::Unit::TestCase
       exp = if_node.expression
       assert_kind_of EqualityExpression, exp
       assert_equal Identifier.new('foo'), exp.lhs
-      assert_equal Digit.new(3), exp.rhs
+      assert_equal Integer.new(3), exp.rhs
 
-      assert_equal [Digit.new(3)], if_node.body.nodes
+      assert_equal [Integer.new(3)], if_node.body.nodes
     end
   end
 
@@ -28,10 +28,10 @@ class IfTest < MiniTest::Unit::TestCase
       exp = if_node.expression
       assert_kind_of InequalityExpression, exp
       assert_equal Identifier.new('foo'), exp.lhs
-      assert_equal Digit.new(3), exp.rhs
+      assert_equal Integer.new(3), exp.rhs
 
-      assert_equal [Digit.new(3)], if_node.body.nodes
-      assert_equal [Digit.new(4)], if_node.else_body.nodes
+      assert_equal [Integer.new(3)], if_node.body.nodes
+      assert_equal [Integer.new(4)], if_node.else_body.nodes
     end
   end
 

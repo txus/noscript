@@ -67,7 +67,7 @@ class Parser < Racc::Parser
          action { [:NEWLINE, text] }
 
       when (text = @ss.scan(/\d+/))
-         action { [:DIGIT, text.to_i] }
+         action { [:INTEGER, text.to_i] }
 
       when (text = @ss.scan(/==/))
          action { [:EQUALS, text] }

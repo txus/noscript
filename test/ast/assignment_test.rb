@@ -10,29 +10,29 @@ class AssignmentTest < MiniTest::Unit::TestCase
     @node = Noscript::AST::Assignment.new(
       nil,
       Noscript::AST::Identifier.new('a'),
-      Noscript::AST::Digit.new(3)
+      Noscript::AST::Integer.new(3)
     )
 
     @node.compile(@context)
 
-    assert_equal Noscript::AST::Digit.new(3), @context.lookup_var('a')
+    assert_equal Noscript::AST::Integer.new(3), @context.lookup_var('a')
   end
 
   def test_expression_assignment
-    @context.store_var(:a, Noscript::AST::Digit.new(5))
+    @context.store_var(:a, Noscript::AST::Integer.new(5))
 
     @node = Noscript::AST::Assignment.new(
       nil,
       Noscript::AST::Identifier.new('a'),
       Noscript::AST::SubtractNode.new(
         Noscript::AST::Identifier.new('a'),
-        Noscript::AST::Digit.new('3'),
+        Noscript::AST::Integer.new('3'),
       )
     )
 
     @node.compile(@context)
 
-    assert_equal Noscript::AST::Digit.new(2), @context.lookup_var('a')
+    assert_equal Noscript::AST::Integer.new(2), @context.lookup_var('a')
   end
 
   def test_slot_assignment
@@ -42,11 +42,11 @@ class AssignmentTest < MiniTest::Unit::TestCase
     @node = Noscript::AST::Assignment.new(
       Noscript::AST::Identifier.new('foo'),
       Noscript::AST::Identifier.new('a'),
-      Noscript::AST::Digit.new('3'),
+      Noscript::AST::Integer.new('3'),
     )
 
     @node.compile(@context)
 
-    assert_equal Noscript::AST::Digit.new(3), @object.slots['a']
+    assert_equal Noscript::AST::Integer.new(3), @object.slots['a']
   end
 end

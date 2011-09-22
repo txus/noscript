@@ -18,7 +18,7 @@ class ArrayTest < MiniTest::Unit::TestCase
       array = nodes.first
 
       assert_kind_of Noscript::AST::Array, array
-      assert_equal([Digit.new(1)], array.body)
+      assert_equal([Integer.new(1)], array.body)
     end
   end
 
@@ -27,7 +27,7 @@ class ArrayTest < MiniTest::Unit::TestCase
       array = nodes.first
 
       assert_kind_of Noscript::AST::Array, array
-      assert_equal([Digit.new(1), Digit.new(2)], array.body)
+      assert_equal([Integer.new(1), Integer.new(2)], array.body)
     end
   end
 

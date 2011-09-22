@@ -16,7 +16,7 @@ class ObjectTest < MiniTest::Unit::TestCase
 
   def test_clone_with_tuple
     tuple = Noscript::AST::Tuple.new({
-      'foo' => Noscript::AST::Digit.new(99),
+      'foo' => Noscript::AST::Integer.new(99),
       'bar' => Noscript::AST::String.new('hey'),
     })
     child = @object.send('clone').call(@context, tuple)
@@ -24,18 +24,18 @@ class ObjectTest < MiniTest::Unit::TestCase
     assert_equal(@object, child.parent)
     assert_includes(child.slots.keys, 'clone')
 
-    assert_equal Noscript::AST::Digit.new(99), child.send('foo')
+    assert_equal Noscript::AST::Integer.new(99), child.send('foo')
     assert_equal Noscript::AST::String.new('hey'), child.send('bar')
   end
 
   def test_uses
     trait = Noscript::Trait.new(Noscript::AST::Tuple.new({
-      'foo' => lambda { |*| Noscript::AST::Digit.new(3) }
+      'foo' => lambda { |*| Noscript::AST::Integer.new(3) }
     }))
     @context.store_var('FooTrait', trait)
     @object.send('uses').call(@context, Noscript::AST::Identifier.new('FooTrait'))
 
-    assert_equal Noscript::AST::Digit.new(3), @object.send('foo').call(@context)
+    assert_equal Noscript::AST::Integer.new(3), @object.send('foo').call(@context)
   end
 
   def test_each
@@ -43,8 +43,8 @@ class ObjectTest < MiniTest::Unit::TestCase
     @fun = lambda { |ctx, k, v| results[k.to_s] = v.to_i * 2 }
     def @fun.compile(*); self; end
 
-    @object.add_slot('foo', Noscript::AST::Digit.new(90))
-    @object.add_slot('bar', Noscript::AST::Digit.new(20))
+    @object.add_slot('foo', Noscript::AST::Integer.new(90))
+    @object.add_slot('bar', Noscript::AST::Integer.new(20))
 
     @object.send('each').call(@context, @fun)
 

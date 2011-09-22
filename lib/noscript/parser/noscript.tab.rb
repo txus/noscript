@@ -412,7 +412,7 @@ racc_token_table = {
   :WHILE => 13,
   :IDENTIFIER => 14,
   :DEREF => 15,
-  :DIGIT => 16,
+  :INTEGER => 16,
   :STRING => 17,
   "{" => 18,
   "}" => 19,
@@ -471,7 +471,7 @@ Racc_token_to_s_table = [
   "WHILE",
   "IDENTIFIER",
   "DEREF",
-  "DIGIT",
+  "INTEGER",
   "STRING",
   "\"{\"",
   "\"}\"",
@@ -506,7 +506,7 @@ Racc_token_to_s_table = [
   "if_else",
   "expression",
   "while",
-  "digit",
+  "integer",
   "string",
   "tuple",
   "tuple_elements",
@@ -554,49 +554,49 @@ module_eval(<<'.,.,', 'noscript.racc', 17)
 
 module_eval(<<'.,.,', 'noscript.racc', 19)
   def _reduce_5(val, _values, result)
-     result = AST::Function.new(val[1], val[3]) 
+     result = AST::Function.new(val[1], val[3]); result.pos(filename, lineno) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 21)
   def _reduce_6(val, _values, result)
-     result = AST::Message.new(val[0], val[2]) 
+     result = AST::Message.new(val[0], val[2]); result.pos(filename, lineno) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 22)
   def _reduce_7(val, _values, result)
-     result = AST::Message.new(val[0], val[2]) 
+     result = AST::Message.new(val[0], val[2]); result.pos(filename, lineno) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 23)
   def _reduce_8(val, _values, result)
-     result = AST::Message.new(nil, val[0]) 
+     result = AST::Message.new(nil, val[0]); result.pos(filename, lineno) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 25)
   def _reduce_9(val, _values, result)
-     result = AST::IfNode.new(val[1], val[3], val[6]) 
+     result = AST::IfNode.new(val[1], val[3], val[6]); result.pos(filename, lineno) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 26)
   def _reduce_10(val, _values, result)
-     result = AST::IfNode.new(val[1], val[3]) 
+     result = AST::IfNode.new(val[1], val[3]); result.pos(filename, lineno) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 28)
   def _reduce_11(val, _values, result)
-     result = AST::WhileNode.new(val[1], val[3]) 
+     result = AST::WhileNode.new(val[1], val[3]); result.pos(filename, lineno) 
     result
   end
 .,.,
@@ -617,7 +617,7 @@ module_eval(<<'.,.,', 'noscript.racc', 31)
 
 module_eval(<<'.,.,', 'noscript.racc', 33)
   def _reduce_14(val, _values, result)
-     result = AST::Digit.new(val[0]) 
+     result = AST::Integer.new(val[0]); result.pos(filename, lineno) 
     result
   end
 .,.,
@@ -964,7 +964,7 @@ module_eval(<<'.,.,', 'noscript.racc', 117)
 
 module_eval(<<'.,.,', 'noscript.racc', 123)
   def _reduce_85(val, _values, result)
-                   result = AST::FunCall.new(val[0], val[2])
+                   result = AST::FunctionCall.new(val[0], val[2]); result.pos(filename, lineno)
              
     result
   end

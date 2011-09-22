@@ -11,11 +11,11 @@ class MessageTest < MiniTest::Unit::TestCase
 
       # BODY
       Noscript::AST::Nodes.new([
-        Noscript::AST::Digit.new(74)
+        Noscript::AST::Integer.new(74)
       ])
     )
     @object.add_slot('bar', @function)
-    @object.add_slot('baz', Digit.new(99))
+    @object.add_slot('baz', Integer.new(99))
     @context.store_var('foo', @object)
   end
 
@@ -35,14 +35,14 @@ class MessageTest < MiniTest::Unit::TestCase
     # foo.bar(9)
     @message = Noscript::AST::Message.new(
       Noscript::AST::Identifier.new('foo'),
-      Noscript::AST::FunCall.new(
+      Noscript::AST::FunctionCall.new(
         Identifier.new('bar'),
-        [Digit.new(9)]
+        [Integer.new(9)]
       )
     )
 
     retval = @message.compile(@context)
 
-    assert_equal Digit.new(74), retval
+    assert_equal Integer.new(74), retval
   end
 end

@@ -9,7 +9,7 @@ class TraitTest < MiniTest::Unit::TestCase
 
       # Body
       Noscript::AST::Nodes.new([
-        Noscript::AST::Digit.new(3)
+        Noscript::AST::Integer.new(3)
       ])
     )
 
@@ -19,7 +19,7 @@ class TraitTest < MiniTest::Unit::TestCase
 
       # Body
       Noscript::AST::Nodes.new([
-        Noscript::AST::Digit.new(10)
+        Noscript::AST::Integer.new(10)
       ])
     )
 

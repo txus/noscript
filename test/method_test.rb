@@ -16,7 +16,7 @@ class FunctionTest < MiniTest::Unit::TestCase
       [
         Noscript::AST::DefaultParameter.new(
           Noscript::AST::Identifier.new('bar'),
-          Noscript::AST::Digit.new(23)
+          Noscript::AST::Integer.new(23)
         )
       ],
 
@@ -25,15 +25,15 @@ class FunctionTest < MiniTest::Unit::TestCase
         Noscript::AST::Assignment.new(
           nil,
           Noscript::AST::Identifier.new('a'),
-          Noscript::AST::Digit.new(3)
+          Noscript::AST::Integer.new(3)
         ),
-        Noscript::AST::Digit.new(74)
+        Noscript::AST::Integer.new(74)
       ])
     )
   end
 
   def test_method_returns_last_value
-    assert_equal Noscript::AST::Digit.new(74), @method.call(@context)
+    assert_equal Noscript::AST::Integer.new(74), @method.call(@context)
   end
 
   def test_method_local_scope
@@ -49,10 +49,10 @@ class FunctionTest < MiniTest::Unit::TestCase
     @method.body.nodes.push(
       Noscript::AST::AddNode.new(
         Noscript::AST::Identifier.new('bar'),
-        Noscript::AST::Digit.new(2),
+        Noscript::AST::Integer.new(2),
       )
     )
-    assert_equal Noscript::AST::Digit.new(25), @method.call(@context)
+    assert_equal Noscript::AST::Integer.new(25), @method.call(@context)
   end
 
   def test_method_overriding_default_param
@@ -63,10 +63,10 @@ class FunctionTest < MiniTest::Unit::TestCase
     @method.body.nodes.push(
       Noscript::AST::AddNode.new(
         Noscript::AST::Identifier.new('bar'),
-        Noscript::AST::Digit.new(2),
+        Noscript::AST::Integer.new(2),
       )
     )
-    assert_equal Noscript::AST::Digit.new(100), @method.call(@context, Noscript::AST::Digit.new(98))
+    assert_equal Noscript::AST::Integer.new(100), @method.call(@context, Noscript::AST::Integer.new(98))
   end
 
   def test_method_using_local_var
@@ -77,10 +77,10 @@ class FunctionTest < MiniTest::Unit::TestCase
     @method.body.nodes.push(
       Noscript::AST::AddNode.new(
         Noscript::AST::Identifier.new('a'),
-        Noscript::AST::Digit.new(2),
+        Noscript::AST::Integer.new(2),
       )
     )
-    assert_equal Noscript::AST::Digit.new(5), @method.call(@context)
+    assert_equal Noscript::AST::Integer.new(5), @method.call(@context)
   end
 
   def test_method_with_too_few_arguments
@@ -100,7 +100,7 @@ class FunctionTest < MiniTest::Unit::TestCase
 
   def test_method_with_too_many_arguments
     assert_raises RuntimeError, "This function expected 1 arguments, not 2" do
-      @method.call(@context, Noscript::AST::Digit.new(10), Noscript::AST::Digit.new(9))
+      @method.call(@context, Noscript::AST::Integer.new(10), Noscript::AST::Integer.new(9))
     end
   end
 
@@ -114,11 +114,11 @@ class FunctionTest < MiniTest::Unit::TestCase
       Noscript::AST::Identifier.new('foo', true)
     )
     object = Noscript::Object.new
-    object.add_slot('foo', Noscript::AST::Digit.new(123))
+    object.add_slot('foo', Noscript::AST::Integer.new(123))
 
     @context.current_receiver = object
 
-    assert_equal Noscript::AST::Digit.new(123), @method.call(@context)
+    assert_equal Noscript::AST::Integer.new(123), @method.call(@context)
   end
 
   def test_method_with_dereferencing_on_the_call
@@ -133,11 +133,11 @@ class FunctionTest < MiniTest::Unit::TestCase
       Noscript::AST::Identifier.new('bar')
     )
     object = Noscript::Object.new
-    object.add_slot('baz', Noscript::AST::Digit.new(123))
+    object.add_slot('baz', Noscript::AST::Integer.new(123))
 
     @context.current_receiver = object
 
-    assert_equal Noscript::AST::Digit.new(123), @method.call(@context, Noscript::AST::Identifier.new('baz', true))
+    assert_equal Noscript::AST::Integer.new(123), @method.call(@context, Noscript::AST::Identifier.new('baz', true))
   end
 
 end

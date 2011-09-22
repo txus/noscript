@@ -9,7 +9,7 @@ macro
   BLANK         [\ ]
 rule
   [\n]+[\s]*    { [:NEWLINE, text] }
-  \d+           { [:DIGIT, text.to_i] }
+  \d+           { [:INTEGER, text.to_i] }
 
   ==            { [:EQUALS, text] }
   !=            { [:NEQUALS, text] }

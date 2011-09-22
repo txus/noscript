@@ -12,7 +12,7 @@ class FunctionTest < MiniTest::Unit::TestCase
       assert_equal [], fun.params
 
       body = fun.body.nodes
-      assert_equal [Digit.new(3)], body
+      assert_equal [Integer.new(3)], body
     end
   end
 
@@ -24,7 +24,7 @@ class FunctionTest < MiniTest::Unit::TestCase
       assert_equal [Identifier.new('bar')], fun.params
 
       body = fun.body.nodes
-      assert_equal [Digit.new(3)], body
+      assert_equal [Integer.new(3)], body
     end
   end
 
@@ -36,7 +36,7 @@ class FunctionTest < MiniTest::Unit::TestCase
       assert_equal [Identifier.new('bar'), Identifier.new('baz')], fun.params
 
       body = fun.body.nodes
-      assert_equal [Digit.new(3)], body
+      assert_equal [Integer.new(3)], body
     end
   end
 
@@ -54,7 +54,7 @@ class FunctionTest < MiniTest::Unit::TestCase
       ], fun.params
 
       body = fun.body.nodes
-      assert_equal [Digit.new(3)], body
+      assert_equal [Integer.new(3)], body
     end
   end
 end

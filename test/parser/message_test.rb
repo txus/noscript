@@ -21,7 +21,7 @@ class MessageTest < MiniTest::Unit::TestCase
 
       assert_kind_of Message, message
       assert_equal Identifier.new('a'), message.receiver
-      assert_equal FunCall.new(Identifier.new('foo'), []), message.slot
+      assert_equal FunctionCall.new(Identifier.new('foo'), []), message.slot
       assert message.call?
     end
   end
@@ -32,11 +32,11 @@ class MessageTest < MiniTest::Unit::TestCase
 
       assert_kind_of Message, message
       assert_equal Identifier.new('a'), message.receiver
-      assert_equal FunCall.new(
+      assert_equal FunctionCall.new(
         Identifier.new('foo'),
         [
           String.new('hey'),
-          Digit.new(34)
+          Integer.new(34)
         ]
       ), message.slot
       assert message.call?

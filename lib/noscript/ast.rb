@@ -49,9 +49,9 @@ module Noscript
 
       def compile(context)
         val = rhs.compile(context)
-        if receiver
+        if @receiver
           # rcv.a = 3 sets a slot on rcv to 3
-          rcv = receiver.compile(context)
+          rcv = @receiver.compile(context)
           rcv.add_slot(lhs.name, val)
         elsif context.current_receiver && lhs.deref
           # @foo = 'bar' sets a slot on the current receiver.foo to 'bar'
@@ -237,20 +237,34 @@ module Noscript
       end
     end
 
-    class FunCall < Struct.new(:name, :arguments)
+    class FunctionCall < Node
+      attr_reader :name, :arguments
+
+      def initialize(name, arguments)
+        @name = name
+        @arguments = arguments
+      end
+
       def compile(context)
         self
       end
     end
 
-    class Message < Struct.new(:receiver, :slot)
+    class Message < Node
+      attr_reader :receiver, :slot
+
+      def initialize(receiver, slot)
+        @receiver = receiver
+        @slot = slot
+      end
+
       def compile(context)
         ctx = Context.new(context)
         ctx.current_receiver = context.current_receiver
 
-        if receiver
+        if @receiver
           # rcv.foo() looks up the message in the receiver slots
-          rcv = receiver.compile(context)
+          rcv = @receiver.compile(context)
 
           # Save a reference to the current receiver
           ctx.current_receiver = rcv
@@ -283,25 +297,37 @@ module Noscript
       end
 
       def call?
-        slot.is_a?(FunCall)
+        slot.is_a?(FunctionCall)
       end
     end
 
-    class Exception < StandardError
-    end
+    class IfNode < Node
+      attr_reader :expression, :body, :else_body
 
-    class IfNode < Struct.new(:expression, :body, :else_body)
+      def initialize(expression, body, else_body=nil)
+        @expression = expression
+        @body = body
+        @else_body = else_body
+      end
+
       def compile(context)
-        result = expression.compile(context)
+        result = @expression.compile(context)
         if result
-          body.compile(context)
+          @body.compile(context)
         elsif else_body
-          else_body.compile(context)
+          @else_body.compile(context)
         end
       end
     end
 
-    class WhileNode < Struct.new(:expression, :body)
+    class WhileNode < Node
+      attr_reader :expression, :body
+
+      def initialize(expression, body)
+        @expression = expression
+        @body = body
+      end
+
       def compile(context)
         while expression.compile(context)
           body.compile(context)
@@ -311,25 +337,31 @@ module Noscript
 
     ## ARITHMETIC
 
-    class Digit < Struct.new(:val)
+    class Integer < Node
+      attr_reader :value
+
+      def initialize(value)
+        @value = value
+      end
+
       def -@
-        Digit.new(-to_i)
+        Integer.new(-to_i)
       end
 
       def +(num)
-        Digit.new num.to_i + to_i
+        Integer.new num.to_i + to_i
       end
 
       def -(num)
-        Digit.new to_i - num.to_i
+        Integer.new to_i - num.to_i
       end
 
       def *(num)
-        Digit.new to_i * num.to_i
+        Integer.new to_i * num.to_i
       end
 
       def /(num)
-        Digit.new to_i / num.to_i
+        Integer.new to_i / num.to_i
       end
 
       def compile(context)
@@ -337,11 +369,11 @@ module Noscript
       end
 
       def to_s
-        val.to_s
+        @value.to_s
       end
 
       def to_i
-        val.to_i
+        @value.to_i
       end
 
       # Boolean comparisons
@@ -371,72 +403,89 @@ module Noscript
       end
     end
 
-    class AddNode < Struct.new(:lhs, :rhs)
+    class BinaryOperation < Node
+      attr_reader :lhs, :rhs
+
+      def initialize(lhs, rhs)
+        @lhs = lhs
+        @rhs = rhs
+      end
+    end
+
+    class UnaryMinus < Node
+      attr_reader :value
+      def initialize(value)
+        @value = value
+      end
+
+      def compile(context)
+        -(value.compile(context))
+      end
+    end
+
+    class AddNode < BinaryOperation
       def compile(context)
         lhs.compile(context) + rhs.compile(context)
       end
     end
 
-    class SubtractNode < Struct.new(:lhs, :rhs)
+    class SubtractNode < BinaryOperation
       def compile(context)
         lhs.compile(context) - rhs.compile(context)
       end
     end
 
-    class MultiplicationNode < Struct.new(:lhs, :rhs)
+    class MultiplicationNode < BinaryOperation
       def compile(context)
         lhs.compile(context) * rhs.compile(context)
       end
     end
 
-    class DivisionNode < Struct.new(:lhs, :rhs)
+    class DivisionNode < BinaryOperation
       def compile(context)
         lhs.compile(context) / rhs.compile(context)
       end
     end
 
-    class UnaryMinus < Struct.new(:val)
-      def compile(context)
-        -(val.compile(context))
-      end
-    end
-
     # Boolean expressions
 
-    class EqualityExpression < Struct.new(:lhs, :rhs)
+    class EqualityExpression < BinaryOperation
       def compile(context)
         lhs.compile(context) == rhs.compile(context)
       end
     end
 
-    class InequalityExpression < Struct.new(:lhs, :rhs)
+    class InequalityExpression < BinaryOperation
       def compile(context)
         !(lhs.compile(context) == rhs.compile(context))
       end
     end
 
-    class GtExpression < Struct.new(:lhs, :rhs)
+    class GtExpression < BinaryOperation
       def compile(context)
         lhs.compile(context) > rhs.compile(context)
       end
     end
 
-    class GteExpression < Struct.new(:lhs, :rhs)
+    class GteExpression < BinaryOperation
       def compile(context)
         lhs.compile(context) >= rhs.compile(context)
       end
     end
 
-    class LtExpression < Struct.new(:lhs, :rhs)
+    class LtExpression < BinaryOperation
       def compile(context)
         lhs.compile(context) < rhs.compile(context)
       end
     end
 
-    class LteExpression < Struct.new(:lhs, :rhs)
+    class LteExpression < BinaryOperation
       def compile(context)
         lhs.compile(context) <= rhs.compile(context)
       end
+    end
+
+    class Exception < StandardError
     end
 
   end

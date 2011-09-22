@@ -18,7 +18,7 @@ class TupleTest < MiniTest::Unit::TestCase
       tuple = nodes.first
 
       assert_kind_of Tuple, tuple
-      assert_equal({'a' => Digit.new(1)}, tuple.body)
+      assert_equal({'a' => Integer.new(1)}, tuple.body)
     end
   end
 
@@ -27,7 +27,7 @@ class TupleTest < MiniTest::Unit::TestCase
       tuple = nodes.first
 
       assert_kind_of Tuple, tuple
-      assert_equal({'a' => Digit.new(1), 'b' => Digit.new(2)}, tuple.body)
+      assert_equal({'a' => Integer.new(1), 'b' => Integer.new(2)}, tuple.body)
     end
   end
 

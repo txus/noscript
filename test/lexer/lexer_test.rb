@@ -15,8 +15,8 @@ class LexerTest < MiniTest::Unit::TestCase
   end
 
   def test_digit
-    tokenizes "3", [[:DIGIT, 3]]
-    tokenizes "3234", [[:DIGIT, 3234]]
+    tokenizes "3", [[:INTEGER, 3]]
+    tokenizes "3234", [[:INTEGER, 3234]]
   end
 
   def test_assign

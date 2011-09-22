@@ -4,7 +4,7 @@ class StringInterpolationTest < MiniTest::Unit::TestCase
 
   def setup
     @context = Noscript::Context.new
-    @context.store_var('foo', Noscript::AST::Digit.new(3))
+    @context.store_var('foo', Noscript::AST::Integer.new(3))
   end
 
   def test_string_interpolation

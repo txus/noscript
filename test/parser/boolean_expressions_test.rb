@@ -10,7 +10,7 @@ class BooleanExpressionsTest < MiniTest::Unit::TestCase
 
       assert_kind_of EqualityExpression, exp
       assert_equal Identifier.new('foo'), exp.lhs
-      assert_equal Digit.new(3), exp.rhs
+      assert_equal Integer.new(3), exp.rhs
     end
   end
 
@@ -20,7 +20,7 @@ class BooleanExpressionsTest < MiniTest::Unit::TestCase
 
       assert_kind_of InequalityExpression, exp
       assert_equal Identifier.new('foo'), exp.lhs
-      assert_equal Digit.new(3), exp.rhs
+      assert_equal Integer.new(3), exp.rhs
     end
   end
 
@@ -30,7 +30,7 @@ class BooleanExpressionsTest < MiniTest::Unit::TestCase
 
       assert_kind_of GtExpression, exp
       assert_equal Identifier.new('foo'), exp.lhs
-      assert_equal Digit.new(3), exp.rhs
+      assert_equal Integer.new(3), exp.rhs
     end
   end
 
@@ -40,7 +40,7 @@ class BooleanExpressionsTest < MiniTest::Unit::TestCase
 
       assert_kind_of GteExpression, exp
       assert_equal Identifier.new('foo'), exp.lhs
-      assert_equal Digit.new(3), exp.rhs
+      assert_equal Integer.new(3), exp.rhs
     end
   end
 
@@ -50,7 +50,7 @@ class BooleanExpressionsTest < MiniTest::Unit::TestCase
 
       assert_kind_of LtExpression, exp
       assert_equal Identifier.new('foo'), exp.lhs
-      assert_equal Digit.new(3), exp.rhs
+      assert_equal Integer.new(3), exp.rhs
     end
   end
 
@@ -60,7 +60,7 @@ class BooleanExpressionsTest < MiniTest::Unit::TestCase
 
       assert_kind_of LteExpression, exp
       assert_equal Identifier.new('foo'), exp.lhs
-      assert_equal Digit.new(3), exp.rhs
+      assert_equal Integer.new(3), exp.rhs
     end
   end
 

@@ -22,7 +22,7 @@ class MessageTest < MiniTest::Unit::TestCase
       assert_kind_of Message, message
       refute message.receiver
       assert_equal Identifier.new('foo'), message.name
-      assert_equal [String.new('hey'), Digit.new(34)], message.arguments
+      assert_equal [String.new('hey'), Integer.new(34)], message.arguments
     end
   end
 
@@ -36,10 +36,10 @@ class MessageTest < MiniTest::Unit::TestCase
       assert_equal Identifier.new('foo'), message.name
       assert_equal [
         MultiplicationNode.new(
-          Digit.new(3),
-          Digit.new(2)
+          Integer.new(3),
+          Integer.new(2)
         ),
-        Digit.new(9)
+        Integer.new(9)
       ], message.arguments
     end
   end
