@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class FunTest < MiniTest::Unit::TestCase
+class FunctionTest < MiniTest::Unit::TestCase
 
   include Noscript::AST
 
@@ -8,32 +8,32 @@ class FunTest < MiniTest::Unit::TestCase
     parses "->\n 3\n end" do |nodes|
       fun = nodes.first
 
-      assert_kind_of FunNode, fun
-      assert_equal [], fun.arguments
+      assert_kind_of Function, fun
+      assert_equal [], fun.params
 
       body = fun.body.nodes
       assert_equal [Digit.new(3)], body
     end
   end
 
-  def test_fun_with_one_argument
+  def test_fun_with_one_param
     parses "-> bar; 3; end" do |nodes|
       fun = nodes.first
 
-      assert_kind_of FunNode, fun
-      assert_equal [Identifier.new('bar')], fun.arguments
+      assert_kind_of Function, fun
+      assert_equal [Identifier.new('bar')], fun.params
 
       body = fun.body.nodes
       assert_equal [Digit.new(3)], body
     end
   end
 
-  def test_fun_with_multiple_arguments
+  def test_fun_with_multiple_params
     parses "-> bar, baz; 3; end" do |nodes|
       fun = nodes.first
 
-      assert_kind_of FunNode, fun
-      assert_equal [Identifier.new('bar'), Identifier.new('baz')], fun.arguments
+      assert_kind_of Function, fun
+      assert_equal [Identifier.new('bar'), Identifier.new('baz')], fun.params
 
       body = fun.body.nodes
       assert_equal [Digit.new(3)], body
@@ -44,14 +44,14 @@ class FunTest < MiniTest::Unit::TestCase
     parses "-> bar, baz='ho'; 3; end" do |nodes|
       fun = nodes.first
 
-      assert_kind_of FunNode, fun
+      assert_kind_of Function, fun
       assert_equal [
         Identifier.new('bar'),
         DefaultParameter.new(
           Identifier.new('baz'),
           String.new('ho')
         )
-      ], fun.arguments
+      ], fun.params
 
       body = fun.body.nodes
       assert_equal [Digit.new(3)], body

@@ -15,7 +15,7 @@ class IfTest < MiniTest::Unit::TestCase
       assert_equal Identifier.new('foo'), exp.lhs
       assert_equal Digit.new(3), exp.rhs
 
-      assert_equal Nodes.new([Digit.new(3)]), if_node.body
+      assert_equal [Digit.new(3)], if_node.body.nodes
     end
   end
 
@@ -30,8 +30,8 @@ class IfTest < MiniTest::Unit::TestCase
       assert_equal Identifier.new('foo'), exp.lhs
       assert_equal Digit.new(3), exp.rhs
 
-      assert_equal Nodes.new([Digit.new(3)]), if_node.body
-      assert_equal Nodes.new([Digit.new(4)]), if_node.else_body
+      assert_equal [Digit.new(3)], if_node.body.nodes
+      assert_equal [Digit.new(4)], if_node.else_body.nodes
     end
   end
 

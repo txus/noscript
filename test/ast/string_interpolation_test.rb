@@ -11,6 +11,6 @@ class StringInterpolationTest < MiniTest::Unit::TestCase
     @string = Noscript::AST::String.new(
       'Hello people, we just bought #{foo} interpolations'
     )
-    assert_equal "Hello people, we just bought 3 interpolations", @string.compile(@context).val
+    assert_equal "Hello people, we just bought 3 interpolations", @string.compile(@context).to_s
   end
 end

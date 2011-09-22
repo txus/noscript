@@ -3,7 +3,7 @@ require 'test_helper'
 class TraitTest < MiniTest::Unit::TestCase
 
   def setup
-    @method_foo = Noscript::Method.new(
+    @method_foo = Noscript::AST::Function.new(
       # Params
       [Noscript::AST::Identifier.new('foo')],
 
@@ -13,7 +13,7 @@ class TraitTest < MiniTest::Unit::TestCase
       ])
     )
 
-    @method_bar = Noscript::Method.new(
+    @method_bar = Noscript::AST::Function.new(
       # Params
       [],
 

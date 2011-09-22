@@ -540,21 +540,21 @@ module_eval(<<'.,.,', 'noscript.racc', 14)
 
 module_eval(<<'.,.,', 'noscript.racc', 16)
   def _reduce_3(val, _values, result)
-     result = AST::AssignNode.new(val[0], val[2], val[4]) 
+     result = AST::Assignment.new(val[0], val[2], val[4]); result.pos(filename, lineno) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 17)
   def _reduce_4(val, _values, result)
-     result = AST::AssignNode.new(nil, val[0], val[2]) 
+     result = AST::Assignment.new(nil, val[0], val[2]); result.pos(filename, lineno) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 19)
   def _reduce_5(val, _values, result)
-     result = AST::FunNode.new(val[1], val[3]) 
+     result = AST::Function.new(val[1], val[3]) 
     result
   end
 .,.,
@@ -603,14 +603,14 @@ module_eval(<<'.,.,', 'noscript.racc', 28)
 
 module_eval(<<'.,.,', 'noscript.racc', 30)
   def _reduce_12(val, _values, result)
-     result = AST::Identifier.new(val[0]) 
+     result = AST::Identifier.new(val[0]); result.pos(filename, lineno) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 31)
   def _reduce_13(val, _values, result)
-     result = AST::Identifier.new(val[0], true)
+     result = AST::Identifier.new(val[0], true); result.pos(filename, lineno) 
     result
   end
 .,.,
@@ -624,21 +624,21 @@ module_eval(<<'.,.,', 'noscript.racc', 33)
 
 module_eval(<<'.,.,', 'noscript.racc', 34)
   def _reduce_15(val, _values, result)
-     result = AST::String.new(val[0]) 
+     result = AST::String.new(val[0]); result.pos(filename, lineno) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 35)
   def _reduce_16(val, _values, result)
-     result = AST::Tuple.new(val[1]) 
+     result = AST::Tuple.new(val[1]); result.pos(filename, lineno) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 36)
   def _reduce_17(val, _values, result)
-     result = AST::Array.new(val[1]) 
+     result = AST::Array.new(val[1]); result.pos(filename, lineno) 
     result
   end
 .,.,
@@ -715,7 +715,7 @@ module_eval(<<'.,.,', 'noscript.racc', 50)
 
 module_eval(<<'.,.,', 'noscript.racc', 51)
   def _reduce_28(val, _values, result)
-     result = [].push(val[0]) 
+     result = [val[0]] 
     result
   end
 .,.,
@@ -770,7 +770,7 @@ module_eval(<<'.,.,', 'noscript.racc', 68)
 
 module_eval(<<'.,.,', 'noscript.racc', 70)
   def _reduce_43(val, _values, result)
-     result = AST::DefaultParameter.new(val[0], val[2])
+     result = AST::DefaultParameter.new(val[0], val[2]); result.pos(filename, lineno)
     result
   end
 .,.,
@@ -939,21 +939,21 @@ module_eval(<<'.,.,', 'noscript.racc', 113)
 
 module_eval(<<'.,.,', 'noscript.racc', 115)
   def _reduce_80(val, _values, result)
-     result = AST::Nodes.new([]) 
+     result = AST::Nodes.new([]); result.pos(filename, lineno) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 116)
   def _reduce_81(val, _values, result)
-     result = AST::Nodes.new([val[0]]) 
+     result = AST::Nodes.new([val[0]]); result.pos(filename, lineno) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.racc', 117)
   def _reduce_82(val, _values, result)
-     result.push(val[1]) 
+     result << val[1] 
     result
   end
 .,.,

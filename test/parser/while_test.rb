@@ -15,7 +15,7 @@ class WhileTest < MiniTest::Unit::TestCase
       assert_equal Identifier.new('foo'), exp.lhs
       assert_equal Digit.new(3), exp.rhs
 
-      assert_equal Nodes.new([Digit.new(3)]), while_node.body
+      assert_equal [Digit.new(3)], while_node.body.nodes
     end
   end
 

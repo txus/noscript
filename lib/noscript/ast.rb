@@ -1,18 +1,52 @@
 module Noscript
   module AST
-    class Nodes < Struct.new(:nodes)
-      def push(element)
-        nodes << element
+
+    class Node
+      attr_reader :filename, :line
+
+      def pos(filename, line)
+        @filename = filename
+        @line = line
       end
 
-      def compile(context)
-        nodes.map do |node|
-          node.compile(context)
-        end.last
+      def ==(other)
+        instance_variables.all? do |ivar|
+          instance_variable_get(ivar) == other.instance_variable_get(ivar)
+        end
       end
     end
 
-    class AssignNode < Struct.new(:receiver, :lhs, :rhs)
+    class Nodes < Node
+      attr_reader :nodes
+
+      def initialize(nodes)
+        @nodes = nodes
+      end
+
+      def <<(element)
+        @nodes << element
+      end
+
+      def compile(context)
+        @nodes.map do |node|
+          node.compile(context)
+        end.last
+      end
+
+      def to_s
+        "[#{@nodes.map(&:to_s).join(', ')}]"
+      end
+    end
+
+    class Assignment < Node
+      attr_reader :receiver, :lhs, :rhs
+
+      def initialize(receiver, lhs, rhs)
+        @receiver = receiver
+        @lhs = lhs
+        @rhs = rhs
+      end
+
       def compile(context)
         val = rhs.compile(context)
         if receiver
@@ -30,7 +64,14 @@ module Noscript
       end
     end
 
-    class Identifier < Struct.new(:name, :deref)
+    class Identifier < Node
+      attr_reader :name, :deref
+
+      def initialize(name, deref=false)
+        @name = name
+        @deref = deref
+      end
+
       def compile(context)
         if deref
           context.current_receiver.send(name)
@@ -38,31 +79,47 @@ module Noscript
           context.lookup_var(name)
         end
       end
+
       def to_s
         name
       end
     end
 
-    class DefaultParameter < Struct.new(:name, :value)
+    class DefaultParameter < Node
+      attr_reader :name, :value
+
+      def initialize(name, value)
+        @name = name
+        @value = value
+      end
+
       def compile(context)
         value
       end
+
       def to_s
         name
       end
     end
 
-    class String < Struct.new(:val)
+    class String < Node
+      attr_reader :value, :interpolated
+
       INTERPOLATION_REGEX = /\#{([^}]*)\}/
 
+      def initialize(value, interpolated=false)
+        @value = value
+        @interpolated = !!@value.scan(INTERPOLATION_REGEX)
+      end
+
       def compile(context)
-        if val.scan(INTERPOLATION_REGEX)
+        if @interpolated
           parser = Noscript::Parser.new
-          interpolated = val.gsub(/\#{([^}]*)\}/) do
+          interpolated_string = value.gsub(/\#{([^}]*)\}/) do
             parser.scan_str($1).compile(context).to_s
           end
 
-          String.new(interpolated)
+          String.new(interpolated_string)
         else
           self
         end
@@ -77,30 +134,38 @@ module Noscript
       define_method('starts with') do
         lambda {|context, *args|
           str = args.first
-          val =~ /^#{str.val}/
+          value =~ /^#{str.value}/
         }
       end
 
-      def ==(other)
-        val == other.val
-      end
-
       def to_s
-        eval("\"#{val}\"")
+        eval("\"#{value}\"")
       end
     end
 
-    class Tuple < Struct.new(:body)
+    class Tuple < Node
+      attr_reader :body
+
+      def initialize(body)
+        @body = body
+      end
+
       def compile(context)
-        Tuple.new(body.inject({}) do |a,e|
-          a.update(e.first.to_s => e.last.compile(context))
+        Tuple.new(@body.inject({}) do |acc, elem|
+          acc.update(elem.first.to_s => elem.last.compile(context))
         end)
       end
     end
 
-    class Array < Struct.new(:body)
+    class Array < Node
+      attr_reader :body
+
+      def initialize(body)
+        @body = body
+      end
+
       def compile(context)
-        Array.new(body.map do |element|
+        Array.new(@body.map do |element|
           element.compile(context)
         end)
       end
@@ -112,7 +177,7 @@ module Noscript
       define_method('push') do
         lambda {|context, *args|
           element = args.first
-          body.push(element.compile(context))
+          @body.push(element.compile(context))
         }
       end
 
@@ -120,16 +185,55 @@ module Noscript
         lambda { |context, fun|
           method = fun.compile(context)
 
-          body.each do |element|
+          @body.each do |element|
             method.call(context, element)
           end
         }
       end
     end
 
-    class FunNode < Struct.new(:arguments, :body)
+    class Function < Node
+      attr_reader :params, :body
+
+      def initialize(params, body)
+        @params = params
+        @body = body
+      end
+
+      def call(context, *args)
+        raise_argument_error(args) if args.size > params.size
+
+        ctx = Context.new(context)
+        ctx.current_receiver = context.current_receiver
+
+        params.each_with_index do |param, idx|
+          if !(passed_value = args[idx]).nil?
+
+            # Try to get the value from the context, or from the current receiver
+            if !passed_value.compile(ctx).nil?
+              compiled_value = passed_value.compile(ctx)
+            else
+              compiled_value = ctx.current_receiver.send(passed_value)
+            end
+
+            ctx.store_var(param.name, compiled_value)
+          elsif param.is_a?(AST::DefaultParameter)
+            ctx.store_var(param.name, param.value)
+          else
+            raise_argument_error(args)
+          end
+        end
+        body.compile(ctx)
+      end
+
       def compile(context)
-        Method.new(arguments, body)
+        self
+      end
+
+      private
+
+      def raise_argument_error(args)
+        raise "This function expected #{params.size} arguments, not #{args.size}"
       end
     end
 

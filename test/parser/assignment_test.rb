@@ -8,7 +8,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     parses "a = 'foo'" do |nodes|
       assignment = nodes.first
 
-      assert_kind_of AssignNode, assignment
+      assert_kind_of Assignment, assignment
 
       assert_equal Identifier.new('a'), assignment.lhs
       assert_equal String.new('foo'), assignment.rhs
@@ -19,7 +19,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     parses "oh my lord = 'foo'" do |nodes|
       assignment = nodes.first
 
-      assert_kind_of AssignNode, assignment
+      assert_kind_of Assignment, assignment
 
       assert_equal Identifier.new('oh my lord'), assignment.lhs
       assert_equal String.new('foo'), assignment.rhs
@@ -29,7 +29,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
   def test_operation_assignment
     parses 'a = (3 + 3) * 4' do |nodes|
       assignment = nodes.first
-      assert_kind_of AssignNode, assignment
+      assert_kind_of Assignment, assignment
       assert_equal Identifier.new('a'), assignment.lhs
 
       multiplication = assignment.rhs
@@ -47,11 +47,11 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
   def test_double_assignment
     parses 'a = b = 3' do |nodes|
       assignment = nodes.first
-      assert_kind_of AssignNode, assignment
+      assert_kind_of Assignment, assignment
       assert_equal Identifier.new('a'), assignment.lhs
 
       other_assignment = assignment.rhs
-      assert_kind_of AssignNode, other_assignment
+      assert_kind_of Assignment, other_assignment
 
       assert_equal Identifier.new('b'), other_assignment.lhs
       assert_equal Digit.new(3), other_assignment.rhs
@@ -61,7 +61,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
   def test_assignment_with_message
     parses 'a = foo()' do |nodes|
       assignment = nodes.first
-      assert_kind_of AssignNode, assignment
+      assert_kind_of Assignment, assignment
       assert_equal Identifier.new('a'), assignment.lhs
 
       message = assignment.rhs
@@ -73,14 +73,14 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
   def test_assignment_with_function_definition
     parses 'a = -> b, c; 3; end;' do |nodes|
       assignment = nodes.first
-      assert_kind_of AssignNode, assignment
+      assert_kind_of Assignment, assignment
       assert_equal Identifier.new('a'), assignment.lhs
 
-      fun_node = assignment.rhs
-      assert_kind_of FunNode, fun_node
-      assert_equal [Identifier.new('b'), Identifier.new('c')], fun_node.arguments
+      function = assignment.rhs
+      assert_kind_of Function, function
+      assert_equal [Identifier.new('b'), Identifier.new('c')], function.params
 
-      body = fun_node.body.nodes
+      body = function.body.nodes
       assert_equal [Digit.new(3)], body
     end
   end
@@ -88,7 +88,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
   def test_assignment_with_semicolon
     parses "a = 3;" do |nodes|
       assignment = nodes.first
-      assert_kind_of AssignNode, assignment
+      assert_kind_of Assignment, assignment
 
       assert_equal Identifier.new('a'), assignment.lhs
       assert_equal Digit.new(3), assignment.rhs
@@ -98,7 +98,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
   def test_assignment_with_newline
     parses "a = 3\n " do |nodes|
       assignment = nodes.first
-      assert_kind_of AssignNode, assignment
+      assert_kind_of Assignment, assignment
 
       assert_equal Identifier.new('a'), assignment.lhs
       assert_equal Digit.new(3), assignment.rhs
@@ -108,7 +108,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
   def test_assignment_with_expression
     parses "a = a - 3\n " do |nodes|
       assignment = nodes.first
-      assert_kind_of AssignNode, assignment
+      assert_kind_of Assignment, assignment
 
       assert_equal Identifier.new('a'), assignment.lhs
       assert_equal SubtractNode.new(
@@ -121,7 +121,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
   def test_slot_assignment
     parses "foo.a = 3\n " do |nodes|
       assignment = nodes.first
-      assert_kind_of AssignNode, assignment
+      assert_kind_of Assignment, assignment
 
       assert_equal Identifier.new('foo'), assignment.receiver
       assert_equal Identifier.new('a'), assignment.lhs

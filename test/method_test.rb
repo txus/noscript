@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class MethodTest < MiniTest::Unit::TestCase
+class FunctionTest < MiniTest::Unit::TestCase
 
   def setup
     @context = Noscript::Context.new
@@ -11,7 +11,7 @@ class MethodTest < MiniTest::Unit::TestCase
     #   a = 3
     #   74
     # end
-    @method = Noscript::Method.new(
+    @method = Noscript::AST::Function.new(
       # PARAMS
       [
         Noscript::AST::DefaultParameter.new(
@@ -22,7 +22,7 @@ class MethodTest < MiniTest::Unit::TestCase
 
       # BODY
       Noscript::AST::Nodes.new([
-        Noscript::AST::AssignNode.new(
+        Noscript::AST::Assignment.new(
           nil,
           Noscript::AST::Identifier.new('a'),
           Noscript::AST::Digit.new(3)
@@ -86,7 +86,7 @@ class MethodTest < MiniTest::Unit::TestCase
   def test_method_with_too_few_arguments
     # -> bar
     # end
-    @method = Noscript::Method.new(
+    @method = Noscript::AST::Function.new(
       # ARGUMENTS
       [ Noscript::AST::Identifier.new('bar') ],
 

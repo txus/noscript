@@ -7,7 +7,7 @@ class AssignmentTest < MiniTest::Unit::TestCase
   end
 
   def test_literal_assignment
-    @node = Noscript::AST::AssignNode.new(
+    @node = Noscript::AST::Assignment.new(
       nil,
       Noscript::AST::Identifier.new('a'),
       Noscript::AST::Digit.new(3)
@@ -21,7 +21,7 @@ class AssignmentTest < MiniTest::Unit::TestCase
   def test_expression_assignment
     @context.store_var(:a, Noscript::AST::Digit.new(5))
 
-    @node = Noscript::AST::AssignNode.new(
+    @node = Noscript::AST::Assignment.new(
       nil,
       Noscript::AST::Identifier.new('a'),
       Noscript::AST::SubtractNode.new(
@@ -39,7 +39,7 @@ class AssignmentTest < MiniTest::Unit::TestCase
     @object = Noscript::Object.new
     @context.store_var('foo', @object)
 
-    @node = Noscript::AST::AssignNode.new(
+    @node = Noscript::AST::Assignment.new(
       Noscript::AST::Identifier.new('foo'),
       Noscript::AST::Identifier.new('a'),
       Noscript::AST::Digit.new('3'),

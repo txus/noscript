@@ -5,7 +5,7 @@ class MessageTest < MiniTest::Unit::TestCase
   def setup
     @context = Noscript::Context.new
     @object = Noscript::Object.new
-    @method = Noscript::Method.new(
+    @function = Noscript::AST::Function.new(
       # PARAMS
       [Noscript::AST::Identifier.new('bar')],
 
@@ -14,7 +14,7 @@ class MessageTest < MiniTest::Unit::TestCase
         Noscript::AST::Digit.new(74)
       ])
     )
-    @object.add_slot('bar', @method)
+    @object.add_slot('bar', @function)
     @object.add_slot('baz', Digit.new(99))
     @context.store_var('foo', @object)
   end
@@ -28,7 +28,7 @@ class MessageTest < MiniTest::Unit::TestCase
 
     retval = @message.compile(@context)
 
-    assert_equal @method, retval
+    assert_equal @function, retval
   end
 
   def test_message_call_with_empty_parens_calls_the_function
