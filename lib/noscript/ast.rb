@@ -155,6 +155,10 @@ module Noscript
           acc.update(elem.first.to_s => elem.last.compile(context))
         end)
       end
+
+      def keys
+        @body.keys
+      end
     end
 
     class Array < Node

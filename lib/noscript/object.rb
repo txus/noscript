@@ -9,7 +9,7 @@ module Noscript
     def initialize
       @parent = nil
       @slots  = {}
-      @traits = []
+      @traits = TraitList.new
 
       add_slot('clone', lambda { |*args|
         child = Object.new
@@ -29,7 +29,7 @@ module Noscript
 
       add_slot('uses', lambda { |context, trait_name|
         trait = trait_name.compile(context)
-        use_trait(trait)
+        use_trait(trait, trait_name.name)
       })
 
       add_slot('each', lambda { |context, fun|
@@ -56,8 +56,8 @@ module Noscript
       @slots[name] = value
     end
 
-    def use_trait(trait)
-      @traits << trait unless @traits.include?(trait)
+    def use_trait(trait, trait_name)
+      @traits.push(trait, trait_name)
     end
 
     private

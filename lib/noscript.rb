@@ -5,6 +5,7 @@ require_relative 'noscript/exceptions'
 require_relative 'noscript/context'
 require_relative 'noscript/object'
 require_relative 'noscript/trait'
+require_relative 'noscript/trait_list'
 
 module Noscript
   def self.bootstrap
