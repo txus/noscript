@@ -22,8 +22,21 @@ module Noscript
       })
 
       ctx.store_var('Object', Object.new)
+      ctx.store_var('Ruby', create_ruby_object)
 
       ctx
+    end
+
+    def self.create_ruby_object
+      ruby = Object.new
+      ruby.add_slot('eval', lambda { |context, string|
+        str = string.compile(context).to_s
+
+        sandbox = ::Object.new
+        sandbox.extend(AST)
+        sandbox.instance_eval(str)
+      })
+      ruby
     end
 
     attr_accessor :lvars, :current_receiver

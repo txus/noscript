@@ -40,6 +40,14 @@ class NoscriptTest < MiniTest::Unit::TestCase
     ], output
   end
 
+  def test_interop
+    output = `./bin/noscript examples/interop.ns`.split("\n")
+
+    assert_equal [
+      "5",
+    ], output
+  end
+
   def test_conditionals
     [
       """
