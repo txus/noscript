@@ -1,14 +1,11 @@
+require 'set'
+
 module Noscript
   class TraitList
     include Enumerable
 
     def initialize
-      @traits = []
-    end
-
-    def push(trait, trait_name)
-      check_conflicts_with(trait, trait_name)
-      @traits << trait unless @traits.include?(trait)
+      @traits = Set.new
     end
 
     def include?(object)
@@ -17,6 +14,11 @@ module Noscript
 
     def each(&block)
       @traits.each(&block)
+    end
+
+    def push(trait, trait_name)
+      check_conflicts_with(trait, trait_name)
+      @traits << trait
     end
 
     def check_conflicts_with(trait, trait_name)
