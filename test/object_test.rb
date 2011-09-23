@@ -67,7 +67,7 @@ class ObjectTest < MiniTest::Unit::TestCase
   end
 
   def test_send_raises_when_inexistent_slot
-    assert_raises RuntimeError do
+    assert_raises Noscript::Exception do
       @object.send('bar')
     end
   end

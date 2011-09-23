@@ -14,7 +14,7 @@ class ContextTest < MiniTest::Unit::TestCase
   end
 
   def test_lookup_var_fails
-    assert_raises RuntimeError, 'Undefined local variable: bar' do
+    assert_raises Noscript::Exception, 'Undefined local variable: bar' do
       @context.lookup_var('bar')
     end
   end

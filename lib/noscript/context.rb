@@ -18,7 +18,7 @@ module Noscript
       })
 
       ctx.store_var('raise', lambda { |context, *args|
-        raise(AST::Exception, args.first.compile(context).to_s)
+        raise(Exception, args.first.compile(context).to_s)
       })
 
       ctx.store_var('Object', Object.new)
@@ -37,7 +37,7 @@ module Noscript
       return @lvars[symbol.to_s] if !@lvars[symbol.to_s].nil?
       return @parent.lookup_var(symbol.to_s) if @parent && !@parent.lookup_var(symbol.to_s).nil?
 
-      raise("Undefined local variable: #{symbol}")
+      raise(Exception, "Undefined local variable: #{symbol}")
     end
 
     def store_var(symbol, value)

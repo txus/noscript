@@ -233,7 +233,7 @@ module Noscript
       private
 
       def raise_argument_error(args)
-        raise "This function expected #{params.size} arguments, not #{args.size}"
+        raise ArgumentError.new("This function expected #{params.size} arguments, not #{args.size} [#{filename}:#{line}]")
       end
     end
 
@@ -483,9 +483,6 @@ module Noscript
       def compile(context)
         lhs.compile(context) <= rhs.compile(context)
       end
-    end
-
-    class Exception < StandardError
     end
 
   end

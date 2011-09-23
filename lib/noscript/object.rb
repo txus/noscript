@@ -49,7 +49,7 @@ module Noscript
       @slots[message.to_s] or
         lookup_traits(message.to_s) or
         lookup_parent(message.to_s) or
-        raise "Inexistent slot #{message} in #{self}"
+        raise(Exception, "Inexistent slot \"#{message}\" in #{self}")
     end
 
     def add_slot(name, value)
