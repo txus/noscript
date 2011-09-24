@@ -63,25 +63,4 @@ class BooleanExpressionsTest < MiniTest::Unit::TestCase
       assert_equal Integer.new(3), exp.rhs
     end
   end
-
-  def test_true
-    parses "true" do |nodes|
-      exp = nodes.first
-      assert_equal true, exp
-    end
-  end
-
-  def test_false
-    parses "false" do |nodes|
-      exp = nodes.first
-      assert_equal false, exp
-    end
-  end
-
-  def test_nil
-    parses "nil" do |nodes|
-      exp = nodes.first
-      assert_equal nil, exp
-    end
-  end
 end

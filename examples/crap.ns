@@ -73,20 +73,20 @@ person.uses(Sports)
 # Businessman implement the same message), we need to *explicitly* resolve that
 # conflict by letting +person+ decide what #run means.
 #
-# In our case, +person+ decides that Sports#run should be ran first with a
-# given speed, and afterwards, Businessman#run should be called.
+# In our case, +person+ decides that Runnable#run should be ran first with a
+# given speed, and afterwards, Executable#run should be called.
 #
 # Note that, in order to disambiguate, we must call each message prepended by
 # the trait name.
-person.run = -> speed=nil
-  if speed == nil # If no arguments were given, run a business
-    @Businessman run(@business)
-  else # Otherwise run at the given speed!
+person.run = -> speed=false
+  if speed
     @Sports run(speed)
+  else
+    @Businessman run(@business)
   end
 end
 
-# Now +person+ can safely use the Businessman trait with no conflicts.
+# Now +person+ can safely use the Executable trait with no conflicts.
 person.uses(Businessman)
 
 # Will run as a sportsman:

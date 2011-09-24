@@ -11,7 +11,7 @@ module Noscript
 
       def compile(context)
         result = @expression.compile(context)
-        if result
+        if result.truthy?
           @body.compile(context)
         elsif else_body
           @else_body.compile(context)

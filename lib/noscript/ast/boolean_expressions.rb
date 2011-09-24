@@ -8,7 +8,7 @@ module Noscript
 
     class InequalityExpression < BinaryOperation
       def compile(context)
-        !(lhs.compile(context) == rhs.compile(context))
+        lhs.compile(context) != rhs.compile(context)
       end
     end
 

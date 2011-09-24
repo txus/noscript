@@ -3,11 +3,6 @@ module Noscript
   end
 end
 
-# FIXME: Want Noscript boolean classes rather than Ruby ones.
-class TrueClass; def compile(context); self; end; end;
-class FalseClass; def compile(context); self; end; end;
-class NilClass; def compile(context); self; end; end;
-
 require_relative 'ast/node'
 require_relative 'ast/nodes'
 require_relative 'ast/assignment'
@@ -25,3 +20,4 @@ require_relative 'ast/integer'
 require_relative 'ast/binary_operation'
 require_relative 'ast/unary_minus'
 require_relative 'ast/boolean_expressions'
+require_relative 'ast/boolean'

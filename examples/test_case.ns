@@ -1,0 +1,25 @@
+MyTestCase = TestCase.clone({
+
+  setup: ->
+    @foo = 'bar'
+  end,
+
+  it does foo things: ->
+    @assert equal(@foo, 'bar')
+  end,
+
+  it does bar things: ->
+    @assert(true)
+  end,
+
+  it can fail too: ->
+    @assert(false)
+  end,
+
+  teardown: ->
+    @foo = nil
+  end
+
+})
+
+MyTestCase.run()

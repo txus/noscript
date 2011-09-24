@@ -36,8 +36,8 @@ class NoscriptTest < MiniTest::Unit::TestCase
     output = `./bin/noscript examples/traits.ns`.split("\n")
 
     assert_equal [
-      "John is running with traits at speed 10",
-      "Executing task",
+      "John is running",
+      "John is running a profitable business!",
     ], output
   end
 

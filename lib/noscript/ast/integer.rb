@@ -58,12 +58,13 @@ module Noscript
       end
 
       def ==(num)
-        to_i == num.to_i
+        to_i == num.to_i rescue false
       end
 
       def !=(num)
         to_i != num.to_i
       end
+
     end
   end
 end

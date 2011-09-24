@@ -83,9 +83,9 @@ rule
               | op_member LTE_OP op_member { result = AST::LteExpression.new(val[0], val[2]); result.pos(filename, lineno) }
               | boolean_literal
 
-  boolean_literal : TRUE { result = AST::True.new; result.pos(filename, lineno) }
-                  | FALSE { result = AST::False.new; result.pos(filename, lineno) }
-                  | NIL { result = AST::Nil.new; result.pos(filename, lineno) }
+  boolean_literal : TRUE { result = true }
+                  | FALSE { result = false }
+                  | NIL { result = nil }
 
   expression : boolean_exp
              | message
@@ -101,22 +101,21 @@ rule
             | statement end_of_statement
 
   op_member : integer
-            | operation
-            | boolean_literal
             | identifier
+            | boolean_literal
             | message
+            | operation
 
   operation : op_member '+' op_member { result = AST::AddNode.new(val[0], val[2]); result.pos(filename, lineno) }
             | op_member '-' op_member { result = AST::SubtractNode.new(val[0], val[2]); result.pos(filename, lineno) }
             | op_member '*' op_member { result = AST::MultiplicationNode.new(val[0], val[2]); result.pos(filename, lineno) }
             | op_member '/' op_member { result = AST::DivisionNode.new(val[0], val[2]); result.pos(filename, lineno) }
             | LPAREN op_member RPAREN { result = val[1] }
-            | '-' op_member =UMINUS { result = AST::UnaryMinus.new(val[1]); result.pos(filename, lineno) }
+            | '-' op_member  =UMINUS { result = AST::UnaryMinus.new(val[1]); result.pos(filename, lineno) } }
 
   statements : { result = AST::Nodes.new([]); result.pos(filename, lineno) }
              | statement { result = AST::Nodes.new([val[0]]); result.pos(filename, lineno) }
              | statements statement { result << val[1] }
-             | NEWLINE statements { result = val[1] }
 
   end_of_statement : SEMICOLON | NEWLINE
 
