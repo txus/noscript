@@ -34,6 +34,9 @@ rule
   else          { [:ELSE, text] }
   while         { [:WHILE, text] }
 
+  # Ignore comments
+  \s*#(.*)      { }
+
   @\w[{BLANK}\w]* { [:DEREF, text.strip[1..-1]] }
   \w[{BLANK}\w]* { [:IDENTIFIER, text.strip] }
 
