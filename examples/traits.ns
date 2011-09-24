@@ -74,7 +74,7 @@ person.uses(Sports)
 # conflict by letting +person+ decide what #run means.
 #
 # In our case, +person+ decides that Sports#run should be ran if a speed is
-# given - otherwise, Businessman#run should be called
+# given - otherwise, Businessman#run should be called.
 #
 # Note that, in order to disambiguate, we must call each message prepended by
 # the trait name.

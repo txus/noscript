@@ -1,13 +1,79 @@
+# TestCase represents an automated test case containing many tests to be run.
+#
+# It contains a couple of assertion methods (+assert+ and +assert equal+) to
+# express expectations about objects.
+#
+# @example
+#
+#   UserTest = TestCase.clone({
+#     setup: ->
+#       @user = Object.clone({ name: 'John', admin: true})
+#     end
+#
+#     it has a name: ->
+#       @assert equal('John', @user.name())
+#     end
+#
+#     it is an admin: ->
+#       @assert(@user.admin())
+#     end
+#
+#     teardown: ->
+#       # Cleanup
+#     end
+#   })
+#
+#   UserTest.run()
+#
+#   ---------------
+#   Output:
+#
+#   ..
+#
+#   2 tests, 2 assertions, 0 failures
+#
 TestCase = Object.clone({
+  # Override #setup with a custom setup task that will be ran before each test.
+  #
+  # @return [Function]
+  #   The setup function.
   setup:    ->; end,
+
+  # Override #teardown with a custom teardown task that will be ran after each
+  # test.
+  #
+  # @return [Function]
+  #   The teardown function.
   teardown: ->; end,
 
+  # An array to store the failures in.
+  #
+  # @return [Array]
+  #   The failures array.
   errors: [],
 
+  # A counter to keep track of the number of tests run.
+  #
+  # @return [Integer]
+  #   The test counter.
   tests: 0,
+
+  # A counter to keep track of the number of assertions made.
+  #
+  # @return [Integer]
+  #   The assertion counter.
   assertions: 0,
+
+  # A counter to keep track of the number of failures made.
+  #
+  # @return [Integer]
+  #   The failure counter.
   failures: 0,
 
+  # Asserts that a given value is truthy.
+  #
+  # @param [Object] value
+  #   The object to assert the truthiness about.
   assert: -> value
     if value != false
       print('\e[32m.')
@@ -19,6 +85,13 @@ TestCase = Object.clone({
     @assertions = @assertions + 1
   end,
 
+  # Asserts equality between two objects.
+  #
+  # @param [Object] expected
+  #   The expected value.
+  #
+  # @param [Object] actual
+  #   The actual value.
   assert equal: -> expected, actual
     if expected == actual
       print('\e[32m.')
@@ -30,25 +103,26 @@ TestCase = Object.clone({
     @assertions = @assertions + 1
   end,
 
+  # Prints the report with the number of +tests+, +assertions+ and +failures+
+  #
+  # It also prints a failure report.
   print report: ->
     puts('\n\n\e[0m#{@tests} tests, #{@assertions} assertions, #{@failures} failures')
-    puts('  Failure report:')
     @errors.each(-> error
       puts('    * #{error}')
     end)
   end,
 
+  # Runs the test case and prints the report afterwards.
   run: ->
-    @setup()
-
     @each(-> name, test
       if name.starts with('it')
+        @setup()
         test()
+        @teardown()
         @tests = @tests + 1
       end
     end)
-
-    @teardown()
 
     @print report()
   end

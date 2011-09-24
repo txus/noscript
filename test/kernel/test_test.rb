@@ -32,7 +32,7 @@ class TestTest < MiniTest::Unit::TestCase
   MyTestCase.run()
 CODE
 
-    expected = "\e[32m.\e[32m.\e[31mF\n\n\e[0m3 tests, 3 assertions, 1 failures\n  Failure report:\n    * Expected false to be truthy.\n"
+    expected = "\e[32m.\e[32m.\e[31mF\n\n\e[0m3 tests, 3 assertions, 1 failures\n    * Expected false to be truthy.\n"
     assert_output expected do
       compiles(code)
     end
