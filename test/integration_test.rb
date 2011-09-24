@@ -44,7 +44,7 @@ class NoscriptTest < MiniTest::Unit::TestCase
     output = `./bin/noscript examples/interop.ns`.split("\n")
 
     assert_equal [
-      "5",
+      "8",
     ], output
   end
 
