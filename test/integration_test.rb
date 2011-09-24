@@ -37,6 +37,7 @@ class NoscriptTest < MiniTest::Unit::TestCase
 
     assert_equal [
       "John is running with traits at speed 10",
+      "Executing task",
     ], output
   end
 

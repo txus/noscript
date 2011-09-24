@@ -40,4 +40,8 @@ class TraitTest < MiniTest::Unit::TestCase
     assert @trait.implements?('foo')
     refute @trait.implements?('johnny')
   end
+
+  def test_get_direct_message
+    assert_kind_of Noscript::AST::Function, @trait.get('foo')
+  end
 end

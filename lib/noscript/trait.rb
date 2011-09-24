@@ -9,5 +9,9 @@ module Noscript
     def implements?(message)
       @slots.body.key?(message)
     end
+
+    def get(message)
+      @slots.body[message]
+    end
   end
 end

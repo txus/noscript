@@ -18,7 +18,7 @@ module Noscript
       end
 
       def to_s
-        "[#{@nodes.map(&:to_s).join(', ')}]"
+        @nodes.map(&:inspect).join(', ')
       end
     end
   end

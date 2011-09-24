@@ -1,12 +1,24 @@
 Runnable = trait({
   run: -> speed
     print(@name, 'is running with traits at speed', speed)
+    puts()
   end
 })
 
-person = Object.clone()
+Executable = trait({
+  run: ->
+    puts('Executing task')
+  end
+})
+
+person = Object.clone({ name: 'John' })
 person.uses(Runnable)
 
-person.name = 'John'
+person.run = -> speed
+  @Runnable run(speed)
+  @Executable run()
+end
+
+person.uses(Executable)
 
 person.run(10)

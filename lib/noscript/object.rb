@@ -9,7 +9,7 @@ module Noscript
     def initialize
       @parent = nil
       @slots  = {}
-      @traits = TraitList.new
+      @traits = TraitList.new(self)
 
       add_slot('clone', lambda { |*args|
         child = Object.new
@@ -67,10 +67,7 @@ module Noscript
     end
 
     def lookup_traits(message)
-      trait = @traits.find do |trait|
-        trait.implements?(message)
-      end
-      trait.slots.body[message] if trait
+      @traits.lookup(message)
     end
   end
 end
