@@ -1,0 +1,35 @@
+ArrayTest = TestCase.clone({
+  setup: ->
+    @array = Array.clone()
+  end,
+
+  it pushes elements: ->
+    @array.push(123)
+    @array.push(77)
+
+    @assert equal(2, @array.length())
+  end,
+
+  it pops elements: ->
+    @array.push(123)
+    @array.push(77)
+    popped = @array.pop()
+
+    @assert equal(77, popped)
+  end,
+
+  it interates over itself: ->
+    total = 0
+
+    @array.push(123)
+    @array.push(77)
+
+    @array.each(-> element
+      total.increment()
+    end)
+
+    @assert equal(2, total)
+  end
+})
+
+ArrayTest.run()

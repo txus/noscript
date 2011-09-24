@@ -33,6 +33,13 @@
 #   2 tests, 2 assertions, 0 failures
 #
 TestCase = Object.clone({
+  initialize: ->
+    @errors = Array.clone()
+    @tests = 0
+    @assertions = 0
+    @failures = 0
+  end,
+
   # Override #setup with a custom setup task that will be ran before each test.
   #
   # @return [Function]
@@ -46,43 +53,19 @@ TestCase = Object.clone({
   #   The teardown function.
   teardown: ->; end,
 
-  # An array to store the failures in.
-  #
-  # @return [Array]
-  #   The failures array.
-  errors: Array.clone(),
-
-  # A counter to keep track of the number of tests run.
-  #
-  # @return [Integer]
-  #   The test counter.
-  tests: 0,
-
-  # A counter to keep track of the number of assertions made.
-  #
-  # @return [Integer]
-  #   The assertion counter.
-  assertions: 0,
-
-  # A counter to keep track of the number of failures made.
-  #
-  # @return [Integer]
-  #   The failure counter.
-  failures: 0,
-
   # Asserts that a given value is truthy.
   #
   # @param [Object] value
   #   The object to assert the truthiness about.
   assert: -> value
     if value != false
-      print('\e[32m.')
+      print('\e[32m.\e[0m')
     else
-      print('\e[31mF')
+      print('\e[31mF\e[0m')
       @errors.push('Expected #{value} to be truthy.')
-      @failures = @failures + 1
+      @failures.increment()
     end
-    @assertions = @assertions + 1
+    @assertions.increment()
   end,
 
   # Asserts equality between two objects.
@@ -94,13 +77,13 @@ TestCase = Object.clone({
   #   The actual value.
   assert equal: -> expected, actual
     if expected == actual
-      print('\e[32m.')
+      print('\e[32m.\e[0m')
     else
-      print('\e[31mF')
+      print('\e[31mF\e[0m')
       @errors.push('Expected #{expected}, got #{actual}.')
-      @failures = @failures + 1
+      @failures.increment()
     end
-    @assertions = @assertions + 1
+    @assertions.increment()
   end,
 
   # Prints the report with the number of +tests+, +assertions+ and +failures+
@@ -120,7 +103,7 @@ TestCase = Object.clone({
         @setup()
         test()
         @teardown()
-        @tests = @tests + 1
+        @tests.increment()
       end
     end)
 

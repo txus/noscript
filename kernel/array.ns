@@ -1,5 +1,7 @@
 Array = Object.clone({
-  body: Ruby.Array(),
+  initialize: ->
+    @body = Ruby.Array()
+  end,
 
   length: ->
     @body.length()

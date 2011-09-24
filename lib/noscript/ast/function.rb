@@ -18,7 +18,7 @@ module Noscript
           if !(passed_value = args[idx]).nil?
 
             # Try to get the value from the context, or from the current receiver
-            if !passed_value.compile(ctx).nil?
+            if passed_value.compile(ctx)
               compiled_value = passed_value.compile(ctx)
             else
               compiled_value = ctx.current_receiver.send(passed_value)

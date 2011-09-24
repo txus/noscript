@@ -23,17 +23,10 @@ module Noscript
         end
       end
 
-      def send(message)
-        __send__ message.name
-      end
-
       # Native methods must return an object that responds to #call.
       # TOOD: Refactor this into something nicer.
-      define_method('starts with') do
-        lambda {|context, *args|
-          str = args.first
-          value =~ /^#{str.value}/
-        }
+      define_method('starts with') do |str|
+        value =~ /^#{str.value}/
       end
 
       def to_s

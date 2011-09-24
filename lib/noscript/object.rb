@@ -24,6 +24,12 @@ module Noscript
           end
         end
 
+        # Initialize if possible
+        if self.slots['initialize']
+          context.current_receiver = child
+          child.send('initialize').call(context)
+        end
+
         child
       })
 
@@ -62,6 +68,10 @@ module Noscript
 
     def use_trait(trait, trait_name)
       @traits.push(trait, trait_name)
+    end
+
+    def compile(context)
+      self
     end
 
     private

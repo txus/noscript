@@ -34,4 +34,12 @@ Rake::TestTask.new(:integration) do |t|
   t.verbose = true
 end
 
-task :default => [:regenerate, :test, :integration]
+desc 'Run Noscript native tests'
+task :native do
+  tests = FileList['test/kernel/*.ns']
+  tests.each do |test|
+    system("./bin/noscript #{test}")
+  end
+end
+
+task :default => [:regenerate, :test, :integration, :native]

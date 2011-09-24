@@ -65,6 +65,14 @@ module Noscript
         to_i != num.to_i
       end
 
+      def increment
+        @value += 1
+      end
+
+      def decrement
+        @value -= 1
+      end
+
     end
   end
 end
