@@ -50,7 +50,7 @@ TestCase = Object.clone({
   #
   # @return [Array]
   #   The failures array.
-  errors: [],
+  errors: Array.clone(),
 
   # A counter to keep track of the number of tests run.
   #
@@ -115,7 +115,7 @@ TestCase = Object.clone({
 
   # Runs the test case and prints the report afterwards.
   run: ->
-    @each(-> name, test
+    @each slot(-> name, test
       if name.starts with('it')
         @setup()
         test()

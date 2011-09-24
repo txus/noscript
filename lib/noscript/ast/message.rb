@@ -19,7 +19,19 @@ module Noscript
           # Save a reference to the current receiver
           ctx.current_receiver = rcv
 
-          retval = rcv.send(name)
+          if rcv.is_a?(Node) || rcv.is_a?(Object)
+            retval = rcv.send(name)
+          else # Native Ruby object
+            retval = lambda {|context, *args|
+              args.map! {|a| a.compile(context) }
+              block = proc { }
+              if args.last.is_a?(Function)
+                block = args.pop.to_proc(context)
+              end
+              rcv.send(name.to_s, *args, &block)
+            }
+          end
+
         elsif ctx.current_receiver && name.deref
           retval = ctx.current_receiver.send(name)
         else

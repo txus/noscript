@@ -36,6 +36,11 @@ module Noscript
         sandbox.extend(AST)
         sandbox.instance_eval(str)
       })
+
+      ruby.add_slot('Array', lambda { |context|
+        Array.new
+      })
+
       ruby
     end
 

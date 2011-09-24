@@ -1,0 +1,19 @@
+Array = Object.clone({
+  body: Ruby.Array(),
+
+  length: ->
+    @body.length()
+  end,
+
+  push: -> element
+    @body.push(element)
+  end,
+
+  pop: ->
+    @body.pop()
+  end,
+
+  each: -> function
+    @body.each(function)
+  end
+})

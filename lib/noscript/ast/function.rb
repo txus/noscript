@@ -38,6 +38,10 @@ module Noscript
         self
       end
 
+      def to_proc(context)
+        proc { |*args| self.call(context, *args) }
+      end
+
       private
 
       def raise_argument_error(args)

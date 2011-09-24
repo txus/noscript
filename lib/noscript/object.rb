@@ -4,7 +4,7 @@ module Noscript
     attr_accessor :slots
     attr_accessor :traits
 
-    PROTECTED_SLOTS = ['clone', 'uses', 'each']
+    PROTECTED_SLOTS = ['clone', 'uses', 'each slot']
 
     def initialize
       @parent = nil
@@ -32,7 +32,7 @@ module Noscript
         use_trait(trait, trait_name.name)
       })
 
-      add_slot('each', lambda { |context, fun|
+      add_slot('each slot', lambda { |context, fun|
         yieldable = self.slots.dup.delete_if do |k,v|
           Object::PROTECTED_SLOTS.include?(k)
         end
@@ -40,7 +40,11 @@ module Noscript
         method = fun.compile(context)
 
         yieldable.each do |slot|
-          method.call(context, AST::String.new(slot.first), slot.last)
+          if method.is_a?(AST::Function)
+            method.call(context, AST::String.new(slot.first), slot.last)
+          else
+            method.call(AST::String.new(slot.first), slot.last)
+          end
         end
       })
     end

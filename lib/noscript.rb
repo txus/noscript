@@ -15,7 +15,10 @@ module Noscript
     parser = Noscript::Parser.new
 
     # Compile files in /kernel
-    Dir['kernel/*.ns'].each do |file|
+    %w(
+      kernel/array.ns
+      kernel/test_case.ns
+    ).each do |file|
       parser.scan_file(file).compile(ctx)
     end
 

@@ -38,15 +38,15 @@ class ObjectTest < MiniTest::Unit::TestCase
     assert_equal Noscript::AST::Integer.new(3), @object.send('foo').call(@context)
   end
 
-  def test_each
+  def test_each_slot
     results = {}
-    @fun = lambda { |ctx, k, v| results[k.to_s] = v.to_i * 2 }
+    @fun = lambda { |k, v| results[k.to_s] = v.to_i * 2 }
     def @fun.compile(*); self; end
 
     @object.add_slot('foo', Noscript::AST::Integer.new(90))
     @object.add_slot('bar', Noscript::AST::Integer.new(20))
 
-    @object.send('each').call(@context, @fun)
+    @object.send('each slot').call(@context, @fun)
 
     assert_equal 180, results['foo']
     assert_equal 40, results['bar']
