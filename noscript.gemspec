@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rexical'
   s.add_development_dependency 'racc'
   s.add_development_dependency 'minitest'
-  s.add_development_dependency 'purdytest'
+  # s.add_development_dependency 'purdytest'
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
