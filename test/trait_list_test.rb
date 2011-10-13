@@ -3,10 +3,10 @@ require 'test_helper'
 class TraitListTest < MiniTest::Unit::TestCase
 
   def setup
-    @object = Noscript::Object.new
-    @trait_list = Noscript::TraitList.new(@object)
-    @trait = Noscript::Trait.new(Noscript::AST::Tuple.new({'foo ho' => 'bar', 'bar' => 'baz', 'hey' => 'ho'}))
-    @another_trait = Noscript::Trait.new(Noscript::AST::Tuple.new({'foo ho' => 'bey', 'hey' => 'ho'}))
+    @object = Object.new
+    @trait_list = TraitList.new(@object)
+    @trait = Trait.new(Tuple.new({'foo ho' => 'bar', 'bar' => 'baz', 'hey' => 'ho'}))
+    @another_trait = Trait.new(Tuple.new({'foo ho' => 'bey', 'hey' => 'ho'}))
 
     @trait_list.push(@trait, 'Runnable')
   end
@@ -16,7 +16,7 @@ class TraitListTest < MiniTest::Unit::TestCase
   end
 
   def test_conflicts
-    assert_raises Noscript::Exception do
+    assert_raises Exception do
       @trait_list.push(@another_trait, 'Executable')
     end
   end

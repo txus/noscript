@@ -3,8 +3,8 @@ require 'test_helper'
 class ObjectTest < MiniTest::Unit::TestCase
 
   def setup
-    @object = Noscript::Object.new
-    @context = Noscript::Context.new
+    @object = Object.new
+    @context = Context.new
   end
 
   def test_clone
@@ -15,27 +15,27 @@ class ObjectTest < MiniTest::Unit::TestCase
   end
 
   def test_clone_with_tuple
-    tuple = Noscript::AST::Tuple.new({
-      'foo' => Noscript::AST::Integer.new(99),
-      'bar' => Noscript::AST::String.new('hey'),
+    tuple = Tuple.new({
+      'foo' => Integer.new(99),
+      'bar' => String.new('hey'),
     })
     child = @object.send('clone').call(@context, tuple)
 
     assert_equal(@object, child.parent)
     assert_includes(child.slots.keys, 'clone')
 
-    assert_equal Noscript::AST::Integer.new(99), child.send('foo')
-    assert_equal Noscript::AST::String.new('hey'), child.send('bar')
+    assert_equal Integer.new(99), child.send('foo')
+    assert_equal String.new('hey'), child.send('bar')
   end
 
   def test_uses
-    trait = Noscript::Trait.new(Noscript::AST::Tuple.new({
-      'foo' => lambda { |*| Noscript::AST::Integer.new(3) }
+    trait = Trait.new(Tuple.new({
+      'foo' => lambda { |*| Integer.new(3) }
     }))
     @context.store_var('FooTrait', trait)
-    @object.send('uses').call(@context, Noscript::AST::Identifier.new('FooTrait'))
+    @object.send('uses').call(@context, Identifier.new('FooTrait'))
 
-    assert_equal Noscript::AST::Integer.new(3), @object.send('foo').call(@context)
+    assert_equal Integer.new(3), @object.send('foo').call(@context)
   end
 
   def test_each_slot
@@ -43,8 +43,8 @@ class ObjectTest < MiniTest::Unit::TestCase
     @fun = lambda { |k, v| results[k.to_s] = v.to_i * 2 }
     def @fun.compile(*); self; end
 
-    @object.add_slot('foo', Noscript::AST::Integer.new(90))
-    @object.add_slot('bar', Noscript::AST::Integer.new(20))
+    @object.add_slot('foo', Integer.new(90))
+    @object.add_slot('bar', Integer.new(20))
 
     @object.send('each slot').call(@context, @fun)
 
@@ -67,7 +67,7 @@ class ObjectTest < MiniTest::Unit::TestCase
   end
 
   def test_send_raises_when_inexistent_slot
-    assert_raises Noscript::Exception do
+    assert_raises Exception do
       @object.send('bar')
     end
   end

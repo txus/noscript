@@ -2,8 +2,6 @@ require 'test_helper'
 
 class ParserAssignmentTest < MiniTest::Unit::TestCase
 
-  include Noscript::AST
-
   def test_simple_assignment
     parses "a = 'foo'" do |nodes|
       assignment = nodes.first

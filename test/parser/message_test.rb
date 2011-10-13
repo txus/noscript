@@ -2,8 +2,6 @@ require 'test_helper'
 
 class MessageTest < MiniTest::Unit::TestCase
 
-  include Noscript::AST
-
   def test_message
     parses "a.foo" do |nodes|
       message = nodes.first

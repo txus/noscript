@@ -3,34 +3,34 @@ require 'test_helper'
 class TraitTest < MiniTest::Unit::TestCase
 
   def setup
-    @method_foo = Noscript::AST::Function.new(
+    @method_foo = Function.new(
       # Params
-      [Noscript::AST::Identifier.new('foo')],
+      [Identifier.new('foo')],
 
       # Body
-      Noscript::AST::Nodes.new([
-        Noscript::AST::Integer.new(3)
+      Nodes.new([
+        Integer.new(3)
       ])
     )
 
-    @method_bar = Noscript::AST::Function.new(
+    @method_bar = Function.new(
       # Params
       [],
 
       # Body
-      Noscript::AST::Nodes.new([
-        Noscript::AST::Integer.new(10)
+      Nodes.new([
+        Integer.new(10)
       ])
     )
 
-    @trait = Noscript::Trait.new(Noscript::AST::Tuple.new({
+    @trait = Noscript::Trait.new(Tuple.new({
       'foo' => @method_foo,
       'bar' => @method_bar
     }))
   end
 
   def test_initialize
-    assert_equal(Noscript::AST::Tuple.new({
+    assert_equal(Tuple.new({
       'foo' => @method_foo,
       'bar' => @method_bar
     }), @trait.slots)
@@ -42,6 +42,6 @@ class TraitTest < MiniTest::Unit::TestCase
   end
 
   def test_get_direct_message
-    assert_kind_of Noscript::AST::Function, @trait.get('foo')
+    assert_kind_of Function, @trait.get('foo')
   end
 end

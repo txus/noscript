@@ -8,8 +8,11 @@ require 'noscript'
 
 class MiniTest::Unit::TestCase
 
+  include Noscript
+  include Noscript::AST
+
   def tokenizes(input, expected)
-    lexer = Noscript::Parser.new
+    lexer = Parser.new
     lexer.scan_setup(input)
     tokens = []
     while token = lexer.next_token
@@ -20,7 +23,7 @@ class MiniTest::Unit::TestCase
   end
 
   def parses(input, &block)
-    parser = Noscript::Parser.new
+    parser = Parser.new
 
     show_tokens(input) if ENV['DEBUG']
 
@@ -32,7 +35,7 @@ class MiniTest::Unit::TestCase
     show_tokens(input) if ENV['DEBUG']
     show_ast(input) if ENV['DEBUG']
 
-    parser = Noscript::Parser.new
+    parser = Parser.new
     ast = parser.scan_str(input.strip)
     result = ast.compile(Noscript.bootstrap)
     if block_given?
@@ -45,7 +48,7 @@ class MiniTest::Unit::TestCase
   private
 
   def show_tokens(input)
-    lexer = Noscript::Parser.new
+    lexer = Parser.new
     lexer.scan_setup(input.strip)
     tokens = []
     while token = lexer.next_token
@@ -55,7 +58,7 @@ class MiniTest::Unit::TestCase
   end
 
   def show_ast(input)
-    parser = Noscript::Parser.new
+    parser = Parser.new
     ast = parser.scan_str(input.strip)
     p ast
   end

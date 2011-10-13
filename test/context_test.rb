@@ -3,7 +3,7 @@ require 'test_helper'
 class ContextTest < MiniTest::Unit::TestCase
 
   def setup
-    @context = Noscript::Context.new
+    @context = Context.new
     @context.lvars   = { 'foo' => 3 }
   end
 
@@ -14,16 +14,16 @@ class ContextTest < MiniTest::Unit::TestCase
   end
 
   def test_lookup_var_fails
-    assert_raises Noscript::Exception, 'Undefined local variable: bar' do
+    assert_raises Exception, 'Undefined local variable: bar' do
       @context.lookup_var('bar')
     end
   end
 
   def test_lookup_var_climbs_up_the_scope_chain
-    parent_context = Noscript::Context.new
+    parent_context = Context.new
     parent_context.lvars = { 'bar' => 9 }
 
-    child_context = Noscript::Context.new(parent_context)
+    child_context = Context.new(parent_context)
 
     assert_equal 9, child_context.lookup_var('bar')
   end

@@ -2,8 +2,6 @@ require 'test_helper'
 
 class WhileTest < MiniTest::Unit::TestCase
 
-  include Noscript::AST
-
   def test_while
     parses "while foo == 3\n 3\n end" do |nodes|
       while_node = nodes.first

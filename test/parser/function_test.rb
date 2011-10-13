@@ -2,8 +2,6 @@ require 'test_helper'
 
 class FunctionTest < MiniTest::Unit::TestCase
 
-  include Noscript::AST
-
   def test_fun_without_args
     parses "->\n 3\n end" do |nodes|
       fun = nodes.first

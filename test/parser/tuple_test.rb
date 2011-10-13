@@ -2,8 +2,6 @@ require 'test_helper'
 
 class TupleTest < MiniTest::Unit::TestCase
 
-  include Noscript::AST
-
   def test_empty_tuple
     parses "{}" do |nodes|
       tuple = nodes.first

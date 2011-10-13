@@ -2,8 +2,6 @@ require 'test_helper'
 
 class MessageTest < MiniTest::Unit::TestCase
 
-  include Noscript::AST
-
   def test_call_message_without_args
     parses "foo()" do |nodes|
       message = nodes.first

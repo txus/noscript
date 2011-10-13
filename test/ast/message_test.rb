@@ -3,15 +3,15 @@ require 'test_helper'
 class MessageTest < MiniTest::Unit::TestCase
 
   def setup
-    @context = Noscript::Context.new
-    @object = Noscript::Object.new
-    @function = Noscript::AST::Function.new(
+    @context = Context.new
+    @object = Object.new
+    @function = Function.new(
       # PARAMS
-      [Noscript::AST::Identifier.new('bar')],
+      [Identifier.new('bar')],
 
       # BODY
-      Noscript::AST::Nodes.new([
-        Noscript::AST::Integer.new(74)
+      Nodes.new([
+        Integer.new(74)
       ])
     )
     @object.add_slot('bar', @function)
@@ -21,9 +21,9 @@ class MessageTest < MiniTest::Unit::TestCase
 
   def test_message_call_without_parens_returns_the_function
     # foo.bar
-    @message = Noscript::AST::Message.new(
-      Noscript::AST::Identifier.new('foo'),
-      Noscript::AST::Identifier.new('bar')
+    @message = Message.new(
+      Identifier.new('foo'),
+      Identifier.new('bar')
     )
 
     retval = @message.compile(@context)
@@ -33,9 +33,9 @@ class MessageTest < MiniTest::Unit::TestCase
 
   def test_message_call_with_empty_parens_calls_the_function
     # foo.bar(9)
-    @message = Noscript::AST::Message.new(
-      Noscript::AST::Identifier.new('foo'),
-      Noscript::AST::FunctionCall.new(
+    @message = Message.new(
+      Identifier.new('foo'),
+      FunctionCall.new(
         Identifier.new('bar'),
         [Integer.new(9)]
       )

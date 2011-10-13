@@ -37,6 +37,7 @@ module Noscript
         sandbox.instance_eval(str)
       })
 
+      # Expose native ruby data structures
       ruby.add_slot('Array', lambda { |context|
         Array.new
       })

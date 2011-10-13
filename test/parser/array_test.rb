@@ -2,13 +2,11 @@ require 'test_helper'
 
 class ArrayTest < MiniTest::Unit::TestCase
 
-  include Noscript::AST
-
   def test_empty_array
     parses "[]" do |nodes|
       array = nodes.first
 
-      assert_kind_of Noscript::AST::Array, array
+      assert_kind_of Array, array
       assert_equal([], array.body)
     end
   end
@@ -17,7 +15,7 @@ class ArrayTest < MiniTest::Unit::TestCase
     parses "[1]" do |nodes|
       array = nodes.first
 
-      assert_kind_of Noscript::AST::Array, array
+      assert_kind_of Array, array
       assert_equal([Integer.new(1)], array.body)
     end
   end
@@ -26,7 +24,7 @@ class ArrayTest < MiniTest::Unit::TestCase
     parses "[1, 2]" do |nodes|
       array = nodes.first
 
-      assert_kind_of Noscript::AST::Array, array
+      assert_kind_of Array, array
       assert_equal([Integer.new(1), Integer.new(2)], array.body)
     end
   end
@@ -35,7 +33,7 @@ class ArrayTest < MiniTest::Unit::TestCase
     parses "[foo, bar]" do |nodes|
       array = nodes.first
 
-      assert_kind_of Noscript::AST::Array, array
+      assert_kind_of Array, array
       assert_equal([Identifier.new('foo'), Identifier.new('bar')], array.body)
     end
   end
@@ -47,7 +45,7 @@ class ArrayTest < MiniTest::Unit::TestCase
     ]" do |nodes|
       array = nodes.first
 
-      assert_kind_of Noscript::AST::Array, array
+      assert_kind_of Array, array
       assert_equal([Identifier.new('foo'), Identifier.new('bar')], array.body)
     end
   end

@@ -3,7 +3,7 @@ require 'test_helper'
 class FunctionTest < MiniTest::Unit::TestCase
 
   def setup
-    @context = Noscript::Context.new
+    @context = Context.new
 
     # Define this function:
     #
@@ -11,29 +11,29 @@ class FunctionTest < MiniTest::Unit::TestCase
     #   a = 3
     #   74
     # end
-    @function = Noscript::AST::Function.new(
+    @function = Function.new(
       # PARAMS
       [
-        Noscript::AST::DefaultParameter.new(
-          Noscript::AST::Identifier.new('bar'),
-          Noscript::AST::Integer.new(23)
+        DefaultParameter.new(
+          Identifier.new('bar'),
+          Integer.new(23)
         )
       ],
 
       # BODY
-      Noscript::AST::Nodes.new([
-        Noscript::AST::Assignment.new(
+      Nodes.new([
+        Assignment.new(
           nil,
-          Noscript::AST::Identifier.new('a'),
-          Noscript::AST::Integer.new(3)
+          Identifier.new('a'),
+          Integer.new(3)
         ),
-        Noscript::AST::Integer.new(74)
+        Integer.new(74)
       ])
     )
   end
 
   def test_function_returns_last_value
-    assert_equal Noscript::AST::Integer.new(74), @function.call(@context)
+    assert_equal Integer.new(74), @function.call(@context)
   end
 
   def test_function_local_scope
@@ -47,12 +47,12 @@ class FunctionTest < MiniTest::Unit::TestCase
     # bar + 2
     #
     @function.body.nodes.push(
-      Noscript::AST::AddNode.new(
-        Noscript::AST::Identifier.new('bar'),
-        Noscript::AST::Integer.new(2),
+      AddNode.new(
+        Identifier.new('bar'),
+        Integer.new(2),
       )
     )
-    assert_equal Noscript::AST::Integer.new(25), @function.call(@context)
+    assert_equal Integer.new(25), @function.call(@context)
   end
 
   def test_function_overriding_default_param
@@ -61,12 +61,12 @@ class FunctionTest < MiniTest::Unit::TestCase
     # bar + 2
     #
     @function.body.nodes.push(
-      Noscript::AST::AddNode.new(
-        Noscript::AST::Identifier.new('bar'),
-        Noscript::AST::Integer.new(2),
+      AddNode.new(
+        Identifier.new('bar'),
+        Integer.new(2),
       )
     )
-    assert_equal Noscript::AST::Integer.new(100), @function.call(@context, Noscript::AST::Integer.new(98))
+    assert_equal Integer.new(100), @function.call(@context, Integer.new(98))
   end
 
   def test_function_using_local_var
@@ -75,36 +75,36 @@ class FunctionTest < MiniTest::Unit::TestCase
     # a + 2
     #
     @function.body.nodes.push(
-      Noscript::AST::AddNode.new(
-        Noscript::AST::Identifier.new('a'),
-        Noscript::AST::Integer.new(2),
+      AddNode.new(
+        Identifier.new('a'),
+        Integer.new(2),
       )
     )
-    assert_equal Noscript::AST::Integer.new(5), @function.call(@context)
+    assert_equal Integer.new(5), @function.call(@context)
   end
 
   def test_function_with_too_few_arguments
     # -> bar
     # end
-    @function = Noscript::AST::Function.new(
+    @function = Function.new(
       # ARGUMENTS
-      [ Noscript::AST::Identifier.new('bar') ],
+      [ Identifier.new('bar') ],
 
       # BODY
-      Noscript::AST::Nodes.new([])
+      Nodes.new([])
     )
 
     @function.pos('file', '1')
 
-    assert_raises Noscript::ArgumentError, "This function expected 1 arguments, not 0 [file:1]" do
+    assert_raises ArgumentError, "This function expected 1 arguments, not 0 [file:1]" do
       @function.call(@context)
     end
   end
 
   def test_function_with_too_many_arguments
-    assert_raises Noscript::ArgumentError, "This function expected 1 arguments, not 2 [file:1]" do
+    assert_raises ArgumentError, "This function expected 1 arguments, not 2 [file:1]" do
       @function.pos('file', '1')
-      @function.call(@context, Noscript::AST::Integer.new(10), Noscript::AST::Integer.new(9))
+      @function.call(@context, Integer.new(10), Integer.new(9))
     end
   end
 
@@ -115,14 +115,14 @@ class FunctionTest < MiniTest::Unit::TestCase
     #   @foo
     # end
     @function.body.nodes.push(
-      Noscript::AST::Identifier.new('foo', true)
+      Identifier.new('foo', true)
     )
-    object = Noscript::Object.new
-    object.add_slot('foo', Noscript::AST::Integer.new(123))
+    object = Object.new
+    object.add_slot('foo', Integer.new(123))
 
     @context.current_receiver = object
 
-    assert_equal Noscript::AST::Integer.new(123), @function.call(@context)
+    assert_equal Integer.new(123), @function.call(@context)
   end
 
   def test_function_with_dereferencing_on_the_call
@@ -134,14 +134,14 @@ class FunctionTest < MiniTest::Unit::TestCase
     #
     # foo(@baz)
     @function.body.nodes.push(
-      Noscript::AST::Identifier.new('bar')
+      Identifier.new('bar')
     )
-    object = Noscript::Object.new
-    object.add_slot('baz', Noscript::AST::Integer.new(123))
+    object = Object.new
+    object.add_slot('baz', Integer.new(123))
 
     @context.current_receiver = object
 
-    assert_equal Noscript::AST::Integer.new(123), @function.call(@context, Noscript::AST::Identifier.new('baz', true))
+    assert_equal Integer.new(123), @function.call(@context, Identifier.new('baz', true))
   end
 
 end

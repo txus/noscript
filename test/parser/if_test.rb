@@ -2,8 +2,6 @@ require 'test_helper'
 
 class IfTest < MiniTest::Unit::TestCase
 
-  include Noscript::AST
-
   def test_if
     parses "if foo == 3\n 3\n end" do |nodes|
       if_node = nodes.first

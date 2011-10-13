@@ -2,8 +2,6 @@ require 'test_helper'
 
 class BooleansTest < MiniTest::Unit::TestCase
 
-  include Noscript::AST
-
   def test_true
     parses "true" do |nodes|
       exp = nodes.first

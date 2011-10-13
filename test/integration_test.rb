@@ -100,7 +100,7 @@ class NoscriptTest < MiniTest::Unit::TestCase
       """
     ].each do |code|
       compiles(code) do |retval|
-        assert_equal Noscript::AST::String.new('ok'), retval
+        assert_equal String.new('ok'), retval
       end
     end
   end
@@ -118,7 +118,7 @@ class NoscriptTest < MiniTest::Unit::TestCase
       """
     ].each do |code|
       compiles(code) do |retval|
-        assert_equal Noscript::AST::Integer.new(0), retval
+        assert_equal Integer.new(0), retval
       end
     end
   end

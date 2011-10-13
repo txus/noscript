@@ -2,8 +2,6 @@ require 'test_helper'
 
 class BooleanExpressionsTest < MiniTest::Unit::TestCase
 
-  include Noscript::AST
-
   def test_equality
     parses "foo == 3" do |nodes|
       exp = nodes.first
