@@ -1,16 +1,16 @@
 require 'test_helper'
 
-class FunctionTest < MiniTest::Unit::TestCase
+class FunctionNodeTest < MiniTest::Unit::TestCase
 
   def test_fun_without_args
     parses "->\n 3\n end" do |nodes|
       fun = nodes.first
 
-      assert_kind_of Function, fun
+      assert_kind_of FunctionNode, fun
       assert_equal [], fun.params
 
       body = fun.body.nodes
-      assert_equal [Integer.new(3)], body
+      assert_equal [3], body.map(&:value)
     end
   end
 
@@ -18,11 +18,11 @@ class FunctionTest < MiniTest::Unit::TestCase
     parses "-> bar; 3; end" do |nodes|
       fun = nodes.first
 
-      assert_kind_of Function, fun
-      assert_equal [Identifier.new('bar')], fun.params
+      assert_kind_of FunctionNode, fun
+      assert_equal ["bar"], fun.params.map(&:name)
 
       body = fun.body.nodes
-      assert_equal [Integer.new(3)], body
+      assert_equal [3], body.map(&:value)
     end
   end
 
@@ -30,11 +30,11 @@ class FunctionTest < MiniTest::Unit::TestCase
     parses "-> bar, baz; 3; end" do |nodes|
       fun = nodes.first
 
-      assert_kind_of Function, fun
-      assert_equal [Identifier.new('bar'), Identifier.new('baz')], fun.params
+      assert_kind_of FunctionNode, fun
+      assert_equal ["bar", "baz"], fun.params.map(&:name)
 
       body = fun.body.nodes
-      assert_equal [Integer.new(3)], body
+      assert_equal [3], body.map(&:value)
     end
   end
 
@@ -42,17 +42,14 @@ class FunctionTest < MiniTest::Unit::TestCase
     parses "-> bar, baz='ho'; 3; end" do |nodes|
       fun = nodes.first
 
-      assert_kind_of Function, fun
-      assert_equal [
-        Identifier.new('bar'),
-        DefaultParameter.new(
-          Identifier.new('baz'),
-          String.new('ho')
-        )
-      ], fun.params
+      assert_kind_of FunctionNode, fun
+      params = fun.params
+      assert_equal "bar", params[0].name
+      assert_equal "baz", params[1].name
+      assert_equal "ho", params[1].default_value.value
 
       body = fun.body.nodes
-      assert_equal [Integer.new(3)], body
+      assert_equal [3], body.map(&:value)
     end
   end
 end
