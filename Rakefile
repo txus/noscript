@@ -42,4 +42,4 @@ task :native do
   end
 end
 
-task :default => [:regenerate, :test, :integration, :native]
+task :default => [:regenerate, :test] #, :integration, :native]
