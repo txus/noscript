@@ -8,12 +8,13 @@ class IfTest < MiniTest::Unit::TestCase
 
       assert_kind_of IfNode, if_node
 
-      exp = if_node.expression
-      assert_kind_of EqualityExpression, exp
-      assert_equal Identifier.new('foo'), exp.lhs
-      assert_equal Integer.new(3), exp.rhs
+      exp = if_node.condition
+      assert_kind_of CallNode, exp
+      assert_equal "foo", exp.receiver
+      assert_equal "==", exp.method
+      assert_equal 3, exp.arguments.first.value
 
-      assert_equal [Integer.new(3)], if_node.body.nodes
+      assert_equal [3], if_node.body.nodes.map(&:value)
     end
   end
 
@@ -23,13 +24,14 @@ class IfTest < MiniTest::Unit::TestCase
 
       assert_kind_of IfNode, if_node
 
-      exp = if_node.expression
-      assert_kind_of InequalityExpression, exp
-      assert_equal Identifier.new('foo'), exp.lhs
-      assert_equal Integer.new(3), exp.rhs
+      exp = if_node.condition
+      assert_kind_of CallNode, exp
+      assert_equal "foo", exp.receiver
+      assert_equal "!=", exp.method
+      assert_equal 3, exp.arguments.first.value
 
-      assert_equal [Integer.new(3)], if_node.body.nodes
-      assert_equal [Integer.new(4)], if_node.else_body.nodes
+      assert_equal [3], if_node.body.nodes.map(&:value)
+      assert_equal [4], if_node.else_body.nodes.map(&:value)
     end
   end
 
