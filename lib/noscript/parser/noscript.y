@@ -31,19 +31,20 @@ preclow
 rule
   # The trunk of the AST.
   Root:
-    /* nothing */     { result = Nodes.new([]); result.pos(filename, lineno) }
+    /* nothing */     { result = Nodes.new([]) }
   | Expressions       { result = val[0] }
   ;
 
-  # Any list of expressions, separated by line breaks.
+  # Any list of expressions, class or method body, separated by line breaks.
   Expressions:
-    Expression                        { result = Nodes.new(val); result.pos(filename, lineno) }
-  | Expressions Terminator Expression { result = val[0] << val[2] }
-  | Expressions Terminator            { result = val[0] }
-  | Terminator                        { result = Nodes.new([]); result.pos(filename, lineno) }
+    Expression                         { result = Nodes.new(val) }
+  | Expressions Terminator Expression  { result = val[0] << val[2] }
+    # To ignore trailing line breaks
+  | Expressions Terminator             { result = val[0] }
+  | Terminator                         { result = Nodes.new([]) }
   ;
 
-  # All tokens that can terminate an expression.
+  # All tokens that can terminate an expression
   Terminator:
     NEWLINE
   | ";"
@@ -53,8 +54,10 @@ rule
   Expression:
     Literal
   | Call
+  | SlotGet
   | Operator
-  | Assign
+  | LocalAssign
+  | SlotAssign
   | If
   | While
   | '(' Expression ')'  { result = val[1] }
@@ -62,124 +65,161 @@ rule
 
   # All hard-coded values
   Literal:
-    INTEGER
+    INTEGER { result = IntegerNode.new(val[0]); result.pos(filename, lineno) }
+  | STRING  { result = StringNode.new(val[0]); result.pos(filename, lineno) }
+  | Function{ result = val[0] }
+  | Array   { result = val[0] }
+  | Tuple   { result = val[0] }
+  | TRUE    { result = TrueNode.new; result.pos(filename, lineno) }
+  | FALSE   { result = FalseNode.new; result.pos(filename, lineno) }
+  | NIL     { result = NilNode.new; result.pos(filename, lineno) }
+  ;
 
+  # Function
+  #
+  # -> a, b
+  #   a + b
+  # end
+  Function:
+    "->" ParamList Terminator
+      Expressions
+    END                           { result = FunctionNode.new(val[1], val[3]); result.pos(filename, lineno) }
+  ;
 
+  Array:
+    LBracket ArrayList RBracket { result = ArrayNode.new(val[1]); result.pos(filename, lineno)}
+  ;
 
-  target : statements
-         | /* none */ { 0 }
+  LBracket:
+    '['
+  | '[' NEWLINE
+  ;
 
-  assignment : identifier '.' identifier '=' statement { result = AST::Assignment.new(val[0], val[2], val[4]); result.pos(filename, lineno) }
-             | identifier '=' statement { result = AST::Assignment.new(nil, val[0], val[2]); result.pos(filename, lineno) }
+  RBracket:
+    ']'
+  | NEWLINE ']'
+  ;
 
-  fun_definition : '->' parameter_list end_of_statement statements END { result = AST::Function.new(val[1], val[3]); result.pos(filename, lineno) }
+  ArrayList:
+    /* nothing */                 { result = [] }
+  | ArrayListElement                   { result = [val[0]] }
+  | ArrayList "," ArrayListElement     { result = val[0] += [val[2]] }
+  ;
 
-  message : identifier '.' identifier { result = AST::Message.new(val[0], val[2]); result.pos(filename, lineno) }
-          | identifier '.' fun_call { result = AST::Message.new(val[0], val[2]); result.pos(filename, lineno) }
-          | fun_call { result = AST::Message.new(nil, val[0]); result.pos(filename, lineno) }
+  ArrayListElement:
+    Expression                 { result = val[0] }
+  | NEWLINE Expression         { result = val[1] }
+  | Expression NEWLINE         { result = val[0] }
+  ;
 
-  if_else : IF expression end_of_statement statements ELSE end_of_statement statements END { result = AST::IfNode.new(val[1], val[3], val[6]); result.pos(filename, lineno) }
-          | IF expression end_of_statement statements END { result = AST::IfNode.new(val[1], val[3]); result.pos(filename, lineno) }
+  Tuple:
+    LBrace TupleList RBrace { result = TupleNode.new(val[1]); result.pos(filename, lineno)}
+  ;
 
-  while   : WHILE expression end_of_statement statements END { result = AST::WhileNode.new(val[1], val[3]); result.pos(filename, lineno) }
+  TupleList:
+    /* nothing */                 { result = {} }
+  | TupleListElement                   { result = val[0] }
+  | TupleList "," TupleListElement     { result = val[0].merge!(val[2]) }
+  ;
 
-  identifier : IDENTIFIER { result = AST::Identifier.new(val[0]); result.pos(filename, lineno) }
-             | DEREF { result = AST::Identifier.new(val[0], true); result.pos(filename, lineno) }
+  TupleListElement:
+    NEWLINE IDENTIFIER ":" Expression { result = { val[1] => val[3] } }
+  ;
 
-  integer : INTEGER { result = AST::Integer.new(val[0]); result.pos(filename, lineno) }
-  string : STRING { result = AST::String.new(val[0]); result.pos(filename, lineno) }
-  tuple : '{' tuple_elements '}' { result = AST::Tuple.new(val[1]); result.pos(filename, lineno) }
-  array : '[' array_elements ']' { result = AST::Array.new(val[1]); result.pos(filename, lineno) }
+  LBrace:
+    '{'
+  | '{' NEWLINE
+  ;
 
-  tuple_element : IDENTIFIER ':' argument { result = {val[0] => val[2]} }
-                | end_of_statement tuple_element { result = val[1] }
-                | tuple_element end_of_statement { result = val[0]}
+  RBrace:
+    '}'
+  | NEWLINE '}'
+  ;
 
-  tuple_elements : { result = {} }
-                 | tuple_element { result.merge!(val[0]) }
-                 | tuple_elements ',' tuple_element { result.merge!(val[2]) }
+  LocalAssign:
+    # foo = 123
+    IDENTIFIER '=' Expression     { result = LocalAssignNode.new(val[0], val[2]); result.pos(filename, lineno) }
+  ;
 
-  array_element : argument { result = val[0] }
-                | end_of_statement array_element { result = val[1] }
-                | array_element end_of_statement { result = val[0]}
+  SlotAssign:
+    # receiver.slot = 123
+    Expression '.' IDENTIFIER '=' Expression     { result = SlotAssignNode.new(val[0], val[2], val[4]); result.pos(filename, lineno) }
+  ;
 
-  array_elements : { result = [] }
-                 | array_element { result = [val[0]] }
-                 | array_elements ',' array_element { result.push(val[2]) }
+  # Function call
+  SlotGet:
+    # local
+    IDENTIFIER                    { result = SlotGetNode.new(nil, val[0]); result.pos(filename, lineno) }
+    # receiver.slot
+  | Expression '.' IDENTIFIER     { result = SlotGetNode.new(val[0], val[2]); result.pos(filename, lineno) }
+  ;
 
-  literal : integer
-          | string
-          | tuple
-          | array
-          | fun_definition
-          | boolean_literal
-          | operation
+  # Function call
+  Call:
+    # function(1, 2, 3)
+    IDENTIFIER ArgListWithParens  { result = CallNode.new(nil, val[0], val[1]); result.pos(filename, lineno) }
+    # receiver.function(1, 2, 3)
+  | Expression '.' IDENTIFIER
+      ArgListWithParens           { result = CallNode.new(val[0], val[2], val[3]); result.pos(filename, lineno) }
+  ;
 
-  argument : identifier
-           | literal
-           | message
+  ArgListWithParens:
+    '(' ')'                             { result = [] }
+  | '(' ArgList ')'                     { result = val[1] }
+  ;
 
-  argument_list : { result = [] }
-                | argument  { result = [val[0]] }
-                | argument_list ',' argument { result.push(val[2]) }
+  ArgList:
+    Expression                    { result = val }
+  | ArgList "," Expression        { result = val[0] << val[2] }
+  ;
 
-  parameter : identifier '=' argument { result = AST::DefaultParameter.new(val[0], val[2]); result.pos(filename, lineno)}
-            | identifier
+  Operator:
+    # Binary operators
+    Expression '||' Expression    { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
+  | Expression '&&' Expression    { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
+  | Expression '==' Expression    { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
+  | Expression '!=' Expression    { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
+  | Expression '>' Expression     { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
+  | Expression '>=' Expression    { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
+  | Expression '<' Expression     { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
+  | Expression '<=' Expression    { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
+    # 1 + 2 => 1.+(2)
+    #   1       +       2                           1       "+"      [2]
+  | Expression '+' Expression     { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno)}
+  | Expression '-' Expression     { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno)}
+  | Expression '*' Expression     { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno)}
+  | Expression '/' Expression     { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno)}
+  # Unary operators
+  | '!' Expression                { result = CallNode.new(val[1], val[0], []); result.pos(filename, lineno) }
+  ;
 
-  parameter_list : { result = [] }
-                 | parameter { result = [val[0]] }
-                 | parameter_list ',' parameter { result.push(val[2]) }
+  ParamList:
+    /* nothing */                { result = [] }
+  | Parameter                    { result = val }
+  | ParamList "," Parameter      { result = val[0] << val[2] }
+  ;
 
-  boolean_exp : op_member '==' op_member { result = AST::EqualityExpression.new(val[0], val[2]); result.pos(filename, lineno) }
-              | op_member '!=' op_member { result = AST::InequalityExpression.new(val[0], val[2]); result.pos(filename, lineno) }
-              | op_member '>' op_member { result = AST::GtExpression.new(val[0], val[2]); result.pos(filename, lineno) }
-              | op_member '>=' op_member { result = AST::GteExpression.new(val[0], val[2]); result.pos(filename, lineno) }
-              | op_member '<' op_member { result = AST::LtExpression.new(val[0], val[2]); result.pos(filename, lineno) }
-              | op_member '<=' op_member { result = AST::LteExpression.new(val[0], val[2]); result.pos(filename, lineno) }
-              | boolean_literal
+  Parameter:
+    IDENTIFIER '=' Expression { result = ParameterNode.new(val[0], val[2]); result.pos(filename, lineno)}
+  | IDENTIFIER                { result = ParameterNode.new(val[0]); result.pos(filename, lineno) }
+  ;
 
-  boolean_literal : TRUE { result = AST::True.new; result.pos(filename, lineno) }
-                  | FALSE { result = AST::False.new; result.pos(filename, lineno) }
-                  | NIL { result = AST::Nil.new; result.pos(filename, lineno) }
+  If:
+    IF Expression Terminator
+      Expressions
+    END                                 { result = IfNode.new(val[1], val[3], nil); result.pos(filename, lineno) }
+  | IF Expression Terminator
+      Expressions
+    ELSE Terminator
+      Expressions
+    END                                 { result = IfNode.new(val[1], val[3], val[6]); result.pos(filename, lineno) }
+  ;
 
-  expression : boolean_exp
-             | message
-             | '(' expression ')'
-
-  statement : assignment
-            | expression
-            | message
-            | literal
-            | if_else
-            | while
-            | op_member
-            | statement end_of_statement
-
-  op_member : integer
-            | operation
-            | boolean_literal
-            | identifier
-            | message
-
-  operation : op_member '+' op_member { result = AST::AddNode.new(val[0], val[2]); result.pos(filename, lineno) }
-            | op_member '-' op_member { result = AST::SubtractNode.new(val[0], val[2]); result.pos(filename, lineno) }
-            | op_member '*' op_member { result = AST::MultiplicationNode.new(val[0], val[2]); result.pos(filename, lineno) }
-            | op_member '/' op_member { result = AST::DivisionNode.new(val[0], val[2]); result.pos(filename, lineno) }
-            | '(' op_member ')' { result = val[1] }
-            | '-' op_member =UMINUS { result = AST::UnaryMinus.new(val[1]); result.pos(filename, lineno) }
-
-  statements : { result = AST::Nodes.new([]); result.pos(filename, lineno) }
-             | statement { result = AST::Nodes.new([val[0]]); result.pos(filename, lineno) }
-             | statements statement { result << val[1] }
-             | NEWLINE statements { result = val[1] }
-
-  end_of_statement : ';' | NEWLINE
-
-  fun_call : identifier '(' argument_list ')'
-             {
-               result = AST::FunctionCall.new(val[0], val[2]); result.pos(filename, lineno)
-             }
-
+  While:
+    WHILE Expression Terminator
+      Expressions
+    END                                 { result = WhileNode.new(val[1], val[3]); result.pos(filename, lineno) }
+  ;
 
 ---- header ----
 #

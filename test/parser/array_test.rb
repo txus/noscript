@@ -6,8 +6,8 @@ class ArrayTest < MiniTest::Unit::TestCase
     parses "[]" do |nodes|
       array = nodes.first
 
-      assert_kind_of Array, array
-      assert_equal([], array.body)
+      assert_kind_of ArrayNode, array
+      assert_equal([], array.value)
     end
   end
 
@@ -15,8 +15,8 @@ class ArrayTest < MiniTest::Unit::TestCase
     parses "[1]" do |nodes|
       array = nodes.first
 
-      assert_kind_of Array, array
-      assert_equal([Integer.new(1)], array.body)
+      assert_kind_of ArrayNode, array
+      assert_equal(1, array.value.first.value)
     end
   end
 
@@ -24,8 +24,8 @@ class ArrayTest < MiniTest::Unit::TestCase
     parses "[1, 2]" do |nodes|
       array = nodes.first
 
-      assert_kind_of Array, array
-      assert_equal([Integer.new(1), Integer.new(2)], array.body)
+      assert_kind_of ArrayNode, array
+      assert_equal([1, 2], array.value.map(&:value))
     end
   end
 
@@ -33,20 +33,20 @@ class ArrayTest < MiniTest::Unit::TestCase
     parses "[foo, bar]" do |nodes|
       array = nodes.first
 
-      assert_kind_of Array, array
-      assert_equal([Identifier.new('foo'), Identifier.new('bar')], array.body)
+      assert_kind_of ArrayNode, array
+      assert_equal(['foo', 'bar'], array.value.map(&:name))
     end
   end
 
   def test_array_multiline
     parses "[
-      foo,
-      bar
+      \"foo\",
+      34
     ]" do |nodes|
       array = nodes.first
 
-      assert_kind_of Array, array
-      assert_equal([Identifier.new('foo'), Identifier.new('bar')], array.body)
+      assert_kind_of ArrayNode, array
+      assert_equal(["foo", 34], array.value.map(&:value))
     end
   end
 

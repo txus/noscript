@@ -1,6 +1,6 @@
 module Noscript
   module AST
-    class Nodes < Node
+    class Nodes
       attr_reader :nodes
 
       def initialize(nodes)
@@ -12,9 +12,9 @@ module Noscript
       end
 
       def compile(context)
-        @nodes.map do |node|
-          node.compile(context)
-        end.last
+        # @nodes.map do |node|
+        #   node.compile(context)
+        # end.last
       end
 
       def to_s
@@ -41,6 +41,16 @@ module Noscript
 
     class IntegerNode < LiteralNode; end
     class StringNode < LiteralNode; end
+    class ArrayNode < LiteralNode; end
+    class TupleNode < LiteralNode; end
+
+    class FunctionNode < Node
+      attr_reader :params, :body
+      def initialize(params, body)
+        @params = params
+        @body   = body
+      end
+    end
 
     class TrueNode < LiteralNode
       def initialize
@@ -76,11 +86,27 @@ module Noscript
     end
 
     # Setting the value of a local variable or a slot.
-    class AssignNode < Node
-      attr_reader :lhs, :rhs, :receiver
-      def initialize(lhs, rhs, receiver=nil)
+    class LocalAssignNode < Node
+      attr_reader :lhs, :rhs
+      def initialize(lhs, rhs)
         @lhs, @rhs = lhs, rhs
-        @receiver  = receiver
+      end
+    end
+
+    class SlotAssignNode < Node
+      attr_reader :receiver, :slot, :value
+      def initialize(receiver, slot, value)
+        @receiver = receiver
+        @slot     = slot
+        @value    = value
+      end
+    end
+
+    class SlotGetNode < Node
+      attr_reader :receiver, :name
+      def initialize(receiver, name)
+        @receiver = receiver
+        @name     = name
       end
     end
 
