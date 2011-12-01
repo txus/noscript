@@ -105,7 +105,7 @@ class Noscript::Parser < Racc::Parser
          action { [:IDENTIFIER, text.strip] }
 
       when (text = @ss.scan(/@\w[[ \t]+\w]*/))
-         action { [:DEREF, text.strip[1..-1]] }
+         action { [:IDENTIFIER, text.strip] }
 
       when (text = @ss.scan(/==/))
          action { [text, text] }

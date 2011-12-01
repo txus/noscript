@@ -11,7 +11,7 @@ token NEWLINE
 token INTEGER
 token STRING
 token TRUE FALSE NIL
-token IDENTIFIER DEREF
+token IDENTIFIER
 token END
 
 prechigh

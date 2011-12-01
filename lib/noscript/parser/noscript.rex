@@ -32,7 +32,7 @@ rule
 
   # Identifiers
   \w[{BLANK}\w]*    { [:IDENTIFIER, text.strip] }
-  @\w[{BLANK}\w]*   { [:DEREF, text.strip[1..-1]] }
+  @\w[{BLANK}\w]*   { [:IDENTIFIER, text.strip] }
 
   # Longer operators
   ==            { [text, text] }

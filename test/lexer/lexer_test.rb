@@ -35,7 +35,7 @@ class LexerTest < MiniTest::Unit::TestCase
     tokenizes "hello world", [[:IDENTIFIER, 'hello world']]
     tokenizes "My constant", [[:IDENTIFIER, 'My constant']]
     tokenizes "goodbye cruel world", [[:IDENTIFIER, 'goodbye cruel world']]
-    tokenizes "@name", [[:DEREF, 'name']]
+    tokenizes "@name", [[:IDENTIFIER, '@name']]
   end
 
   def test_double_operators

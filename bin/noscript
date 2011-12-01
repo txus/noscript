@@ -42,11 +42,11 @@ if ast
     pp ast
     puts
   end
-
-  result = ast.compile(Noscript.bootstrap)
+#
+#   result = ast.compile(Noscript.bootstrap)
 
   if args.any?{|a| a =~ /--return/}
     puts "-----RETURN VALUE-----"
-    pp result
+    # pp result
   end
 end
