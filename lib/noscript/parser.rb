@@ -1,1 +1,1 @@
-require_relative 'parser/noscript.tab'
+require_relative 'parser/parser'

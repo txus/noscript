@@ -8,8 +8,8 @@ task :regenerate do
   has_racc = `which racc`
 
   if has_rex && has_racc
-    `rex lib/noscript/parser/noscript.rex`
-    `racc lib/noscript/parser/noscript.racc`
+    `rex lib/noscript/parser/noscript.rex -o lib/noscript/parser/lexer.rb`
+    `racc lib/noscript/parser/noscript.racc -o lib/noscript/parser/parser.rb`
   else
     puts "You need both Rexical and Racc to do that. Install them by doing:"
     puts

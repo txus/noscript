@@ -10,8 +10,7 @@ require 'racc/parser'
 #
 # Noscript Lexer
 #
-module Noscript
-class Parser < Racc::Parser
+class Noscript::Parser < Racc::Parser
   require 'strscan'
 
   class ScanError < StandardError ; end
@@ -63,59 +62,23 @@ class Parser < Racc::Parser
     token = case @state
     when nil
       case
-      when (text = @ss.scan(/[\n]+[\s]*/))
+      when (text = @ss.scan(/[ \t]+/))
+        ;
+
+      when (text = @ss.scan(/\#.*$/))
+        ;
+
+      when (text = @ss.scan(/\n+/))
          action { [:NEWLINE, text] }
 
       when (text = @ss.scan(/\d+/))
          action { [:INTEGER, text.to_i] }
 
-      when (text = @ss.scan(/==/))
-         action { [:EQUALS, text] }
-
-      when (text = @ss.scan(/!=/))
-         action { [:NEQUALS, text] }
-
-      when (text = @ss.scan(/>=/))
-         action { [:GTE_OP, text] }
-
-      when (text = @ss.scan(/<=/))
-         action { [:LTE_OP, text] }
-
-      when (text = @ss.scan(/</))
-         action { [:LT_OP, text] }
-
-      when (text = @ss.scan(/->/))
-         action { [:FUN, text] }
-
-      when (text = @ss.scan(/>/))
-         action { [:GT_OP, text] }
-
-      when (text = @ss.scan(/true/))
-         action { [:TRUE, text] }
-
-      when (text = @ss.scan(/false/))
-         action { [:FALSE, text] }
-
-      when (text = @ss.scan(/nil/))
-         action { [:NIL, text] }
-
-      when (text = @ss.scan(/=/))
-         action { [:ASSIGN, text] }
-
-      when (text = @ss.scan(/,/))
-         action { [:COMMA, text] }
-
-      when (text = @ss.scan(/;/))
-         action { [:SEMICOLON, text] }
-
-      when (text = @ss.scan(/'[^']*'/))
+      when (text = @ss.scan(/\'[^']*\'/))
          action { [:STRING, text[1..-2]] }
 
-      when (text = @ss.scan(/\(/))
-         action { [:LPAREN, text] }
-
-      when (text = @ss.scan(/\)/))
-         action { [:RPAREN, text] }
+      when (text = @ss.scan(/\"[^"]*\"/))
+         action { [:STRING, text[1..-2]] }
 
       when (text = @ss.scan(/end/))
          action { [:END, text] }
@@ -129,17 +92,35 @@ class Parser < Racc::Parser
       when (text = @ss.scan(/while/))
          action { [:WHILE, text] }
 
-      when (text = @ss.scan(/\s*#(.*)/))
-         action { }
+      when (text = @ss.scan(/true/))
+         action { [:TRUE, text] }
 
-      when (text = @ss.scan(/@\w[[ ]\w]*/))
-         action { [:DEREF, text.strip[1..-1]] }
+      when (text = @ss.scan(/false/))
+         action { [:FALSE, text] }
 
-      when (text = @ss.scan(/\w[[ ]\w]*/))
+      when (text = @ss.scan(/nil/))
+         action { [:NIL, text] }
+
+      when (text = @ss.scan(/\w[[ \t]+\w]*/))
          action { [:IDENTIFIER, text.strip] }
 
-      when (text = @ss.scan(/\s/))
-        ;
+      when (text = @ss.scan(/@\w[[ \t]+\w]*/))
+         action { [:DEREF, text.strip[1..-1]] }
+
+      when (text = @ss.scan(/==/))
+         action { [text, text] }
+
+      when (text = @ss.scan(/!=/))
+         action { [text, text] }
+
+      when (text = @ss.scan(/>=/))
+         action { [text, text] }
+
+      when (text = @ss.scan(/<=/))
+         action { [text, text] }
+
+      when (text = @ss.scan(/->/))
+         action { [text, text] }
 
       when (text = @ss.scan(/./))
          action { [text, text] }
@@ -155,5 +136,12 @@ class Parser < Racc::Parser
     token
   end  # def _next_token
 
+  def run(code)
+    scan_setup(code)
+    tokens = []
+    while token = next_token
+      tokens << token
+    end
+    tokens
+  end
 end # class
-end

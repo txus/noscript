@@ -3,44 +3,55 @@
 #
 # Noscript Lexer
 #
-module Noscript
-class Parser
+class Noscript::Parser
+
 macro
-  BLANK         [\ ]
+  BLANK         [\ \t]+
+
 rule
-  [\n]+[\s]*    { [:NEWLINE, text] }
+  # Ignore comments and whitespace
+  {BLANK}
+  \#.*$
+
+  # Newlines
+  \n+           { [:NEWLINE, text] }
+
+  # Literals
   \d+           { [:INTEGER, text.to_i] }
+  \'[^']*\'     { [:STRING, text[1..-2]] }
+  \"[^"]*\"     { [:STRING, text[1..-2]] }
 
-  ==            { [:EQUALS, text] }
-  !=            { [:NEQUALS, text] }
-  >=            { [:GTE_OP, text] }
-  <=            { [:LTE_OP, text] }
-  <             { [:LT_OP, text] }
-  ->            { [:FUN, text] }
-  >             { [:GT_OP, text] }
-
-  true          { [:TRUE, text] }
-  false         { [:FALSE, text] }
-  nil           { [:NIL, text] }
-
-  =             { [:ASSIGN, text] }
-  ,             { [:COMMA, text] }
-  ;             { [:SEMICOLON, text] }
-  '[^']*'       { [:STRING, text[1..-2]] }
-  \(            { [:LPAREN, text] }
-  \)            { [:RPAREN, text] }
+  # Keywords
   end           { [:END, text] }
   if            { [:IF, text] }
   else          { [:ELSE, text] }
   while         { [:WHILE, text] }
+  true          { [:TRUE, text] }
+  false         { [:FALSE, text] }
+  nil           { [:NIL, text] }
 
-  # Ignore comments
-  \s*#(.*)      { }
+  # Identifiers
+  \w[{BLANK}\w]*    { [:IDENTIFIER, text.strip] }
+  @\w[{BLANK}\w]*   { [:DEREF, text.strip[1..-1]] }
 
-  @\w[{BLANK}\w]* { [:DEREF, text.strip[1..-1]] }
-  \w[{BLANK}\w]* { [:IDENTIFIER, text.strip] }
+  # Longer operators
+  ==            { [text, text] }
+  !=            { [text, text] }
+  >=            { [text, text] }
+  <=            { [text, text] }
+  ->            { [text, text] }
 
-  \s
+  # Catch all
   .             { [text, text] }
-end
+
+inner
+  def run(code)
+    scan_setup(code)
+    tokens = []
+    while token = next_token
+      tokens << token
+    end
+    tokens
+  end
+
 end
