@@ -8,12 +8,13 @@ class WhileTest < MiniTest::Unit::TestCase
 
       assert_kind_of WhileNode, while_node
 
-      exp = while_node.expression
-      assert_kind_of EqualityExpression, exp
-      assert_equal Identifier.new('foo'), exp.lhs
-      assert_equal Integer.new(3), exp.rhs
+      exp = while_node.condition
+      assert_kind_of CallNode, exp
+      assert_equal "foo", exp.receiver
+      assert_equal "==", exp.method
+      assert_equal 3, exp.arguments.first.value
 
-      assert_equal [Integer.new(3)], while_node.body.nodes
+      assert_equal [3], while_node.body.nodes.map(&:value)
     end
   end
 
