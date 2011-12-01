@@ -124,7 +124,12 @@ rule
   ;
 
   TupleListElement:
-    NEWLINE IDENTIFIER ":" Expression { result = { val[1] => val[3] } }
+    TupleKey ":" Expression    { result = { val[0] => val[2] } }
+  ;
+
+  TupleKey:
+    IDENTIFIER
+  | NEWLINE IDENTIFIER { result = val[1] }
   ;
 
   LBrace:

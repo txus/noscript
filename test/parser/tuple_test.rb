@@ -6,8 +6,8 @@ class TupleTest < MiniTest::Unit::TestCase
     parses "{}" do |nodes|
       tuple = nodes.first
 
-      assert_kind_of Tuple, tuple
-      assert_equal({}, tuple.body)
+      assert_kind_of TupleNode, tuple
+      assert_equal({}, tuple.value)
     end
   end
 
@@ -15,8 +15,9 @@ class TupleTest < MiniTest::Unit::TestCase
     parses "{a: 1}" do |nodes|
       tuple = nodes.first
 
-      assert_kind_of Tuple, tuple
-      assert_equal({'a' => Integer.new(1)}, tuple.body)
+      assert_kind_of TupleNode, tuple
+      assert_equal(['a'], tuple.value.keys)
+      assert_equal([1], tuple.value.values.map(&:value))
     end
   end
 
@@ -24,29 +25,24 @@ class TupleTest < MiniTest::Unit::TestCase
     parses "{a: 1, b: 2}" do |nodes|
       tuple = nodes.first
 
-      assert_kind_of Tuple, tuple
-      assert_equal({'a' => Integer.new(1), 'b' => Integer.new(2)}, tuple.body)
-    end
-  end
-
-  def test_tuple_with_multiple_identifiers
-    parses "{a: foo, b: bar}" do |nodes|
-      tuple = nodes.first
-
-      assert_kind_of Tuple, tuple
-      assert_equal({'a' => Identifier.new('foo'), 'b' => Identifier.new('bar')}, tuple.body)
+      assert_kind_of TupleNode, tuple
+      assert_equal(['a', 'b'], tuple.value.keys)
+      assert_equal([1, 2], tuple.value.values.map(&:value))
     end
   end
 
   def test_tuple_multiline
     parses "{
-      a: foo,
-      b: bar
+    a: 1,
+
+    b: 2
+
     }" do |nodes|
       tuple = nodes.first
 
-      assert_kind_of Tuple, tuple
-      assert_equal({'a' => Identifier.new('foo'), 'b' => Identifier.new('bar')}, tuple.body)
+      assert_kind_of TupleNode, tuple
+      assert_equal(['a', 'b'], tuple.value.keys)
+      assert_equal([1, 2], tuple.value.values.map(&:value))
     end
   end
 
