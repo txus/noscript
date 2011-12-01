@@ -4,13 +4,68 @@
 
 class Noscript::Parser
 
+# Declare tokens produced by the lexer
+token IF ELSE
+token WHILE
+token NEWLINE
+token INTEGER
+token STRING
+token TRUE FALSE NIL
+token IDENTIFIER DEREF
+token END
+
 prechigh
-    nonassoc UMINUS
-    left '*' '/'
-    left '+' '-'
+  nonassoc UMINUS
+  left  '.'
+  right '!'
+  left  '*' '/'
+  left  '+' '-'
+  left  '>' '>=' '<' '<='
+  left  '==' '!='
+  left  '&&'
+  left  '||'
+  right '='
+  left  ','
 preclow
 
 rule
+  # The trunk of the AST.
+  Root:
+    /* nothing */     { result = Nodes.new([]); result.pos(filename, lineno) }
+  | Expressions       { result = val[0] }
+  ;
+
+  # Any list of expressions, separated by line breaks.
+  Expressions:
+    Expression                        { result = Nodes.new(val); result.pos(filename, lineno) }
+  | Expressions Terminator Expression { result = val[0] << val[2] }
+  | Expressions Terminator            { result = val[0] }
+  | Terminator                        { result = Nodes.new([]); result.pos(filename, lineno) }
+  ;
+
+  # All tokens that can terminate an expression.
+  Terminator:
+    NEWLINE
+  | ";"
+  ;
+
+  # All types of expression in Noscript
+  Expression:
+    Literal
+  | Call
+  | Operator
+  | Assign
+  | If
+  | While
+  | '(' Expression ')'  { result = val[1] }
+  ;
+
+  # All hard-coded values
+  Literal:
+    INTEGER
+
+
+
   target : statements
          | /* none */ { 0 }
 
@@ -133,5 +188,7 @@ rule
 require_relative 'lexer'
 
 ---- inner ----
+
+include AST
 
 ---- footer ----
