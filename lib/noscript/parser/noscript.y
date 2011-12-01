@@ -54,12 +54,13 @@ rule
   Expression:
     Literal
   | Call
-  | SlotGet
+  | SlotAssign
   | Operator
   | LocalAssign
-  | SlotAssign
   | If
   | While
+  | SlotGet
+  | Identifier
   | '(' Expression ')'  { result = val[1] }
   ;
 
@@ -136,6 +137,10 @@ rule
   | NEWLINE '}'
   ;
 
+  Identifier:
+    IDENTIFIER
+  ;
+
   LocalAssign:
     # foo = 123
     IDENTIFIER '=' Expression     { result = LocalAssignNode.new(val[0], val[2]); result.pos(filename, lineno) }
@@ -146,10 +151,8 @@ rule
     Expression '.' IDENTIFIER '=' Expression     { result = SlotAssignNode.new(val[0], val[2], val[4]); result.pos(filename, lineno) }
   ;
 
-  # Function call
+  # Get a slot from an object
   SlotGet:
-    # local
-    IDENTIFIER                    { result = SlotGetNode.new(nil, val[0]); result.pos(filename, lineno) }
     # receiver.slot
   | Expression '.' IDENTIFIER     { result = SlotGetNode.new(val[0], val[2]); result.pos(filename, lineno) }
   ;

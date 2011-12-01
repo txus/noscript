@@ -6,10 +6,10 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     parses "a = 'foo'" do |nodes|
       assignment = nodes.first
 
-      assert_kind_of Assignment, assignment
+      assert_kind_of LocalAssignNode, assignment
 
-      assert_equal Identifier.new('a'), assignment.lhs
-      assert_equal String.new('foo'), assignment.rhs
+      assert_equal "a", assignment.lhs
+      assert_equal "foo", assignment.rhs.value
     end
   end
 
@@ -17,113 +17,97 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     parses "oh my lord = 'foo'" do |nodes|
       assignment = nodes.first
 
-      assert_kind_of Assignment, assignment
+      assert_kind_of LocalAssignNode, assignment
 
-      assert_equal Identifier.new('oh my lord'), assignment.lhs
-      assert_equal String.new('foo'), assignment.rhs
+      assert_equal 'oh my lord', assignment.lhs
+      assert_equal "foo", assignment.rhs.value
     end
   end
 
   def test_operation_assignment
     parses 'a = (3 + 3) * 4' do |nodes|
       assignment = nodes.first
-      assert_kind_of Assignment, assignment
-      assert_equal Identifier.new('a'), assignment.lhs
+      assert_kind_of LocalAssignNode, assignment
+      assert_equal "a", assignment.lhs
 
       multiplication = assignment.rhs
-      assert_kind_of MultiplicationNode, multiplication
+      assert_kind_of CallNode, multiplication
+      assert_equal '*', multiplication.method
+      assert_equal 4, multiplication.arguments.first.value
 
-      assert_equal Integer.new(4), multiplication.rhs
-
-      parens_op = multiplication.lhs
-      assert_kind_of AddNode, parens_op
-      assert_equal Integer.new(3), parens_op.lhs
-      assert_equal Integer.new(3), parens_op.rhs
+      parens_op = multiplication.receiver
+      assert_kind_of CallNode, parens_op
+      assert_equal 3, parens_op.receiver.value
+      assert_equal '+', parens_op.method
+      assert_equal 3, parens_op.arguments.first.value
     end
   end
 
   def test_double_assignment
     parses 'a = b = 3' do |nodes|
       assignment = nodes.first
-      assert_kind_of Assignment, assignment
-      assert_equal Identifier.new('a'), assignment.lhs
+      assert_kind_of LocalAssignNode, assignment
+      assert_equal "a", assignment.lhs
 
       other_assignment = assignment.rhs
-      assert_kind_of Assignment, other_assignment
+      assert_kind_of LocalAssignNode, other_assignment
 
-      assert_equal Identifier.new('b'), other_assignment.lhs
-      assert_equal Integer.new(3), other_assignment.rhs
+      assert_equal "b", other_assignment.lhs
+      assert_equal 3, other_assignment.rhs.value
     end
   end
 
-  def test_assignment_with_message
+  def test_assignment_with_call
     parses 'a = foo()' do |nodes|
       assignment = nodes.first
-      assert_kind_of Assignment, assignment
-      assert_equal Identifier.new('a'), assignment.lhs
+      assert_kind_of LocalAssignNode, assignment
+      assert_equal "a", assignment.lhs
 
-      message = assignment.rhs
-      assert_kind_of Message, message
-      assert_equal Message.new(nil, FunctionCall.new(Identifier.new('foo'), [])), message
+      call = assignment.rhs
+      assert_kind_of CallNode, call
+      assert_nil call.receiver
+      assert_equal "foo", call.method
+      assert_equal [], call.arguments
     end
   end
 
   def test_assignment_with_function_definition
     parses 'a = -> b, c; 3; end;' do |nodes|
       assignment = nodes.first
-      assert_kind_of Assignment, assignment
-      assert_equal Identifier.new('a'), assignment.lhs
+      assert_kind_of LocalAssignNode, assignment
+      assert_equal "a", assignment.lhs
 
       function = assignment.rhs
-      assert_kind_of Function, function
-      assert_equal [Identifier.new('b'), Identifier.new('c')], function.params
+      assert_kind_of FunctionNode, function
+      assert_equal ['b', 'c'], function.params.map(&:name)
 
       body = function.body.nodes
-      assert_equal [Integer.new(3)], body
-    end
-  end
-
-  def test_assignment_with_semicolon
-    parses "a = 3;" do |nodes|
-      assignment = nodes.first
-      assert_kind_of Assignment, assignment
-
-      assert_equal Identifier.new('a'), assignment.lhs
-      assert_equal Integer.new(3), assignment.rhs
-    end
-  end
-
-  def test_assignment_with_newline
-    parses "a = 3\n " do |nodes|
-      assignment = nodes.first
-      assert_kind_of Assignment, assignment
-
-      assert_equal Identifier.new('a'), assignment.lhs
-      assert_equal Integer.new(3), assignment.rhs
+      assert_equal [3], body.map(&:value)
     end
   end
 
   def test_assignment_with_expression
-    parses "a = a - 3\n " do |nodes|
+    parses "a = a - 3" do |nodes|
       assignment = nodes.first
-      assert_kind_of Assignment, assignment
+      assert_kind_of LocalAssignNode, assignment
+      assert_equal "a", assignment.lhs
 
-      assert_equal Identifier.new('a'), assignment.lhs
-      assert_equal SubtractNode.new(
-        Identifier.new('a'),
-        Integer.new(3)
-      ), assignment.rhs
+      exp = assignment.rhs
+      assert_kind_of CallNode, exp
+      assert_equal "a", exp.receiver
+      assert_equal "-", exp.method
+      assert_equal [3], exp.arguments.map(&:value)
     end
   end
 
   def test_slot_assignment
     parses "foo.a = 3\n " do |nodes|
       assignment = nodes.first
-      assert_kind_of Assignment, assignment
+      assert_kind_of SlotAssignNode, assignment
 
-      assert_equal Identifier.new('foo'), assignment.receiver
-      assert_equal Identifier.new('a'), assignment.lhs
-      assert_equal Integer.new(3), assignment.rhs
+      assert_equal "foo", assignment.receiver
+      assert_equal "a", assignment.slot
+      assert_equal 3, assignment.value.value
     end
   end
 end
