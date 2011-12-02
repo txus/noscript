@@ -11,12 +11,6 @@ module Noscript
         @nodes << element
       end
 
-      def compile(context)
-        # @nodes.map do |node|
-        #   node.compile(context)
-        # end.last
-      end
-
       def to_s
         @nodes.map(&:inspect).join(', ')
       end

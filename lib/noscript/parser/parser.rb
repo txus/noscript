@@ -18,6 +18,10 @@ module_eval(<<'...end noscript.y/module_eval...', 'noscript.y', 239)
 
 include AST
 
+def parse(code)
+  scan_str(code)
+end
+
 ...end noscript.y/module_eval...
 ##### State transition tables begin ###
 
