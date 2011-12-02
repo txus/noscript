@@ -33,9 +33,17 @@ class LexerTest < MiniTest::Unit::TestCase
     tokenizes "hello", [[:IDENTIFIER, 'hello']]
     tokenizes "hello_world", [[:IDENTIFIER, 'hello_world']]
     tokenizes "hello world", [[:IDENTIFIER, 'hello world']]
-    tokenizes "My constant", [[:IDENTIFIER, 'My constant']]
+    tokenizes "My constant+", [[:IDENTIFIER, 'My constant'], ['+', '+']]
     tokenizes "goodbye cruel world", [[:IDENTIFIER, 'goodbye cruel world']]
     tokenizes "@name", [[:IDENTIFIER, '@name']]
+
+    %w(+ - * / % < > >= <= -> && ||).each do |operator|
+      tokenizes "some identifier #{operator} bar", [
+        [:IDENTIFIER, 'some identifier'],
+        [operator, operator],
+        [:IDENTIFIER, 'bar'],
+      ]
+    end
   end
 
   def test_double_operators

@@ -35,4 +35,15 @@ class FunctionCallTest < MiniTest::Unit::TestCase
     end
   end
 
+  def test_operations
+    parses "a + b" do |nodes|
+      invocation = nodes.first
+
+      assert_kind_of CallNode, invocation
+      assert_equal "a", invocation.receiver
+      assert_equal "+", invocation.method
+      assert_equal "b", invocation.arguments.first
+    end
+  end
+
 end

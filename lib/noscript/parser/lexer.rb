@@ -62,7 +62,7 @@ class Noscript::Parser < Racc::Parser
     token = case @state
     when nil
       case
-      when (text = @ss.scan(/[ \t]+/))
+      when (text = @ss.scan(/[ ]/))
         ;
 
       when (text = @ss.scan(/\#.*$/))
@@ -101,12 +101,6 @@ class Noscript::Parser < Racc::Parser
       when (text = @ss.scan(/nil/))
          action { [:NIL, text] }
 
-      when (text = @ss.scan(/\w[[ \t]+\w]*/))
-         action { [:IDENTIFIER, text.strip] }
-
-      when (text = @ss.scan(/@\w[[ \t]+\w]*/))
-         action { [:IDENTIFIER, text.strip] }
-
       when (text = @ss.scan(/==/))
          action { [text, text] }
 
@@ -121,6 +115,18 @@ class Noscript::Parser < Racc::Parser
 
       when (text = @ss.scan(/->/))
          action { [text, text] }
+
+      when (text = @ss.scan(/&&/))
+         action { [text, text] }
+
+      when (text = @ss.scan(/\|\|/))
+         action { [text, text] }
+
+      when (text = @ss.scan(/\w[[ ]\w]*/))
+         action { [:IDENTIFIER, text.strip] }
+
+      when (text = @ss.scan(/@\w[[ ]\w]*/))
+         action { [:IDENTIFIER, text.strip] }
 
       when (text = @ss.scan(/./))
          action { [text, text] }

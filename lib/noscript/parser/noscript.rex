@@ -6,7 +6,7 @@
 class Noscript::Parser
 
 macro
-  BLANK         [\ \t]+
+  BLANK         [\ ]
 
 rule
   # Ignore comments and whitespace
@@ -30,16 +30,18 @@ rule
   false         { [:FALSE, text] }
   nil           { [:NIL, text] }
 
-  # Identifiers
-  \w[{BLANK}\w]*    { [:IDENTIFIER, text.strip] }
-  @\w[{BLANK}\w]*   { [:IDENTIFIER, text.strip] }
-
   # Longer operators
   ==            { [text, text] }
   !=            { [text, text] }
   >=            { [text, text] }
   <=            { [text, text] }
   ->            { [text, text] }
+  &&            { [text, text] }
+  \|\|            { [text, text] }
+
+  # Identifiers
+  \w[{BLANK}\w]*  { [:IDENTIFIER, text.strip] }
+  @\w[{BLANK}\w]* { [:IDENTIFIER, text.strip] }
 
   # Catch all
   .             { [text, text] }
