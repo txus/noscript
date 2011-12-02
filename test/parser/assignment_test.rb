@@ -8,7 +8,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
 
       assert_kind_of LocalAssignNode, assignment
 
-      assert_equal "a", assignment.lhs
+      assert_equal "a", assignment.lhs.name
       assert_equal "foo", assignment.rhs.value
     end
   end
@@ -19,7 +19,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
 
       assert_kind_of LocalAssignNode, assignment
 
-      assert_equal 'oh my lord', assignment.lhs
+      assert_equal 'oh my lord', assignment.lhs.name
       assert_equal "foo", assignment.rhs.value
     end
   end
@@ -28,7 +28,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     parses 'a = (3 + 3) * 4' do |nodes|
       assignment = nodes.first
       assert_kind_of LocalAssignNode, assignment
-      assert_equal "a", assignment.lhs
+      assert_equal "a", assignment.lhs.name
 
       multiplication = assignment.rhs
       assert_kind_of CallNode, multiplication
@@ -47,12 +47,12 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     parses 'a = b = 3' do |nodes|
       assignment = nodes.first
       assert_kind_of LocalAssignNode, assignment
-      assert_equal "a", assignment.lhs
+      assert_equal "a", assignment.lhs.name
 
       other_assignment = assignment.rhs
       assert_kind_of LocalAssignNode, other_assignment
 
-      assert_equal "b", other_assignment.lhs
+      assert_equal "b", other_assignment.lhs.name
       assert_equal 3, other_assignment.rhs.value
     end
   end
@@ -61,12 +61,12 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     parses 'a = foo()' do |nodes|
       assignment = nodes.first
       assert_kind_of LocalAssignNode, assignment
-      assert_equal "a", assignment.lhs
+      assert_equal "a", assignment.lhs.name
 
       call = assignment.rhs
       assert_kind_of CallNode, call
       assert_nil call.receiver
-      assert_equal "foo", call.method
+      assert_equal "foo", call.method.name
       assert_equal [], call.arguments
     end
   end
@@ -75,11 +75,11 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     parses 'a = -> b, c; 3; end;' do |nodes|
       assignment = nodes.first
       assert_kind_of LocalAssignNode, assignment
-      assert_equal "a", assignment.lhs
+      assert_equal "a", assignment.lhs.name
 
       function = assignment.rhs
       assert_kind_of FunctionNode, function
-      assert_equal ['b', 'c'], function.params.map(&:name)
+      assert_equal ['b', 'c'], function.params.map(&:name).map(&:name)
 
       body = function.body.nodes
       assert_equal [3], body.map(&:value)
@@ -90,11 +90,11 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     parses "a = a - 3" do |nodes|
       assignment = nodes.first
       assert_kind_of LocalAssignNode, assignment
-      assert_equal "a", assignment.lhs
+      assert_equal "a", assignment.lhs.name
 
       exp = assignment.rhs
       assert_kind_of CallNode, exp
-      assert_equal "a", exp.receiver
+      assert_equal "a", exp.receiver.name
       assert_equal "-", exp.method
       assert_equal [3], exp.arguments.map(&:value)
     end
@@ -105,8 +105,8 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
       assignment = nodes.first
       assert_kind_of SlotAssignNode, assignment
 
-      assert_equal "foo", assignment.receiver
-      assert_equal "a", assignment.slot
+      assert_equal "foo", assignment.receiver.name
+      assert_equal "a", assignment.slot.name
       assert_equal 3, assignment.value.value
     end
   end

@@ -30,6 +30,7 @@ class LexerTest < MiniTest::Unit::TestCase
   end
 
   def test_identifiers_and_constants
+    tokenizes "foo", [[:IDENTIFIER, 'foo']]
     tokenizes "hello", [[:IDENTIFIER, 'hello']]
     tokenizes "hello_world", [[:IDENTIFIER, 'hello_world']]
     tokenizes "hello world", [[:IDENTIFIER, 'hello world']]

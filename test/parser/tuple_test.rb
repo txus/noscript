@@ -16,7 +16,7 @@ class TupleTest < MiniTest::Unit::TestCase
       tuple = nodes.first
 
       assert_kind_of TupleNode, tuple
-      assert_equal(['a'], tuple.value.keys)
+      assert_equal('a', tuple.value.keys.first.name)
       assert_equal([1], tuple.value.values.map(&:value))
     end
   end
@@ -26,7 +26,8 @@ class TupleTest < MiniTest::Unit::TestCase
       tuple = nodes.first
 
       assert_kind_of TupleNode, tuple
-      assert_equal(['a', 'b'], tuple.value.keys)
+      assert_equal('a', tuple.value.keys.first.name)
+      assert_equal('b', tuple.value.keys.last.name)
       assert_equal([1, 2], tuple.value.values.map(&:value))
     end
   end
@@ -41,7 +42,8 @@ class TupleTest < MiniTest::Unit::TestCase
       tuple = nodes.first
 
       assert_kind_of TupleNode, tuple
-      assert_equal(['a', 'b'], tuple.value.keys)
+      assert_equal('a', tuple.value.keys.first.name)
+      assert_equal('b', tuple.value.keys.last.name)
       assert_equal([1, 2], tuple.value.values.map(&:value))
     end
   end

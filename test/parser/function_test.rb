@@ -19,7 +19,7 @@ class FunctionNodeTest < MiniTest::Unit::TestCase
       fun = nodes.first
 
       assert_kind_of FunctionNode, fun
-      assert_equal ["bar"], fun.params.map(&:name)
+      assert_equal ["bar"], fun.params.map(&:name).map(&:name)
 
       body = fun.body.nodes
       assert_equal [3], body.map(&:value)
@@ -31,7 +31,7 @@ class FunctionNodeTest < MiniTest::Unit::TestCase
       fun = nodes.first
 
       assert_kind_of FunctionNode, fun
-      assert_equal ["bar", "baz"], fun.params.map(&:name)
+      assert_equal ["bar", "baz"], fun.params.map(&:name).map(&:name)
 
       body = fun.body.nodes
       assert_equal [3], body.map(&:value)
@@ -44,8 +44,8 @@ class FunctionNodeTest < MiniTest::Unit::TestCase
 
       assert_kind_of FunctionNode, fun
       params = fun.params
-      assert_equal "bar", params[0].name
-      assert_equal "baz", params[1].name
+      assert_equal "bar", params[0].name.name
+      assert_equal "baz", params[1].name.name
       assert_equal "ho", params[1].default_value.value
 
       body = fun.body.nodes

@@ -128,8 +128,8 @@ rule
   ;
 
   TupleKey:
-    IDENTIFIER
-  | NEWLINE IDENTIFIER { result = val[1] }
+    Identifier
+  | NEWLINE Identifier { result = val[1] }
   ;
 
   LBrace:
@@ -143,31 +143,31 @@ rule
   ;
 
   Identifier:
-    IDENTIFIER
+    IDENTIFIER { result = IdentifierNode.new(val[0]); result.pos(filename, lineno) }
   ;
 
   LocalAssign:
     # foo = 123
-    IDENTIFIER '=' Expression     { result = LocalAssignNode.new(val[0], val[2]); result.pos(filename, lineno) }
+    Identifier '=' Expression     { result = LocalAssignNode.new(val[0], val[2]); result.pos(filename, lineno) }
   ;
 
   SlotAssign:
     # receiver.slot = 123
-    Expression '.' IDENTIFIER '=' Expression     { result = SlotAssignNode.new(val[0], val[2], val[4]); result.pos(filename, lineno) }
+    Expression '.' Identifier '=' Expression     { result = SlotAssignNode.new(val[0], val[2], val[4]); result.pos(filename, lineno) }
   ;
 
   # Get a slot from an object
   SlotGet:
     # receiver.slot
-  | Expression '.' IDENTIFIER     { result = SlotGetNode.new(val[0], val[2]); result.pos(filename, lineno) }
+  | Expression '.' Identifier     { result = SlotGetNode.new(val[0], val[2]); result.pos(filename, lineno) }
   ;
 
   # Function call
   Call:
     # function(1, 2, 3)
-    IDENTIFIER ArgListWithParens  { result = CallNode.new(nil, val[0], val[1]); result.pos(filename, lineno) }
+    Identifier ArgListWithParens  { result = CallNode.new(nil, val[0], val[1]); result.pos(filename, lineno) }
     # receiver.function(1, 2, 3)
-  | Expression '.' IDENTIFIER
+  | Expression '.' Identifier
       ArgListWithParens           { result = CallNode.new(val[0], val[2], val[3]); result.pos(filename, lineno) }
   ;
 
@@ -208,8 +208,8 @@ rule
   ;
 
   Parameter:
-    IDENTIFIER '=' Expression { result = ParameterNode.new(val[0], val[2]); result.pos(filename, lineno)}
-  | IDENTIFIER                { result = ParameterNode.new(val[0]); result.pos(filename, lineno) }
+    Identifier '=' Expression { result = ParameterNode.new(val[0], val[2]); result.pos(filename, lineno)}
+  | Identifier                { result = ParameterNode.new(val[0]); result.pos(filename, lineno) }
   ;
 
   If:

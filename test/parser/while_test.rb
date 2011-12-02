@@ -10,7 +10,7 @@ class WhileTest < MiniTest::Unit::TestCase
 
       exp = while_node.condition
       assert_kind_of CallNode, exp
-      assert_equal "foo", exp.receiver
+      assert_equal "foo", exp.receiver.name
       assert_equal "==", exp.method
       assert_equal 3, exp.arguments.first.value
 

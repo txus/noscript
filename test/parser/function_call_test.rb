@@ -7,8 +7,8 @@ class FunctionCallTest < MiniTest::Unit::TestCase
       invocation = nodes.first
 
       assert_kind_of SlotGetNode, invocation
-      assert_equal "a", invocation.receiver
-      assert_equal "foo", invocation.name
+      assert_equal "a", invocation.receiver.name
+      assert_equal "foo", invocation.name.name
     end
   end
 
@@ -17,8 +17,8 @@ class FunctionCallTest < MiniTest::Unit::TestCase
       invocation = nodes.first
 
       assert_kind_of CallNode, invocation
-      assert_equal "a", invocation.receiver
-      assert_equal "foo", invocation.method
+      assert_equal "a", invocation.receiver.name
+      assert_equal "foo", invocation.method.name
       assert_equal [], invocation.arguments
     end
   end
@@ -28,8 +28,8 @@ class FunctionCallTest < MiniTest::Unit::TestCase
       invocation = nodes.first
 
       assert_kind_of CallNode, invocation
-      assert_equal "a", invocation.receiver
-      assert_equal "foo", invocation.method
+      assert_equal "a", invocation.receiver.name
+      assert_equal "foo", invocation.method.name
 
       assert_equal ["hey", 34], invocation.arguments.map(&:value)
     end
@@ -40,9 +40,9 @@ class FunctionCallTest < MiniTest::Unit::TestCase
       invocation = nodes.first
 
       assert_kind_of CallNode, invocation
-      assert_equal "a", invocation.receiver
+      assert_equal "a", invocation.receiver.name
       assert_equal "+", invocation.method
-      assert_equal "b", invocation.arguments.first
+      assert_equal "b", invocation.arguments.first.name
     end
   end
 

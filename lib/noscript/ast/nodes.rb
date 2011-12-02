@@ -10,10 +10,10 @@ module Noscript
       def <<(element)
         @nodes << element
       end
-
-      def to_s
-        @nodes.map(&:inspect).join(', ')
-      end
+#
+#       def to_s
+#         @nodes.map(&:inspect).join(', ')
+#       end
     end
 
     class Node
@@ -37,6 +37,9 @@ module Noscript
     class StringNode < LiteralNode; end
     class ArrayNode < LiteralNode; end
     class TupleNode < LiteralNode; end
+    class IdentifierNode < LiteralNode
+      def name; value; end
+    end
 
     class FunctionNode < Node
       attr_reader :params, :body

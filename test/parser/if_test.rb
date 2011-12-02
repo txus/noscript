@@ -10,7 +10,7 @@ class IfTest < MiniTest::Unit::TestCase
 
       exp = if_node.condition
       assert_kind_of CallNode, exp
-      assert_equal "foo", exp.receiver
+      assert_equal "foo", exp.receiver.name
       assert_equal "==", exp.method
       assert_equal 3, exp.arguments.first.value
 
@@ -26,7 +26,7 @@ class IfTest < MiniTest::Unit::TestCase
 
       exp = if_node.condition
       assert_kind_of CallNode, exp
-      assert_equal "foo", exp.receiver
+      assert_equal "foo", exp.receiver.name
       assert_equal "!=", exp.method
       assert_equal 3, exp.arguments.first.value
 

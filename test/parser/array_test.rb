@@ -34,7 +34,7 @@ class ArrayTest < MiniTest::Unit::TestCase
       array = nodes.first
 
       assert_kind_of ArrayNode, array
-      assert_equal(['foo', 'bar'], array.value)
+      assert_equal(['foo', 'bar'], array.value.map(&:name))
     end
   end
 
