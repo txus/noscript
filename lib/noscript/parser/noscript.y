@@ -40,7 +40,7 @@ rule
     Expression                         { result = Nodes.new(val) }
   | Expressions Terminator Expression  { result = val[0] << val[2] }
     # To ignore trailing line breaks
-  | Expressions Terminator             { result = val[0] }
+  | Expressions Terminator             { result = val[0].is_a?(Nodes) ? val[0] : Nodes.new(val[0]) }
   | Terminator                         { result = Nodes.new([]) }
   ;
 

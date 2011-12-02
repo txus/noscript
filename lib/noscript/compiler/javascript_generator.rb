@@ -5,8 +5,9 @@ module Noscript
       @locals = []
     end
 
-    def compile_all(nodes)
+    def compile_all(nodes, indent=0)
       nodes.each do |node|
+        emit " " * indent
         node.compile(self)
         emit ";"
       end
@@ -21,11 +22,12 @@ module Noscript
     end
 
     def has_local?(name)
-      @locals.any?{|l| l == name}
+      @locals.any?{|l| l == name }
     end
 
     def is_operator?(method)
-      %(+ - * / == != > < >= <=).include?(method)
+      name = method.is_a?(String) ? method : method.name
+      %(+ - * / == != > < >= <=).include?(name)
     end
 
     def integer_literal(value)
@@ -33,7 +35,9 @@ module Noscript
     end
 
     def string_literal(value)
+      emit '"'
       emit value.to_s
+      emit '"'
     end
 
     def array_literal(value)
@@ -45,13 +49,16 @@ module Noscript
     end
 
     def tuple_literal(value)
-      emit "{"
+      emit "{\n  "
       value.each_pair do |k, v|
+        emit "  "
         k.compile(self)
         emit ": "
         v.compile(self)
+        emit",\n  "
       end
-      emit "}"
+      pop
+      emit "\n  }"
     end
 
     def function_literal(params, body)
@@ -64,14 +71,18 @@ module Noscript
         end
         emit ", "
       end
-      pop
+      pop if params.any?
       emit ") {\n"
-      compile_all(body.nodes)
+      compile_all(body.nodes, 2)
       emit "}"
     end
 
     def identifier(name)
-      emit name
+      if name =~ /^@/
+        emit "this."
+        name = name[1..-1]
+      end
+      emit name.gsub(" ", "-")
     end
 
     def true_literal
@@ -101,18 +112,29 @@ module Noscript
         receiver.compile(self)
         emit "."
       end
-      emit method
+
+      if method.is_a?(String)
+        emit method
+      else
+        method.compile(self)
+      end
+
       emit "("
       arguments.each do |argument|
         argument.compile(self)
         emit ", "
       end
-      pop
+      pop if arguments.any?
       emit ")"
     end
 
     def set_local(name, value)
-      @locals << name.name unless has_local?(name.name)
+      local_name = if name.name =~ /^@/
+        name.name[1..-1]
+      else
+        name.name
+      end
+      @locals << local_name unless has_local?(local_name)
       name.compile(self)
       emit " = "
       value.compile(self)
@@ -136,12 +158,11 @@ module Noscript
       emit "if ("
       condition.compile(self)
       emit ") {\n"
-      body.compile(self)
+      compile_all(body.nodes, 2)
       emit "}"
       if else_body
-        emit "}"
         emit " else {\n"
-        else_body.compile(self)
+        compile_all(body.nodes, 2)
         emit "}"
       end
     end
@@ -149,13 +170,13 @@ module Noscript
     def while(condition, body)
       emit "while ("
       condition.compile(self)
-      emit ") {"
-      body.compile(self)
+      emit ") {\n"
+      compile_all(body.nodes, 2)
       emit "}"
     end
 
     def assemble
-      @code.unshift "var #{@locals.join(', ')};"
+      @code.unshift "var #{@locals.map{|l| l.gsub(" ", "-")}.join(', ')};"
       @code.join.split(";").join(";\n") << ";"
     end
   end

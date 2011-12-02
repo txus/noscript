@@ -543,7 +543,7 @@ module_eval(<<'.,.,', 'noscript.y', 40)
 
 module_eval(<<'.,.,', 'noscript.y', 42)
   def _reduce_5(val, _values, result)
-     result = val[0] 
+     result = val[0].is_a?(Nodes) ? val[0] : Nodes.new(val[0]) 
     result
   end
 .,.,

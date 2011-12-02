@@ -21,7 +21,19 @@ end
 args = ARGV
 
 begin
-  ast = parser.scan_file(filename)
+  if compile = args.detect{|a| a =~ /-c/}
+    case compile
+    when "-cjs"
+      str = File.read(filename)
+      compiler = Noscript::Compiler.new(Noscript::JavascriptGenerator)
+      parser = compiler.parser
+      compiled = compiler.compile(str)
+      STDOUT.print compiled
+    end
+    return
+  else
+    ast = parser.scan_file(filename)
+  end
 rescue
   $stderr.printf  "Syntax error\n\t%s:%d:%s\n", parser.filename, parser.lineno, $!.message
 end

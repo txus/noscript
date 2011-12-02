@@ -2,6 +2,7 @@ require_relative 'compiler/javascript_generator'
 
 module Noscript
   class Compiler
+    attr_reader :parser
     def initialize(generator_class)
       @parser = Parser.new
       @generator_class = generator_class
@@ -9,7 +10,11 @@ module Noscript
 
     def compile(code)
       generator = @generator_class.new
-      @parser.parse(code).compile(generator)
+      a = @parser.parse(code)
+      if a.is_a?(Array)
+        p a.first.line
+      end
+      a.compile(generator)
       generator.assemble
     end
   end
