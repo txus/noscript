@@ -47,6 +47,10 @@ module Noscript
       @compiler.compile("-> a; 3; end").must_equal [:function_literal]
     end
 
+    def test_compile_identifier
+      @compiler.compile("a").must_equal [:identifier]
+    end
+
     def test_compile_true
       @compiler.compile("true").must_equal [:true_literal]
     end

@@ -1,3 +1,5 @@
+require_relative 'compiler/javascript_generator'
+
 module Noscript
   class Compiler
     def initialize(generator_class)
@@ -40,6 +42,12 @@ module Noscript
     class TupleNode
       def compile(generator)
         generator.tuple_literal(value)
+      end
+    end
+
+    class IdentifierNode
+      def compile(generator)
+        generator.identifier(value)
       end
     end
 
