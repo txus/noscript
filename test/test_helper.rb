@@ -1,7 +1,8 @@
-require 'rubygems'
-gem 'minitest'
-require 'minitest/unit'
+# require 'rubygems'
+# gem 'minitest'
+# require 'minitest/unit'
 require 'minitest/autorun'
+# require 'minitest/spec'
 # require 'purdytest'
 
 require 'noscript'

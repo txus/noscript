@@ -28,63 +28,63 @@ module Noscript
     end
 
     def test_compile_integer_literal
-      @compiler.compile("1").must_equal [:integer_literal]
+      assert_equal [:integer_literal], @compiler.compile("1")
     end
 
     def test_compile_string_literal
-      @compiler.compile("'1'").must_equal [:string_literal]
+      assert_equal [:string_literal], @compiler.compile("'1'")
     end
 
     def test_compile_array_literal
-      @compiler.compile("[]").must_equal [:array_literal]
+      assert_equal [:array_literal], @compiler.compile("[]")
     end
 
     def test_compile_tuple_literal
-      @compiler.compile("{}").must_equal [:tuple_literal]
+      assert_equal [:tuple_literal], @compiler.compile("{}")
     end
 
     def test_compile_function
-      @compiler.compile("-> a; 3; end").must_equal [:function_literal]
+      assert_equal [:function_literal], @compiler.compile("-> a; 3; end")
     end
 
     def test_compile_identifier
-      @compiler.compile("a").must_equal [:identifier]
+      assert_equal [:identifier], @compiler.compile("a")
     end
 
     def test_compile_true
-      @compiler.compile("true").must_equal [:true_literal]
+      assert_equal [:true_literal], @compiler.compile("true")
     end
 
     def test_compile_false
-      @compiler.compile("false").must_equal [:false_literal]
+      assert_equal [:false_literal], @compiler.compile("false")
     end
 
     def test_compile_nil
-      @compiler.compile("nil").must_equal [:nil_literal]
+      assert_equal [:nil_literal], @compiler.compile("nil")
     end
 
     def test_compile_call
-      @compiler.compile("foo()").must_equal [:call]
+      assert_equal [:call], @compiler.compile("foo()")
     end
 
     def test_compile_local_assign
-      @compiler.compile("a = 3").must_equal [:set_local]
+      assert_equal [:set_local], @compiler.compile("a = 3")
     end
 
     def test_compile_slot_assign
-      @compiler.compile("foo.a = 3").must_equal [:assign_slot]
+      assert_equal [:assign_slot], @compiler.compile("foo.a = 3")
     end
 
     def test_compile_slot_get
-      @compiler.compile("foo.a").must_equal [:get_slot]
+      assert_equal [:get_slot], @compiler.compile("foo.a")
     end
 
     def test_compile_if
-      @compiler.compile("if true; 1; end").must_equal [:if]
+      assert_equal [:if], @compiler.compile("if true; 1; end")
     end
 
     def test_compile_while
-      @compiler.compile("while true; 1; end").must_equal [:while]
+      assert_equal [:while], @compiler.compile("while true; 1; end")
     end
   end
 end
