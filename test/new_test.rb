@@ -72,10 +72,15 @@ module Noscript
       assert_kind_of Runtime::ObjectType, obj
       assert_equal Runtime::Object, obj.prototype
     end
-#
-#     def test_compile_object_clone_with_properties
-#       assert_equal 1, @compiler.compile("obj = Object.clone({a: 1}); obj.a").call
-#     end
+
+    def test_compile_object_clone_with_properties
+      obj = @compiler.compile("Object.clone({a: 1})").call
+      assert_equal 1, obj.get(:a)
+    end
+
+    # def test_compile_slot_get
+    #   assert_equal 1, @compiler.compile("obj = Object.clone({a: 1}); obj.a").call
+    # end
 
     # def test_compile_slot_assign
     #   assert_equal [:assign_slot], @compiler.compile("foo.a = 3")

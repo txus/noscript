@@ -35,11 +35,13 @@ class Runtime
       @prototype = Object
     end
 
-    noscript_def("clone") do |properties={}|
+    noscript_def("clone") do |*args|
       obj = ObjectType.new
       obj.prototype = self
-      properties.keys.each do |k|
-        obj.put(k.to_sym, properties[k])
+      if properties = args.first
+        properties.keys.each do |k|
+          obj.put(k.to_sym, properties[k])
+        end
       end
       obj
     end

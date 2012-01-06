@@ -159,7 +159,7 @@ rule
   # Get a slot from an object
   SlotGet:
     # receiver.slot
-  | Expression '.' Identifier     { result = SlotGetNode.new(val[0], val[2]); result.pos(filename, lineno) }
+  | Expression '.' Identifier     { result = SlotGet.new(lineno, val[0], val[2].name) }
   ;
 
   # Function call

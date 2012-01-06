@@ -15,8 +15,8 @@ module Noscript
     def compile(ast, debugging=false)
       ast = Noscript::Parser.new.parse(ast) unless ast.kind_of?(AST::Node)
 
-      require 'pp'
-      pp ast
+      # require 'pp'
+      # pp ast
 
       g.name = :call
 
@@ -148,6 +148,13 @@ module Noscript
     def visit_LocalVariableAccess(o)
       set_line(o)
       s.push_variable o.name
+    end
+
+    def visit_SlotGet(o)
+      set_line(o)
+      o.receiver.accept(self)
+      g.push_literal o.name
+      g.send "get", 1
     end
 
     def finalize

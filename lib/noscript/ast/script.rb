@@ -107,13 +107,14 @@ module Noscript
 #       end
 #     end
 #
-#     class SlotGetNode < Node
-#       attr_reader :receiver, :name
-#       def initialize(receiver, name)
-#         @receiver = receiver
-#         @name     = name
-#       end
-#     end
+    class SlotGet < Node
+      attr_reader :receiver, :name
+      def initialize(line, receiver, name)
+        super(line)
+        @receiver = receiver
+        @name     = name.to_sym
+      end
+    end
 #
 #     class IfNode < Node
 #       attr_reader :condition, :body, :else_body
