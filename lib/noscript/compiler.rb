@@ -154,7 +154,7 @@ module Noscript
       set_line(o)
       o.receiver.accept(self)
       g.push_literal o.name
-      g.send "get", 1
+      g.send :get, 1
     end
 
     def finalize
