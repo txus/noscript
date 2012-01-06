@@ -31,17 +31,17 @@ preclow
 rule
   # The trunk of the AST.
   Root:
-    /* nothing */     { result = Nodes.new([]) }
-  | Expressions       { result = val[0] }
+    /* nothing */     { result = Script.new(lineno, filename, Nodes.new(lineno, [])) }
+  | Expressions       { result = Script.new(lineno, filename, val[0]) }
   ;
 
   # Any list of expressions, class or method body, separated by line breaks.
   Expressions:
-    Expression                         { result = Nodes.new(val) }
+    Expression                         { result = Nodes.new(lineno, val) }
   | Expressions Terminator Expression  { result = val[0] << val[2] }
     # To ignore trailing line breaks
-  | Expressions Terminator             { result = val[0].is_a?(Nodes) ? val[0] : Nodes.new(val[0]) }
-  | Terminator                         { result = Nodes.new([]) }
+  | Expressions Terminator             { result = val[0].is_a?(Nodes) ? val[0] : Nodes.new(lineno, val[0]) }
+  | Terminator                         { result = Nodes.new(lineno, []) }
   ;
 
   # All tokens that can terminate an expression
@@ -66,14 +66,14 @@ rule
 
   # All hard-coded values
   Literal:
-    INTEGER { result = IntegerNode.new(val[0]); result.pos(filename, lineno) }
-  | STRING  { result = StringNode.new(val[0]); result.pos(filename, lineno) }
+    INTEGER { result = FixnumLiteral.new(lineno, val[0]) }
+  | STRING  { result = StringLiteral.new(lineno, val[0]) }
   | Function{ result = val[0] }
   | Array   { result = val[0] }
   | Tuple   { result = val[0] }
-  | TRUE    { result = TrueNode.new; result.pos(filename, lineno) }
-  | FALSE   { result = FalseNode.new; result.pos(filename, lineno) }
-  | NIL     { result = NilNode.new; result.pos(filename, lineno) }
+  | TRUE    { result = TrueLiteral.new(lineno) }
+  | FALSE   { result = FalseLiteral.new(lineno) }
+  | NIL     { result = NilLiteral.new(lineno) }
   ;
 
   # Function
@@ -84,11 +84,11 @@ rule
   Function:
     "->" ParamList Terminator
       Expressions
-    END                           { result = FunctionNode.new(val[1], val[3]); result.pos(filename, lineno) }
+    END                           { result = FunctionLiteral.new(lineno, val[1], val[3]) }
   ;
 
   Array:
-    LBracket ArrayList RBracket { result = ArrayNode.new(val[1]); result.pos(filename, lineno)}
+    LBracket ArrayList RBracket { result = ArrayLiteral.new(lineno, val[1]) }
   ;
 
   LBracket:
@@ -114,17 +114,17 @@ rule
   ;
 
   Tuple:
-    LBrace TupleList RBrace { result = TupleNode.new(val[1]); result.pos(filename, lineno)}
+    LBrace TupleList RBrace { result = HashLiteral.new(lineno, val[1].flatten) }
   ;
 
   TupleList:
-    /* nothing */                 { result = {} }
+    /* nothing */                 { result = [] }
   | TupleListElement                   { result = val[0] }
-  | TupleList "," TupleListElement     { result = val[0].merge!(val[2]) }
+  | TupleList "," TupleListElement     { result = val[0] + val[2] }
   ;
 
   TupleListElement:
-    TupleKey ":" Expression    { result = { val[0] => val[2] } }
+    TupleKey ":" Expression    { result = [StringLiteral.new(lineno, val[0].name), val[2]] }
   ;
 
   TupleKey:
@@ -143,12 +143,12 @@ rule
   ;
 
   Identifier:
-    IDENTIFIER { result = IdentifierNode.new(val[0]); result.pos(filename, lineno) }
+    IDENTIFIER { result = Identifier.new(lineno, val[0]) }
   ;
 
   LocalAssign:
     # foo = 123
-    Identifier '=' Expression     { result = LocalAssignNode.new(val[0], val[2]); result.pos(filename, lineno) }
+    Identifier '=' Expression     { result = LocalVariableAssignment.new(lineno, val[0], val[2]) }
   ;
 
   SlotAssign:
@@ -165,10 +165,10 @@ rule
   # Function call
   Call:
     # function(1, 2, 3)
-    Identifier ArgListWithParens  { result = CallNode.new(nil, val[0], val[1]); result.pos(filename, lineno) }
+    Identifier ArgListWithParens  { result = CallNode.new(lineno, nil, val[0], val[1]) }
     # receiver.function(1, 2, 3)
   | Expression '.' Identifier
-      ArgListWithParens           { result = CallNode.new(val[0], val[2], val[3]); result.pos(filename, lineno) }
+      ArgListWithParens           { result = CallNode.new(lineno, val[0], val[2], val[3]) }
   ;
 
   ArgListWithParens:
@@ -193,23 +193,18 @@ rule
   | Expression '<=' Expression    { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
     # 1 + 2 => 1.+(2)
     #   1       +       2                           1       "+"      [2]
-  | Expression '+' Expression     { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno)}
-  | Expression '-' Expression     { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno)}
-  | Expression '*' Expression     { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno)}
-  | Expression '/' Expression     { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno)}
+  | Expression '+' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
+  | Expression '-' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
+  | Expression '*' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
+  | Expression '/' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
   # Unary operators
-  | '!' Expression                { result = CallNode.new(val[1], val[0], []); result.pos(filename, lineno) }
+  | '!' Expression                { result = CallNode.new(lineno, val[1], val[0], []) }
   ;
 
   ParamList:
     /* nothing */                { result = [] }
-  | Parameter                    { result = val }
-  | ParamList "," Parameter      { result = val[0] << val[2] }
-  ;
-
-  Parameter:
-    Identifier '=' Expression { result = ParameterNode.new(val[0], val[2]); result.pos(filename, lineno)}
-  | Identifier                { result = ParameterNode.new(val[0]); result.pos(filename, lineno) }
+  | Identifier                   { result = [val[0].name] }
+  | ParamList "," Identifier     { result = val[0].args << val[2].name }
   ;
 
   If:

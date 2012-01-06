@@ -1,119 +1,170 @@
-require_relative 'compiler/javascript_generator'
+require 'rexpl'
 
 module Noscript
   class Compiler
-    attr_reader :parser
-    def initialize(generator_class)
-      @parser = Parser.new
-      @generator_class = generator_class
+    attr_reader :generator, :scope
+    alias g generator
+    alias s scope
+
+    def initialize(parent=nil)
+      @generator = Generator.new
+      parent_scope = parent ? parent.scope : nil
+      @scope = Scope.new(@generator, parent_scope)
     end
 
-    def compile(code)
-      generator = @generator_class.new
-      a = @parser.parse(code)
-      if a.is_a?(Array)
-        p a.first.line
+    def compile(ast, debugging=false)
+      ast = Noscript::Parser.new.parse(ast) unless ast.kind_of?(AST::Node)
+
+      # require 'pp'
+      # pp ast
+
+      g.name = :call
+
+      if ast.respond_to?(:filename) && ast.filename
+        g.file = ast.filename
+      else
+        g.file = :"(noscript)"
       end
-      a.compile(generator)
-      generator.assemble
-    end
-  end
 
-  module AST
-    class Nodes
-      def compile(generator)
-        generator.compile_all(nodes)
-      end
-    end
+      g.set_line 1
 
-    class IntegerNode
-      def compile(generator)
-        generator.integer_literal(value)
-      end
-    end
+      g.required_args = 0
+      g.total_args = 0
+      g.splat_index = nil
 
-    class StringNode
-      def compile(generator)
-        generator.string_literal(value)
-      end
-    end
+      ast.accept(self)
 
-    class ArrayNode
-      def compile(generator)
-        generator.array_literal(value)
-      end
+      debug if debugging
+
+      g.ret
+
+      finalize
+
+      g.encode
+      cm = g.package Rubinius::CompiledMethod
+      puts cm.decode if $DEBUG
+
+      code = Code.new
+      ss = Rubinius::StaticScope.new Runtime
+      Rubinius.attach_method g.name, cm, ss, code
+
+      code
     end
 
-    class TupleNode
-      def compile(generator)
-        generator.tuple_literal(value)
-      end
+    def visit_Script(o)
+      set_line(o)
+      o.body.accept(self)
     end
 
-    class IdentifierNode
-      def compile(generator)
-        generator.identifier(value)
-      end
-    end
-
-    class FunctionNode
-      def compile(generator)
-        generator.function_literal(params, body)
-      end
-    end
-
-    class TrueNode
-      def compile(generator)
-        generator.true_literal
+    def visit_Nodes(o)
+      set_line(o)
+      o.expressions.each do |exp|
+        exp.accept(self)
       end
     end
 
-    class FalseNode
-      def compile(generator)
-        generator.false_literal
+    def visit_FunctionLiteral(o)
+      set_line(o)
+      # Get a new compiler
+      block = Compiler.new(self)
+
+      # Configures the new generator
+      # TODO Move this to a method on the compiler
+      block.generator.for_block = true
+      block.generator.total_args = o.arguments.size
+      block.generator.required_args = o.arguments.size
+      block.generator.post_args = o.arguments.size
+      block.generator.cast_for_multi_block_arg unless o.arguments.empty?
+      block.generator.set_line o.line if o.line
+
+      block.visit_arguments(o.arguments)
+      o.body.accept(block)
+
+      block.generator.ret
+
+      g.push_const :Function
+
+      # Invoke the create block instruction
+      # with the generator of the block compiler
+      g.create_block block.finalize
+      g.send :new, 1
+    end
+
+    def visit_arguments(args)
+      args.each_with_index do |a, i|
+        g.shift_array
+        p 'setting a'
+        s.set_local a
+        g.pop
+      end
+      g.pop unless args.empty?
+    end
+
+    def visit_CallNode(o)
+      meth = nil
+      if o.receiver
+        meth = o.method.is_a?(String) ? o.method : o.method.name
+        o.receiver.accept(self)
+      else
+        meth = :call
+        visit_Identifier(o.method)
+      end
+
+      o.arguments.each do |argument|
+        argument.accept(self)
+      end
+
+      g.noscript_send meth, o.arguments.length
+    end
+
+    def visit_Identifier(o)
+      set_line(o)
+      if s.slot_for(o.name)
+        visit_LocalVariableAccess(o)
+      # else
+      #   g.push_nil
       end
     end
 
-    class NilNode
-      def compile(generator)
-        generator.nil_literal
+    def visit_LocalVariableAssignment(o)
+      set_line(o)
+      o.value.accept(self)
+      s.set_local o.name
+    end
+
+    %w(StringLiteral FixnumLiteral ArrayLiteral HashLiteral TrueLiteral FalseLiteral NilLiteral).each do |rbx|
+
+      define_method("visit_#{rbx}") do |o|
+        set_line(o)
+        o.bytecode(g)
       end
     end
 
-    class CallNode
-      def compile(generator)
-        generator.call(receiver, method, arguments)
-      end
+    def visit_LocalVariableAccess(o)
+      set_line(o)
+      s.push_variable o.name
     end
 
-    class LocalAssignNode
-      def compile(generator)
-        generator.set_local(lhs, rhs)
-      end
+    def finalize
+      g.local_names = s.variables
+      g.local_count = s.variables.size
+      g.close
+      g
     end
 
-    class SlotAssignNode
-      def compile(generator)
-        generator.assign_slot(receiver, slot, value)
-      end
+    def set_line(o)
+      g.set_line o.line if o.line
     end
 
-    class SlotGetNode
-      def compile(generator)
-        generator.get_slot(receiver, name)
+    def debug(gen = self.g)
+      p '*****'
+      ip = 0
+      while instruction = gen.stream[ip]
+        instruct = Rubinius::InstructionSet[instruction]
+        ip += instruct.size
+        puts instruct.name
       end
-    end
-
-    class IfNode
-      def compile(generator)
-        generator.if condition, body, else_body
-      end
-    end
-
-    class WhileNode
-      def compile(generator)
-        generator.while condition, body
-      end
+      p '**end**'
     end
   end
 end

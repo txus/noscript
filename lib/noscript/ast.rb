@@ -3,4 +3,6 @@ module Noscript
   end
 end
 
-require_relative 'ast/nodes'
+require_relative 'ast/script'
+# require_relative 'ast/node'
+# require_relative 'ast/literal'
