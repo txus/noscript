@@ -204,7 +204,7 @@ rule
   ParamList:
     /* nothing */                { result = [] }
   | Identifier                   { result = [val[0].name] }
-  | ParamList "," Identifier     { result = val[0].args << val[2].name }
+  | ParamList "," Identifier     { result = val[0] << val[2].name }
   ;
 
   If:

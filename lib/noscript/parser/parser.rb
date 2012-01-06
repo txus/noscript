@@ -928,7 +928,7 @@ module_eval(<<'.,.,', 'noscript.y', 205)
 
 module_eval(<<'.,.,', 'noscript.y', 206)
   def _reduce_76(val, _values, result)
-     result = val[0].args << val[2].name 
+     result = val[0] << val[2].name 
     result
   end
 .,.,

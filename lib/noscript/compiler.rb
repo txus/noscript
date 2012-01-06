@@ -93,7 +93,6 @@ module Noscript
     def visit_arguments(args)
       args.each_with_index do |a, i|
         g.shift_array
-        p 'setting a'
         s.set_local a
         g.pop
       end
@@ -121,8 +120,8 @@ module Noscript
       set_line(o)
       if s.slot_for(o.name)
         visit_LocalVariableAccess(o)
-      # else
-      #   g.push_nil
+      else
+        g.push_nil
       end
     end
 
