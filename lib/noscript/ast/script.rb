@@ -82,6 +82,10 @@ module Noscript
         super(line)
         @name = name
       end
+
+      def constant?
+        @name.to_s[0] =~ /[A-Z]/
+      end
     end
 
     class LocalVariableAssignment < Node

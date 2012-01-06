@@ -28,8 +28,21 @@ class Runtime
   # get(name<Symbol>)        => object
   # put(name<Symbol>, object<Object>)
   #
-  class Object < Rubinius::LookupTable
+  class ObjectType < Rubinius::LookupTable
     attr_accessor :prototype
+
+    def initialize
+      @prototype = Object
+    end
+
+    noscript_def("clone") do |properties={}|
+      obj = ObjectType.new
+      obj.prototype = self
+      properties.keys.each do |k|
+        obj.put(k.to_sym, properties[k])
+      end
+      obj
+    end
 
     # def function(name, block=name)
     #   if block.is_a?(Symbol)
@@ -65,6 +78,7 @@ class Runtime
       end
     end
   end
+  Object = ObjectType.new
 end
 
 class Function

@@ -15,8 +15,8 @@ module Noscript
     def compile(ast, debugging=false)
       ast = Noscript::Parser.new.parse(ast) unless ast.kind_of?(AST::Node)
 
-      # require 'pp'
-      # pp ast
+      require 'pp'
+      pp ast
 
       g.name = :call
 
@@ -118,6 +118,12 @@ module Noscript
 
     def visit_Identifier(o)
       set_line(o)
+
+      if o.constant?
+        g.push_const o.name.to_sym
+        return
+      end
+
       if s.slot_for(o.name)
         visit_LocalVariableAccess(o)
       else
