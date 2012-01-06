@@ -29,12 +29,6 @@ module Noscript
         @filename = filename
         @body = body
       end
-
-      def bytecode(g)
-        g.push_state ClosedScope.new(@line)
-        @body.bytecode(g)
-        g.pop_state
-      end
     end
 
     class Nodes < Node
@@ -52,12 +46,6 @@ module Noscript
       def empty?
         @expressions.empty?
       end
-
-      def bytecode(g)
-        @expressions.each do |exp|
-          exp.bytecode(g)
-        end
-      end
     end
 
     class FunctionLiteral < Node
@@ -66,34 +54,6 @@ module Noscript
         super(line)
         @arguments = arguments
         @body = body
-      end
-
-      def bytecode(g)
-        pos(g)
-        # Get a new compiler
-        block = Compiler.new
-
-        # Configures the new generator
-        # TODO Move this to a method on the compiler
-        block.generator.for_block = true
-        block.generator.total_args = @arguments.size
-        block.generator.cast_for_multi_block_arg unless @arguments.empty?
-        block.generator.set_line @line if @line
-
-        # Visit arguments and then the block
-        child_scope = ClosedScope.new(@line)
-        # g.state.scope.nest_scope(child_scope)
-        block.generator.push_state child_scope
-        @arguments.bytecode(block.generator)
-        @body.bytecode(block.generator)
-        block.generator.pop_state
-
-        g.push_const :Function
-
-        # Invoke the create block instruction
-        # with the generator of the block compiler
-        g.create_block block.finalize
-        g.send :new, 1
       end
     end
 
@@ -113,15 +73,6 @@ module Noscript
         @method    = method
         @arguments = arguments
       end
-
-      def bytecode(g)
-        @receiver.bytecode(g)
-        @arguments.each do |argument|
-          argument.bytecode(g)
-        end
-        meth = @method.is_a?(String) ? @method : @method.name
-        g.noscript_send meth, @arguments.length
-      end
     end
 
     class Identifier < Node
@@ -131,14 +82,6 @@ module Noscript
         super(line)
         @name = name
       end
-
-      def bytecode(g)
-        if g.state.scope.search_local(@name)
-          LocalVariableAccess.new(@line, @name).bytecode(g)
-        else
-          # raise "Undefined local variable or method - #{@name}"
-        end
-      end
     end
 
     class LocalVariableAssignment < Node
@@ -147,12 +90,6 @@ module Noscript
         super(line)
         @name = name.is_a?(Identifier) ? name.name : name
         @value = value
-      end
-
-      def bytecode(g)
-        g.local_count += 1
-        Rubinius::AST::LocalVariableAssignment.new(@line, @lhs.name, @rhs).
-          bytecode(g)
       end
     end
 #
