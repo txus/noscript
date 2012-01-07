@@ -157,6 +157,14 @@ module Noscript
       g.send :get, 1
     end
 
+    def visit_SlotAssign(o)
+      set_line(o)
+      o.receiver.accept(self)
+      g.push_literal o.name
+      o.value.accept(self)
+      g.send :put, 2
+    end
+
     def finalize
       g.local_names = s.variables
       g.local_count = s.variables.size

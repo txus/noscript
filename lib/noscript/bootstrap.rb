@@ -32,7 +32,7 @@ class Runtime
     attr_accessor :prototype
 
     def initialize
-      @prototype = Object
+      @prototype = Runtime::Object
     end
 
     noscript_def("clone") do |*args|

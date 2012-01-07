@@ -765,7 +765,7 @@ module_eval(<<'.,.,', 'noscript.y', 150)
 
 module_eval(<<'.,.,', 'noscript.y', 155)
   def _reduce_52(val, _values, result)
-     result = SlotAssignNode.new(val[0], val[2], val[4]); result.pos(filename, lineno) 
+     result = SlotAssign.new(lineno, val[0], val[2], val[4]) 
     result
   end
 .,.,
@@ -774,7 +774,7 @@ module_eval(<<'.,.,', 'noscript.y', 155)
 
 module_eval(<<'.,.,', 'noscript.y', 161)
   def _reduce_54(val, _values, result)
-     result = SlotGet.new(lineno, val[0], val[2].name) 
+     result = SlotGet.new(lineno, val[0], val[2]) 
     result
   end
 .,.,

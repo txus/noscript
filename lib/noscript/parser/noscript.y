@@ -153,13 +153,13 @@ rule
 
   SlotAssign:
     # receiver.slot = 123
-    Expression '.' Identifier '=' Expression     { result = SlotAssignNode.new(val[0], val[2], val[4]); result.pos(filename, lineno) }
+    Expression '.' Identifier '=' Expression     { result = SlotAssign.new(lineno, val[0], val[2], val[4]) }
   ;
 
   # Get a slot from an object
   SlotGet:
     # receiver.slot
-  | Expression '.' Identifier     { result = SlotGet.new(lineno, val[0], val[2].name) }
+  | Expression '.' Identifier     { result = SlotGet.new(lineno, val[0], val[2]) }
   ;
 
   # Function call

@@ -96,23 +96,23 @@ module Noscript
         @value = value
       end
     end
-#
-#
-#     class SlotAssignNode < Node
-#       attr_reader :receiver, :slot, :value
-#       def initialize(receiver, slot, value)
-#         @receiver = receiver
-#         @slot     = slot
-#         @value    = value
-#       end
-#     end
-#
+
+    class SlotAssign < Node
+      attr_reader :receiver, :name, :value
+      def initialize(line, receiver, name, value)
+        super(line)
+        @receiver = receiver
+        @name     = name.name.to_sym
+        @value    = value
+      end
+    end
+
     class SlotGet < Node
       attr_reader :receiver, :name
       def initialize(line, receiver, name)
         super(line)
         @receiver = receiver
-        @name     = name.to_sym
+        @name     = name.name.to_sym
       end
     end
 #

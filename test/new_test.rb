@@ -82,9 +82,10 @@ module Noscript
       assert_equal 1, @compiler.compile("obj = Object.clone({a: 1}); obj.a").call
     end
 
-    # def test_compile_slot_assign
-    #   assert_equal [:assign_slot], @compiler.compile("foo.a = 3")
-    # end
+    def test_compile_slot_assign
+      obj = @compiler.compile("foo = Object.clone(); foo.a = 3; foo").call
+      assert_equal 3, obj.get(:a)
+    end
 
     # def test_compile_slot_get
     #   assert_equal [:get_slot], @compiler.compile("foo.a")
