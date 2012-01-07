@@ -1,12 +1,11 @@
 module Noscript
   module AST
-    [
+    RubiniusNodes = [
       :Node, :StringLiteral, :FixnumLiteral, :ArrayLiteral, :HashLiteral,
       :TrueLiteral, :FalseLiteral, :NilLiteral,
-      :LocalVariableAccess,
       :ClosedScope,
-    ].
-      each { |n| const_set(n, Rubinius::AST.const_get(n)) }
+    ]
+    RubiniusNodes.each { |n| const_set(n, Rubinius::AST.const_get(n)) }
   end
   module Visitable
     def accept(visitor)

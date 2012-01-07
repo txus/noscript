@@ -87,10 +87,6 @@ module Noscript
       assert_equal 3, obj.get(:a)
     end
 
-    # def test_compile_slot_get
-    #   assert_equal [:get_slot], @compiler.compile("foo.a")
-    # end
-
     # def test_compile_if
     #   assert_equal [:if], @compiler.compile("if true; 1; end")
     # end

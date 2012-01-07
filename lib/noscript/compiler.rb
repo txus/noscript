@@ -137,8 +137,7 @@ module Noscript
       s.set_local o.name
     end
 
-    %w(StringLiteral FixnumLiteral ArrayLiteral HashLiteral TrueLiteral FalseLiteral NilLiteral).each do |rbx|
-
+    AST::RubiniusNodes.each do |rbx|
       define_method("visit_#{rbx}") do |o|
         set_line(o)
         o.bytecode(g)
