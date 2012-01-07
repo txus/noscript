@@ -114,15 +114,16 @@ module Noscript
         @name     = name.name.to_sym
       end
     end
-#
-#     class IfNode < Node
-#       attr_reader :condition, :body, :else_body
-#       def initialize(condition, body, else_body=nil)
-#         @condition = condition
-#         @body      = body
-#         @else_body = else_body
-#       end
-#     end
+
+    class IfNode < Node
+      attr_reader :condition, :body, :else_body
+      def initialize(line, condition, body, else_body=nil)
+        super(line)
+        @condition = condition
+        @body      = body
+        @else_body = else_body || NilLiteral.new(line)
+      end
+    end
 #
 #     class WhileNode < Node
 #       attr_reader :condition, :body

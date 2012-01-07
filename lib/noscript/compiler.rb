@@ -164,6 +164,24 @@ module Noscript
       g.send :put, 2
     end
 
+    def visit_IfNode(o)
+      set_line(o)
+      done = g.new_label
+      else_label = g.new_label
+
+      o.condition.accept(self)
+      g.gif else_label
+
+      o.body.accept(self)
+      g.goto done
+
+      else_label.set!
+      o.else_body.accept(self)
+
+      g.set_line 0
+      done.set!
+    end
+
     def finalize
       g.local_names = s.variables
       g.local_count = s.variables.size

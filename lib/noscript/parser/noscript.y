@@ -210,12 +210,12 @@ rule
   If:
     IF Expression Terminator
       Expressions
-    END                                 { result = IfNode.new(val[1], val[3], nil); result.pos(filename, lineno) }
+    END                                 { result = IfNode.new(lineno, val[1], val[3], nil) }
   | IF Expression Terminator
       Expressions
     ELSE Terminator
       Expressions
-    END                                 { result = IfNode.new(val[1], val[3], val[6]); result.pos(filename, lineno) }
+    END                                 { result = IfNode.new(lineno, val[1], val[3], val[6]) }
   ;
 
   While:

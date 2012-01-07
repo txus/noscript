@@ -935,14 +935,14 @@ module_eval(<<'.,.,', 'noscript.y', 206)
 
 module_eval(<<'.,.,', 'noscript.y', 212)
   def _reduce_77(val, _values, result)
-     result = IfNode.new(val[1], val[3], nil); result.pos(filename, lineno) 
+     result = IfNode.new(lineno, val[1], val[3], nil) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.y', 217)
   def _reduce_78(val, _values, result)
-     result = IfNode.new(val[1], val[3], val[6]); result.pos(filename, lineno) 
+     result = IfNode.new(lineno, val[1], val[3], val[6]) 
     result
   end
 .,.,

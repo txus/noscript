@@ -87,9 +87,13 @@ module Noscript
       assert_equal 3, obj.get(:a)
     end
 
-    # def test_compile_if
-    #   assert_equal [:if], @compiler.compile("if true; 1; end")
-    # end
+    def test_compile_if
+      assert_equal 1, @compiler.compile("if true; 1; end").call
+    end
+
+    def test_compile_if_else
+      assert_equal 2, @compiler.compile("if false; 1; else; 2; end").call
+    end
 
     # def test_compile_while
     #   assert_equal [:while], @compiler.compile("while true; 1; end")
