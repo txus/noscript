@@ -1,64 +1,79 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env rbx
 
-begin
-  require 'noscript'
-rescue LoadError
-  require_relative '../lib/noscript'
+file = __FILE__
+file = File.readlink(file) while File.symlink? file
+$LOAD_PATH.unshift(File.expand_path('../../lib', file))
+
+Dir.chdir File.expand_path('..', file) do
+  system 'rake signature'
 end
 
+require 'noscript'
 require 'pp'
 
-parser = Noscript::Parser.new
+evals    = []
+settings = Hash.new { |h,k| h[k] = false }
+options  = Rubinius::Options.new "Usage: #$0 [options] [script]", 20
 
-filename = ARGV.shift
-if filename && code = File.read(filename)
-  code.strip!
-else
-  puts "No input file provided. Bye!"
-  exit(1)
+options.on( "-A", "Print the AST"          ) { settings[:ast]  = true }
+options.on( "-B", "Print the bytecode"     ) { settings[:bc]   = true }
+
+options.on "-e", "CODE", "Execute CODE" do |e|
+  evals << ['(eval)', e]
 end
 
-args = ARGV
+options.on "-v", "--version", "Show version" do
+  puts "Noscript #{Noscript::VERSION}"
+  exit 0
+end
 
-begin
-  if compile = args.detect{|a| a =~ /-c/}
-    case compile
-    when "-cjs"
-      str = File.read(filename)
-      compiler = Noscript::Compiler.new(Noscript::JavascriptGenerator)
-      parser = compiler.parser
-      compiled = compiler.compile(str)
-      STDOUT.print compiled
+options.on "-h", "--help", "Display this help" do
+  puts options
+  exit 0
+end
+
+info = proc do |cond, name, &block|
+  next unless settings[cond]
+  puts '', " #{name} ".center(80, "=")
+  block[]
+  puts "-" * 80, ''
+end
+
+display = proc do |file, code, ev=true|
+  begin
+    if settings[:ast]
+      ast = Noscript::Parser.new.parse_string(code)
+      info.call(:ast, 'AST') { Rubinius::AST::AsciiGrapher.new(ast).print }
     end
-    return
+
+    info.call(:bc, "Bytecode") { puts Noscript::Compiler.compile_string(code, file).decode }
+    if ev
+      puts "=> %p" % Noscript.eval_noscript(code, file)
+    else
+      Noscript.eval_noscript(code, file)
+    end
+
+  rescue Exception => e
+    e.render
+  end
+end
+
+options.parse(ARGV).each do |file|
+  evals << [file, File.read(file), false]
+end
+
+if evals.empty?
+  if $stdin.tty?
+    require 'readline'
+    loop do
+      code = Readline.readline "ns> "
+      exit 0 unless code and code != "exit"
+      display['(repl)', code]
+    end
   else
-    ast = parser.scan_file(filename)
-  end
-rescue
-  $stderr.printf  "Syntax error\n\t%s:%d:%s\n", parser.filename, parser.lineno, $!.message
-end
-
-if args.any?{|a| a =~ /--tokens/}
-  puts "-----TOKENS-----"
-  lexer = Noscript::Parser.new
-  lexer.load_file filename
-  while token = lexer.next_token
-    p token
-  end
-  puts
-end
-
-if ast
-  if args.any?{|a| a =~ /--ast/}
-    puts "-----AST-----"
-    pp ast
-    puts
-  end
-#
-#   result = ast.compile(Noscript.bootstrap)
-
-  if args.any?{|a| a =~ /--return/}
-    puts "-----RETURN VALUE-----"
-    # pp result
+    evals << ['(stdin)', STDIN.read]
   end
 end
+
+evals.each(&display)
+

@@ -198,7 +198,8 @@ rule
   | Expression '*' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
   | Expression '/' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
   # Unary operators
-  | '!' Expression                { result = CallNode.new(lineno, val[1], val[0], []) }
+  | '!' Expression                { result = CallNode.new(lineno, val[1], '@!', []) }
+  | '-' Expression                { result = CallNode.new(lineno, val[1], '@-', []) }
   ;
 
   ParamList:
@@ -235,7 +236,7 @@ require_relative 'lexer'
 include AST
 
 def parse(code)
-  scan_str(code.strip)
+  parse_string(code, filename)
 end
 
 ---- footer ----

@@ -1,7 +1,169 @@
 require 'rexpl'
 
 module Noscript
-  class Compiler
+  class Compiler < Rubinius::Compiler
+    # module Noscriptify
+    #   Rubinius::Compiler::Stage.extend self
+
+    #   def new(compiler, *args, &block)
+    #     if compiler.is_a? Noscript::Compiler and name =~ /^Rubinius::Compiler::([^:]+)$/
+    #       const = Noscript::Compiler.const_get($1)
+    #       return const.new(compiler, *args, &block) if const != self
+    #     end
+    #     super
+    #   end
+    # end
+
+    # def self.noscript_compiled_name(file)
+    #   if file.suffix? ".ns"
+    #     file + "c"
+    #   else
+    #     file + ".compiled.nsc"
+    #   end
+    # end
+
+    # def self.compile_fancy_file(file, output = nil, line = 1, print = false)
+    #   compiler = new :fancy_file, :compiled_file
+
+    #   parser = compiler.parser
+    #   parser.root Noscript::AST::Script
+
+    #   parser.input file, line
+
+    #   if print
+    #     parser.print
+    #     printer = compiler.packager.print
+    #     printer.bytecode = true
+    #   end
+
+    #   writer = compiler.writer
+    #   writer.name = output ? output : noscript_compiled_name(file)
+
+    #   begin
+    #     compiler.run
+    #   rescue Exception => e
+    #     compiler_error "Error trying to compile noscript: #{file}", e
+    #   end
+    # end
+
+    def self.compile_eval(string, variable_scope, file="(eval)", line=1)
+      if ec = @eval_cache
+        layout = variable_scope.local_layout
+        if cm = ec.retrieve([string, layout, line])
+          return cm
+        end
+      end
+
+      compiler = new :noscript_eval, :compiled_method
+
+      parser = compiler.parser
+      parser.root Rubinius::AST::EvalExpression
+      parser.input string, file, line
+
+      compiler.generator.variable_scope = variable_scope
+
+      cm = compiler.run
+
+      cm.add_metadata :for_eval, true
+
+      if ec and parser.should_cache?
+        ec.set([string.dup, layout, line], cm)
+      end
+
+      return cm
+    end
+
+    # AST -> symbolic bytecode
+    class Generator < Stage
+      stage :bytecode
+      next_stage Rubinius::Compiler::Encoder
+
+      attr_accessor :variable_scope
+
+      def initialize(compiler, last)
+        super
+        @variable_scope = nil
+        compiler.generator = self
+        @compiler = Noscript::BytecodeCompiler
+      end
+
+      def run
+        compiler = @compiler.new
+        @output = compiler.compile(@input)
+        run_next
+      end
+    end
+
+    class Parser < Rubinius::Compiler::Parser
+      def initialize(compiler, last)
+        super
+
+        @compiler  = compiler
+        @processor = Noscript::Parser
+      end
+
+      def create
+        # TODO: we totally ignore @transforms
+        @parser = @processor.new
+        @parser
+      end
+
+      # def run
+      #   @output = @root.new parse
+      #   @output.file = @file
+      #   run_next
+      # end
+    end
+
+    class FileParser < Parser
+      stage :noscript_file
+      next_stage Noscript::Compiler::Generator
+
+      def input(file, line = 1)
+        @file = file
+        @line = line
+      end
+
+      def parse
+        create.parse_file
+      end
+    end
+
+    class StringParser < Parser
+      stage :noscript_string
+      next_stage Noscript::Compiler::Generator
+
+      def input(string, name = "(eval)", line = 1)
+        @input = string
+        @file = name
+        @line = line
+      end
+
+      def parse
+        create.parse_string(@input)
+      end
+    end
+
+    class EvalParser < StringParser
+      stage :noscript_eval
+      next_stage Noscript::Compiler::Generator
+
+      def should_cache?
+        @output.should_cache?
+      end
+    end
+
+    class Writer < Rubinius::Compiler::Writer
+      def initialize(compiler, last)
+        super
+        @signature = Noscript::Signature
+      end
+    end
+  end
+end
+
+module Noscript
+  class BytecodeCompiler
     attr_reader :generator, :scope
     alias g generator
     alias s scope
@@ -10,16 +172,15 @@ module Noscript
       @generator = Generator.new
       parent_scope = parent ? parent.scope : nil
       @scope = Scope.new(@generator, parent_scope)
-      @generator.push_state(@scope)
     end
 
     def compile(ast, debugging=false)
-      ast = Noscript::Parser.new.parse(ast) unless ast.kind_of?(AST::Node)
+      if debugging
+        require 'pp'
+        pp ast
+      end
 
-      # require 'pp'
-      # pp ast
-
-      g.name = :call
+      ast = ast.body if ast.kind_of?(Rubinius::AST::EvalExpression)
 
       if ast.respond_to?(:filename) && ast.filename
         g.file = ast.filename
@@ -27,29 +188,14 @@ module Noscript
         g.file = :"(noscript)"
       end
 
-      g.set_line 1
-
-      g.required_args = 0
-      g.total_args = 0
-      g.splat_index = nil
+      g.set_line ast.line || 1
 
       ast.accept(self)
 
       debug if debugging
-
       g.ret
 
       finalize
-
-      g.encode
-      cm = g.package Rubinius::CompiledMethod
-      puts cm.decode if $DEBUG
-
-      code = Code.new
-      ss = Rubinius::StaticScope.new Runtime
-      Rubinius.attach_method g.name, cm, ss, code
-
-      code
     end
 
     def visit_Script(o)
@@ -67,7 +213,7 @@ module Noscript
     def visit_FunctionLiteral(o)
       set_line(o)
       # Get a new compiler
-      block = Compiler.new(self)
+      block = BytecodeCompiler.new(self)
 
       # Configures the new generator
       # TODO Move this to a method on the compiler
@@ -101,23 +247,23 @@ module Noscript
     end
 
     def visit_CallNode(o)
-      meth = nil
+      meth = o.method.respond_to?(:name) ? o.method.name.to_sym : o.method.to_sym
+
       if o.receiver
-        meth = o.method.is_a?(String) ? o.method : o.method.name
         o.receiver.accept(self)
       else
         meth = :call
-        visit_Identifier(o.method)
+
+        visit_Identifier(o.method, true)
       end
 
       o.arguments.each do |argument|
         argument.accept(self)
       end
-
       g.noscript_send meth, o.arguments.length
     end
 
-    def visit_Identifier(o)
+    def visit_Identifier(o, for_method=false)
       set_line(o)
 
       if o.constant?
@@ -128,7 +274,7 @@ module Noscript
       if s.slot_for(o.name)
         visit_LocalVariableAccess(o)
       else
-        g.push_nil
+        raise "Undefined identifier #{o.name}"
       end
     end
 
@@ -223,5 +369,20 @@ module Noscript
       end
       p '**end**'
     end
+  end
+end
+
+class Noscript::Compiler::Generator
+  def initialize(compiler, last)
+    super
+    @variable_scope = nil
+    compiler.generator = self
+    @compiler = Noscript::BytecodeCompiler
+  end
+
+  def run
+    compiler = @compiler.new
+    @output = compiler.compile(@input)
+    run_next
   end
 end

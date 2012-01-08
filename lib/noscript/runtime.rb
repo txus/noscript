@@ -17,9 +17,11 @@ class Object
   end
 
   noscript_alias [:==, :"!="]
+  noscript_def("@!") { !self }
 
   noscript_alias :nil?
   noscript_alias :inspect
+  noscript_def("puts") { |*args| send :puts, *args } # Because it's private
 
   noscript_def("respond to?") { |name| respond_to? "noscript:#{name}"}
 end
@@ -95,7 +97,8 @@ class Function
   end
 end
 class Fixnum
-  noscript_alias [:+, :-, :<, :>]
+  noscript_alias [:+, :-, :*, :/, :<, :>, :<=, :>=]
+  noscript_def("@-") { -self }
 end
 
 class Array

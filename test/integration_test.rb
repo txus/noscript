@@ -3,8 +3,8 @@ require 'test_helper'
 module Noscript
   class IntegrationTest < MiniTest::Unit::TestCase
 
-    def setup
-      @compiler = Compiler.new
+    def compile(code)
+      Noscript.eval_noscript(code)
     end
 
     # def test_hello_world
@@ -104,7 +104,7 @@ module Noscript
           end
         """
       ].each do |code|
-        assert_equal 'ok', @compiler.compile(code).call
+        assert_equal 'ok', compile(code)
       end
     end
 
@@ -120,7 +120,7 @@ module Noscript
           foo
         """
       ].each do |code|
-        assert_equal 0, @compiler.compile(code).call
+        assert_equal 0, compile(code)
       end
     end
 

@@ -3,27 +3,27 @@ johnny = 4000
 oh my god = 'lord'
 
 
-foo = -> johnny=3
+foo = -> johnny
  34 + johnny * 3
 end
 
-bar = -> johnny=3
+bar = -> johnny
  (34 + johnny) * 3
 end
 
-puts('Negative johnny is', -johnny)
+Object.puts('Negative johnny is', -johnny)
 
-puts(foo())
-puts(foo(242))
+Object.puts(foo(3))
+Object.puts(foo(242))
 
-if bar() == 111
-  puts(bar())
+if bar(3) == 111
+  Object.puts(bar(3))
 end
 
 if bar(242) == 728
-  puts('wrong!')
+  Object.puts('wrong!')
 else
-  puts('cool!')
+  Object.puts('cool!')
 end
 
 foo = 30
@@ -38,16 +38,15 @@ end
 cool object = Object.clone()
 cool object.foo = 'bar'
 cool object.bar = -> a
-  { foo: a, bar: 'baz' }
   'baz'
 end
 
-puts(cool object.foo)
-puts(cool object.bar(3))
+Object.puts(cool object.foo)
+Object.puts(cool object.bar(3))
 
-puts('Johnny is still', johnny)
+Object.puts('Johnny is still', johnny)
 
-puts(oh my god)
+Object.puts(oh my god)
 
-puts(myvar)
+Object.puts(myvar)
 

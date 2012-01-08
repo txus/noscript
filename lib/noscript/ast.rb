@@ -2,7 +2,7 @@ module Noscript
   module AST
     RubiniusNodes = [
       :Node, :StringLiteral, :FixnumLiteral, :ArrayLiteral, :HashLiteral,
-      :TrueLiteral, :FalseLiteral, :NilLiteral,
+      :TrueLiteral, :FalseLiteral, :NilLiteral, :EvalExpression,
       :ClosedScope,
     ]
     RubiniusNodes.each { |n| const_set(n, Rubinius::AST.const_get(n)) }
@@ -21,6 +21,7 @@ module Noscript
   module AST
     class Script < Node
       attr_reader :body, :filename
+      attr_accessor :variable_scope
 
       def initialize(line, filename, body)
         super(line)
