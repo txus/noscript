@@ -823,56 +823,56 @@ module_eval(<<'.,.,', 'noscript.y', 180)
 
 module_eval(<<'.,.,', 'noscript.y', 185)
   def _reduce_61(val, _values, result)
-     result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) 
+     result = CallNode.new(lineno, val[0], val[1], [val[2]]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.y', 186)
   def _reduce_62(val, _values, result)
-     result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) 
+     result = CallNode.new(lineno, val[0], val[1], [val[2]]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.y', 187)
   def _reduce_63(val, _values, result)
-     result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) 
+     result = CallNode.new(lineno, val[0], val[1], [val[2]]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.y', 188)
   def _reduce_64(val, _values, result)
-     result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) 
+     result = CallNode.new(lineno, val[0], val[1], [val[2]]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.y', 189)
   def _reduce_65(val, _values, result)
-     result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) 
+     result = CallNode.new(lineno, val[0], val[1], [val[2]]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.y', 190)
   def _reduce_66(val, _values, result)
-     result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) 
+     result = CallNode.new(lineno, val[0], val[1], [val[2]]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.y', 191)
   def _reduce_67(val, _values, result)
-     result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) 
+     result = CallNode.new(lineno, val[0], val[1], [val[2]]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.y', 192)
   def _reduce_68(val, _values, result)
-     result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) 
+     result = CallNode.new(lineno, val[0], val[1], [val[2]]) 
     result
   end
 .,.,
@@ -949,7 +949,7 @@ module_eval(<<'.,.,', 'noscript.y', 217)
 
 module_eval(<<'.,.,', 'noscript.y', 223)
   def _reduce_79(val, _values, result)
-     result = WhileNode.new(val[1], val[3]); result.pos(filename, lineno) 
+     result = WhileNode.new(lineno, val[1], val[3]) 
     result
   end
 .,.,

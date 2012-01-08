@@ -10,6 +10,7 @@ module Noscript
       @generator = Generator.new
       parent_scope = parent ? parent.scope : nil
       @scope = Scope.new(@generator, parent_scope)
+      @generator.push_state(@scope)
     end
 
     def compile(ast, debugging=false)
@@ -180,6 +181,25 @@ module Noscript
 
       g.set_line 0
       done.set!
+    end
+
+    def visit_WhileNode(o)
+      set_line(o)
+      brk = g.new_label
+      repeat = g.new_label
+      repeat.set!
+
+      # Evaluate the condition and jump to the end if false
+      o.condition.accept(self)
+      g.gif brk
+
+      # Otherwise, evaluate the body and jump to the start of the loop again.
+      o.body.accept(self)
+      g.pop
+      g.goto repeat
+
+      brk.set!
+      g.push_nil
     end
 
     def finalize

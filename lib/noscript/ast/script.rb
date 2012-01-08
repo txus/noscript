@@ -124,13 +124,14 @@ module Noscript
         @else_body = else_body || NilLiteral.new(line)
       end
     end
-#
-#     class WhileNode < Node
-#       attr_reader :condition, :body
-#       def initialize(condition, body)
-#         @condition = condition
-#         @body      = body
-#       end
-#     end
+
+    class WhileNode < Node
+      attr_reader :condition, :body
+      def initialize(line, condition, body)
+        super(line)
+        @condition = condition
+        @body      = body
+      end
+    end
   end
 end

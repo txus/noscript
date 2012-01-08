@@ -183,14 +183,14 @@ rule
 
   Operator:
     # Binary operators
-    Expression '||' Expression    { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
-  | Expression '&&' Expression    { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
-  | Expression '==' Expression    { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
-  | Expression '!=' Expression    { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
-  | Expression '>' Expression     { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
-  | Expression '>=' Expression    { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
-  | Expression '<' Expression     { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
-  | Expression '<=' Expression    { result = CallNode.new(val[0], val[1], [val[2]]); result.pos(filename, lineno) }
+    Expression '||' Expression    { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
+  | Expression '&&' Expression    { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
+  | Expression '==' Expression    { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
+  | Expression '!=' Expression    { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
+  | Expression '>' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
+  | Expression '>=' Expression    { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
+  | Expression '<' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
+  | Expression '<=' Expression    { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
     # 1 + 2 => 1.+(2)
     #   1       +       2                           1       "+"      [2]
   | Expression '+' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
@@ -221,7 +221,7 @@ rule
   While:
     WHILE Expression Terminator
       Expressions
-    END                                 { result = WhileNode.new(val[1], val[3]); result.pos(filename, lineno) }
+    END                                 { result = WhileNode.new(lineno, val[1], val[3]) }
   ;
 
 ---- header ----

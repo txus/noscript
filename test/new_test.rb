@@ -95,8 +95,8 @@ module Noscript
       assert_equal 2, @compiler.compile("if false; 1; else; 2; end").call
     end
 
-    # def test_compile_while
-    #   assert_equal [:while], @compiler.compile("while true; 1; end")
-    # end
+    def test_compile_while
+      assert_equal 10, @compiler.compile("a = 3; while a < 10; a = a + 1; end; a").call
+    end
   end
 end
