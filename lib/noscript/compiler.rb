@@ -14,7 +14,7 @@ module Noscript
     end
 
     def compile(ast, debugging=false)
-      ast = Noscript::Parser.new.parse(ast) unless ast.kind_of?(AST::Node)
+      ast = Noscript::Parser.new.parse(ast.strip) unless ast.kind_of?(AST::Node)
 
       # require 'pp'
       # pp ast
@@ -225,4 +225,3 @@ module Noscript
     end
   end
 end
-

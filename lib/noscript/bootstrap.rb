@@ -16,6 +16,8 @@ class Object
     __send__ "noscript:#{send}", *args
   end
 
+  noscript_alias [:==, :"!="]
+
   noscript_alias :nil?
   noscript_alias :inspect
 

@@ -32,20 +32,6 @@ class MiniTest::Unit::TestCase
     block.call(ast.nodes)
   end
 
-  def compiles(input, &block)
-    show_tokens(input) if ENV['DEBUG']
-    show_ast(input) if ENV['DEBUG']
-
-    parser = Parser.new
-    ast = parser.scan_str(input.strip)
-    result = ast.compile(Noscript.bootstrap)
-    if block_given?
-      block.call(result)
-    else
-      result
-    end
-  end
-
   private
 
   def show_tokens(input)

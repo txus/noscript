@@ -1,126 +1,128 @@
 require 'test_helper'
 
-class NoscriptTest < MiniTest::Unit::TestCase
+module Noscript
+  class IntegrationTest < MiniTest::Unit::TestCase
 
-  def test_hello_world
-    output = `./bin/noscript examples/hello_world.ns`.split("\n")
+    def setup
+      @compiler = Compiler.new
+    end
 
-    assert_equal [
-      "Negative johnny is",
-      "-4000",
-      "43",
-      "760",
-      "111",
-      "cool!",
-      "bar",
-      "baz",
-      "Johnny is still",
-      "4000",
-      "lord",
-      "hello world",
-    ], output
-  end
+    # def test_hello_world
+    #   output = `./bin/noscript examples/hello_world.ns`.split("\\n")
 
-  def test_objects
-    output = `./bin/noscript examples/objects.ns`.split("\n")
+    #   assert_equal [
+    #     "Negative johnny is",
+    #     "-4000",
+    #     "43",
+    #     "760",
+    #     "111",
+    #     "cool!",
+    #     "bar",
+    #     "baz",
+    #     "Johnny is still",
+    #     "4000",
+    #     "lord",
+    #     "hello world",
+    #   ], output
+    # end
 
-    assert_equal [
-      "running!",
-      "10",
-      "vroom",
-      "99",
-    ], output
-  end
+    # def test_objects
+    #   output = `./bin/noscript examples/objects.ns`.split("\\n")
 
-  def test_traits
-    output = `./bin/noscript examples/traits.ns`.split("\n")
+    #   assert_equal [
+    #     "running!",
+    #     "10",
+    #     "vroom",
+    #     "99",
+    #   ], output
+    # end
 
-    assert_equal [
-      "John is running",
-      "John is running a profitable business!",
-    ], output
-  end
+    # def test_traits
+    #   output = `./bin/noscript examples/traits.ns`.split("\\n")
 
-  def test_interop
-    output = `./bin/noscript examples/interop.ns`.split("\n")
+    #   assert_equal [
+    #     "John is running",
+    #     "John is running a profitable business!",
+    #   ], output
+    # end
 
-    assert_equal [
-      "8",
-    ], output
-  end
+    # def test_interop
+    #   output = `./bin/noscript examples/interop.ns`.split("\\n")
 
-  def test_conditionals
-    [
-      """
-        foo = 3
+    #   assert_equal [
+    #     "8",
+    #   ], output
+    # end
 
-        if foo != 91
-          'ok'
-        end
-      """,
+    def test_conditionals
+      [
+        """
+          foo = 3
 
-      """
-        foo = 3
+          if foo != 91
+            'ok'
+          end
+        """,
 
-        if foo > 2
-          'ok'
-        else
-          'ko'
-        end
-      """,
+        """
+          foo = 3
 
-      """
-        foo = 3
+          if foo > 2
+            'ok'
+          else
+            'ko'
+          end
+        """,
 
-        if foo < 2
-          'ko'
-        else
-          'ok'
-        end
-      """,
+        """
+          foo = 3
 
-      """
-        foo = 3
+          if foo < 2
+            'ko'
+          else
+            'ok'
+          end
+        """,
 
-        if foo <= 3
-          'ok'
-        else
-          'ko'
-        end
-      """,
+        """
+          foo = 3
 
-      """
-        foo = 4
+          if foo <= 3
+            'ok'
+          else
+            'ko'
+          end
+        """,
 
-        if foo >= 3
-          'ok'
-        else
-          'ko'
-        end
-      """
-    ].each do |code|
-      compiles(code) do |retval|
-        assert_equal String.new('ok'), retval
+        """
+          foo = 4
+
+          if foo >= 3
+            'ok'
+          else
+            'ko'
+          end
+        """
+      ].each do |code|
+        assert_equal 'ok', @compiler.compile(code).call
       end
     end
-  end
 
-  def test_while
-    [
-      """
-        foo = 3
+    def test_while
+      [
+        """
+          foo = 3
 
-        while foo > 0
-          foo = foo - 1
-        end
+          while foo > 0
+            foo = foo - 1
+          end
 
-        foo
-      """
-    ].each do |code|
-      compiles(code) do |retval|
-        assert_equal Integer.new(0), retval
+          foo
+        """
+      ].each do |code|
+        assert_equal 0, @compiler.compile(code).call
       end
     end
-  end
 
+  end
 end
