@@ -14,7 +14,7 @@ class IfTest < MiniTest::Unit::TestCase
       assert_equal "==", exp.method
       assert_equal 3, exp.arguments.first.value
 
-      assert_equal [3], if_node.body.nodes.map(&:value)
+      assert_equal [3], if_node.body.expressions.map(&:value)
     end
   end
 
@@ -30,8 +30,8 @@ class IfTest < MiniTest::Unit::TestCase
       assert_equal "!=", exp.method
       assert_equal 3, exp.arguments.first.value
 
-      assert_equal [3], if_node.body.nodes.map(&:value)
-      assert_equal [4], if_node.else_body.nodes.map(&:value)
+      assert_equal [3], if_node.body.expressions.map(&:value)
+      assert_equal [4], if_node.else_body.expressions.map(&:value)
     end
   end
 

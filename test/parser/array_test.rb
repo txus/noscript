@@ -6,8 +6,8 @@ class ArrayTest < MiniTest::Unit::TestCase
     parses "[]" do |nodes|
       array = nodes.first
 
-      assert_kind_of ArrayNode, array
-      assert_equal([], array.value)
+      assert_kind_of ArrayLiteral, array
+      assert_equal([], array.body)
     end
   end
 
@@ -15,8 +15,8 @@ class ArrayTest < MiniTest::Unit::TestCase
     parses "[1]" do |nodes|
       array = nodes.first
 
-      assert_kind_of ArrayNode, array
-      assert_equal(1, array.value.first.value)
+      assert_kind_of ArrayLiteral, array
+      assert_equal(1, array.body.first.value)
     end
   end
 
@@ -24,8 +24,8 @@ class ArrayTest < MiniTest::Unit::TestCase
     parses "[1, 2]" do |nodes|
       array = nodes.first
 
-      assert_kind_of ArrayNode, array
-      assert_equal([1, 2], array.value.map(&:value))
+      assert_kind_of ArrayLiteral, array
+      assert_equal([1, 2], array.body.map(&:value))
     end
   end
 
@@ -33,8 +33,8 @@ class ArrayTest < MiniTest::Unit::TestCase
     parses "[foo, bar]" do |nodes|
       array = nodes.first
 
-      assert_kind_of ArrayNode, array
-      assert_equal(['foo', 'bar'], array.value.map(&:name))
+      assert_kind_of ArrayLiteral, array
+      assert_equal(['foo', 'bar'], array.body.map(&:name))
     end
   end
 
@@ -45,8 +45,9 @@ class ArrayTest < MiniTest::Unit::TestCase
     ]" do |nodes|
       array = nodes.first
 
-      assert_kind_of ArrayNode, array
-      assert_equal(["foo", 34], array.value.map(&:value))
+      assert_kind_of ArrayLiteral, array
+      assert_equal "foo", array.body.first.string
+      assert_equal 34, array.body.last.value
     end
   end
 

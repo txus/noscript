@@ -143,7 +143,7 @@ class Noscript::Parser < Racc::Parser
   end  # def _next_token
 
   def run(code)
-    scan_setup(code)
+    scan_setup(code.strip)
     tokens = []
     while token = next_token
       tokens << token

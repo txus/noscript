@@ -14,7 +14,7 @@ class WhileTest < MiniTest::Unit::TestCase
       assert_equal "==", exp.method
       assert_equal 3, exp.arguments.first.value
 
-      assert_equal [3], while_node.body.nodes.map(&:value)
+      assert_equal [3], while_node.body.expressions.map(&:value)
     end
   end
 

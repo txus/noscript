@@ -28,8 +28,8 @@ class MiniTest::Unit::TestCase
 
     show_tokens(input) if ENV['DEBUG']
 
-    ast = parser.scan_str(input)
-    block.call(ast.nodes)
+    ast = parser.parse(input)
+    block.call(ast.body.expressions)
   end
 
   private

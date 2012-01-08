@@ -6,9 +6,9 @@ class FunctionCallTest < MiniTest::Unit::TestCase
     parses "a.foo" do |nodes|
       invocation = nodes.first
 
-      assert_kind_of SlotGetNode, invocation
+      assert_kind_of SlotGet, invocation
       assert_equal "a", invocation.receiver.name
-      assert_equal "foo", invocation.name.name
+      assert_equal :foo, invocation.name
     end
   end
 
@@ -31,7 +31,8 @@ class FunctionCallTest < MiniTest::Unit::TestCase
       assert_equal "a", invocation.receiver.name
       assert_equal "foo", invocation.method.name
 
-      assert_equal ["hey", 34], invocation.arguments.map(&:value)
+      assert_equal "hey", invocation.arguments.first.string
+      assert_equal 34, invocation.arguments.last.value
     end
   end
 

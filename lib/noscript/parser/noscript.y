@@ -235,7 +235,7 @@ require_relative 'lexer'
 include AST
 
 def parse(code)
-  scan_str(code)
+  scan_str(code.strip)
 end
 
 ---- footer ----

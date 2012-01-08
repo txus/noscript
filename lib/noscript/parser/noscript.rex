@@ -48,7 +48,7 @@ rule
 
 inner
   def run(code)
-    scan_setup(code)
+    scan_setup(code.strip)
     tokens = []
     while token = next_token
       tokens << token

@@ -6,8 +6,8 @@ class TupleTest < MiniTest::Unit::TestCase
     parses "{}" do |nodes|
       tuple = nodes.first
 
-      assert_kind_of TupleNode, tuple
-      assert_equal({}, tuple.value)
+      assert_kind_of HashLiteral, tuple
+      assert_equal([], tuple.array)
     end
   end
 
@@ -15,9 +15,10 @@ class TupleTest < MiniTest::Unit::TestCase
     parses "{a: 1}" do |nodes|
       tuple = nodes.first
 
-      assert_kind_of TupleNode, tuple
-      assert_equal('a', tuple.value.keys.first.name)
-      assert_equal([1], tuple.value.values.map(&:value))
+      assert_kind_of HashLiteral, tuple
+      body = tuple.array
+      assert_equal 'a', body.first.string
+      assert_equal 1, body.last.value
     end
   end
 
@@ -25,10 +26,13 @@ class TupleTest < MiniTest::Unit::TestCase
     parses "{a: 1, b: 2}" do |nodes|
       tuple = nodes.first
 
-      assert_kind_of TupleNode, tuple
-      assert_equal('a', tuple.value.keys.first.name)
-      assert_equal('b', tuple.value.keys.last.name)
-      assert_equal([1, 2], tuple.value.values.map(&:value))
+      assert_kind_of HashLiteral, tuple
+      body = tuple.array
+      assert_equal 'a', body[0].string
+      assert_equal 1, body[1].value
+
+      assert_equal 'b', body[2].string
+      assert_equal 2, body[3].value
     end
   end
 
@@ -41,10 +45,13 @@ class TupleTest < MiniTest::Unit::TestCase
     }" do |nodes|
       tuple = nodes.first
 
-      assert_kind_of TupleNode, tuple
-      assert_equal('a', tuple.value.keys.first.name)
-      assert_equal('b', tuple.value.keys.last.name)
-      assert_equal([1, 2], tuple.value.values.map(&:value))
+      assert_kind_of HashLiteral, tuple
+      body = tuple.array
+      assert_equal 'a', body[0].string
+      assert_equal 1, body[1].value
+
+      assert_equal 'b', body[2].string
+      assert_equal 2, body[3].value
     end
   end
 

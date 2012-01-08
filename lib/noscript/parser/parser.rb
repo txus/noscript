@@ -19,7 +19,7 @@ module_eval(<<'...end noscript.y/module_eval...', 'noscript.y', 234)
 include AST
 
 def parse(code)
-  scan_str(code)
+  scan_str(code.strip)
 end
 
 ...end noscript.y/module_eval...
