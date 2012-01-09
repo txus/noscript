@@ -91,6 +91,8 @@ rule
     "->" ParamList Terminator
       Expressions
     END                           { result = FunctionLiteral.new(lineno, val[1], val[3]) }
+  | "->" ParamList Terminator
+    END                           { result = FunctionLiteral.new(lineno, val[1], Nodes.new(lineno, [NilLiteral.new(lineno)])) }
   ;
 
   Array:

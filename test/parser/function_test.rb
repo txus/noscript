@@ -37,4 +37,16 @@ class FunctionLiteralTest < MiniTest::Unit::TestCase
       assert_equal [3], body.map(&:value)
     end
   end
+
+  def test_fun_with_empty_body
+    parses "-> bar, baz; end" do |nodes|
+      fun = nodes.first
+
+      assert_kind_of FunctionLiteral, fun
+      assert_equal ["bar", "baz"], fun.arguments
+
+      body = fun.body.expressions.first
+      assert_kind_of NilLiteral, body
+    end
+  end
 end

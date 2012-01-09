@@ -37,6 +37,8 @@ module Noscript
       def initialize(line, expressions)
         super(line)
         @expressions = expressions
+        require 'pp'
+        pp @expressions
       end
 
       def <<(exp)
