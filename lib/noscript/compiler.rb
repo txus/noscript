@@ -140,7 +140,7 @@ module Noscript
       end
 
       def parse
-        create.parse_string(@input)
+        create.parse_string(@input, @file)
       end
     end
 
