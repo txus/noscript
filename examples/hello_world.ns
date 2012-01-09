@@ -38,6 +38,7 @@ end
 cool object = Object.clone()
 cool object.foo = 'bar'
 cool object.bar = -> a
+  { foo: a, bar: 'baz' }
   'baz'
 end
 

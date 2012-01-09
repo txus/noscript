@@ -85,7 +85,6 @@ class Runtime
     end
 
     def has_property?(name)
-      p "looking for property #{name}"
       if result = key?(name)
         result
       elsif proto = prototype

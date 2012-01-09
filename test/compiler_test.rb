@@ -30,6 +30,14 @@ module Noscript
       assert_equal({'a' => true, 'b' => false}, compile("{a: true, b: false}"))
     end
 
+    def test_compile_tuple_literal_referring_to_a_variable
+      assert_equal({'a' => 34, 'b' => false}, compile("foo = 34; {a: foo, b: false}"))
+    end
+
+    def test_compile_tuple_literal_inside_a_function
+      assert_equal({'a' => 34, 'b' => false}, compile("foo = -> bar; {a: bar, b: false}; end; foo(34)"))
+    end
+
     def test_compile_tuple_literal_as_an_expression
       assert_equal(['a', 'b'], compile("{a: true, b: false}.keys()"))
     end
