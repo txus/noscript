@@ -18,10 +18,6 @@ module_eval(<<'...end noscript.y/module_eval...', 'noscript.y', 241)
 
 include AST
 
-# def parse(code)
-#   parse_string(code, filename)
-# end
-
 def filename
   @filename
 end

@@ -241,10 +241,6 @@ require_relative 'lexer'
 
 include AST
 
-# def parse(code)
-#   parse_string(code, filename)
-# end
-
 def filename
   @filename
 end
