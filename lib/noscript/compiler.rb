@@ -256,8 +256,7 @@ module Noscript
       else
         meth = :call
         visit_Identifier(o.method)
-        g.push_const :Runtime
-        g.find_const :Object
+        g.push_self
       end
 
       o.arguments.each do |argument|

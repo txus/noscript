@@ -42,7 +42,7 @@ class Runtime
     attr_accessor :prototype
 
     def initialize
-      @prototype = Runtime::Object
+      @prototype = nil
     end
 
     noscript_def("clone") do |*args|
@@ -54,6 +54,10 @@ class Runtime
         end
       end
       obj
+    end
+
+    noscript_def("puts") do |*args|
+      puts(*args)
     end
 
     # def function(name, block=name)
@@ -81,6 +85,7 @@ class Runtime
     end
 
     def has_property?(name)
+      p "looking for property #{name}"
       if result = key?(name)
         result
       elsif proto = prototype
@@ -117,6 +122,10 @@ end
 class Fixnum
   noscript_alias [:+, :-, :*, :/, :<, :>, :<=, :>=]
   noscript_def("-@") { -self }
+end
+
+class String
+  noscript_alias [:+, :*]
 end
 
 class Array

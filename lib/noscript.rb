@@ -13,7 +13,7 @@ module Noscript
   # CodeLoader.run('kernel/Alpha')
 
   def self.eval_noscript(code, *args)
-    file, line, binding = '(eval)', 1, Runtime.send(:binding)
+    file, line, binding = '(eval)', 1, Runtime::Object.send(:binding)
     args.each do |arg|
       case arg
       when String   then file    = arg
