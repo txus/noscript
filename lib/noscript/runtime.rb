@@ -93,7 +93,7 @@ class Runtime
     def method_missing(m, *args)
       fun = m.to_s.split(":").last.to_sym
       if has_property?(fun)
-        return get(fun).call(self, *args)
+        return get(fun).call(args.shift, *args)
       end
       super
     end

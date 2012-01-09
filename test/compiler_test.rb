@@ -50,9 +50,9 @@ module Noscript
       assert_equal 7, compile("foo = -> a, b, c; b + c; end; foo(5, 4, 3)")
     end
 
-    # def test_compile_function_as_an_object_slot
-    #   assert_equal 4, compile("foo = Object.clone(); foo.bar = ->; 4; end; foo.bar()")
-    # end
+    def test_compile_function_as_an_object_slot
+      assert_equal 4, compile("foo = Object.clone(); foo.bar = ->; 4; end; foo.bar()")
+    end
 
     def test_compile_true
       assert_equal true, compile("true")
