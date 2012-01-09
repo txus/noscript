@@ -14,7 +14,7 @@ rule
   \#.*$
 
   # Newlines
-  \n+           { [:NEWLINE, text] }
+  \n            { [:NEWLINE, text] }
 
   # Literals
   \d+           { [:INTEGER, text.to_i] }

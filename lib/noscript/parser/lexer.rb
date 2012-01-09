@@ -68,7 +68,7 @@ class Noscript::Parser < Racc::Parser
       when (text = @ss.scan(/\#.*$/))
         ;
 
-      when (text = @ss.scan(/\n+/))
+      when (text = @ss.scan(/\n/))
          action { [:NEWLINE, text] }
 
       when (text = @ss.scan(/\d+/))

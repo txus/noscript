@@ -8,7 +8,7 @@ class LexerTest < MiniTest::Unit::TestCase
 
   def test_newline
     tokenizes "\n", [[:NEWLINE, "\n"]]
-    tokenizes "\n\n", [[:NEWLINE, "\n\n"]]
+    tokenizes "\n\n", [[:NEWLINE, "\n"], [:NEWLINE, "\n"]]
   end
 
   def test_integer

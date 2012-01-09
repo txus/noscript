@@ -8,12 +8,12 @@ module Noscript
     end
 
     def parse_file(filename, log = false)
-      @filename = file
+      # @filename = file
       parse_string(File.read(filename), filename, log)
     end
 
     def parse_string(input, file = '(eval)', log = false)
-      @filename = file
+      #@filename = file
       p input
       scan_str(input)
     end

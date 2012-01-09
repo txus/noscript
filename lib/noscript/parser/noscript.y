@@ -44,9 +44,14 @@ rule
   | Terminator                         { result = Nodes.new(lineno, []) }
   ;
 
+  Newline:
+    NEWLINE
+  | NEWLINE Newline
+  ;
+
   # All tokens that can terminate an expression
   Terminator:
-    NEWLINE
+    Newline
   | ";"
   ;
 
@@ -62,6 +67,7 @@ rule
   | SlotGet
   | Identifier
   | '(' Expression ')'  { result = val[1] }
+  | Newline Expression  { result = val[1] }
   ;
 
   # All hard-coded values
@@ -93,12 +99,12 @@ rule
 
   LBracket:
     '['
-  | '[' NEWLINE
+  | '[' Newline
   ;
 
   RBracket:
     ']'
-  | NEWLINE ']'
+  | Newline ']'
   ;
 
   ArrayList:
@@ -109,8 +115,8 @@ rule
 
   ArrayListElement:
     Expression                 { result = val[0] }
-  | NEWLINE Expression         { result = val[1] }
-  | Expression NEWLINE         { result = val[0] }
+  | Newline Expression         { result = val[1] }
+  | Expression Newline         { result = val[0] }
   ;
 
   Tuple:
@@ -129,17 +135,17 @@ rule
 
   TupleKey:
     Identifier
-  | NEWLINE Identifier { result = val[1] }
+  | Newline Identifier { result = val[1] }
   ;
 
   LBrace:
     '{'
-  | '{' NEWLINE
+  | '{' Newline
   ;
 
   RBrace:
     '}'
-  | NEWLINE '}'
+  | Newline '}'
   ;
 
   Identifier:
@@ -235,8 +241,17 @@ require_relative 'lexer'
 
 include AST
 
-def parse(code)
-  parse_string(code, filename)
+# def parse(code)
+#   parse_string(code, filename)
+# end
+
+def filename
+  @filename
+end
+
+def on_error(t, val, vstack)
+  raise ParseError, sprintf("\nparse error on value %s (%s) #{@filename}:#{@line}",
+      val.inspect, token_to_str(t) || '?')
 end
 
 ---- footer ----
