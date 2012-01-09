@@ -28,7 +28,7 @@ class MiniTest::Unit::TestCase
 
     show_tokens(input) if ENV['DEBUG']
 
-    ast = parser.parse(input)
+    ast = parser.parse_string(input, "(test)")
     block.call(ast.body.expressions)
   end
 
