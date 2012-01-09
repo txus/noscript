@@ -7,35 +7,35 @@ module Noscript
       Noscript.eval_noscript(code)
     end
 
-    # def test_hello_world
-    #   output = `./bin/noscript examples/hello_world.ns`.split("\\n")
+    def test_hello_world
+      output = `./bin/noscript examples/hello_world.ns`.split("\n")
 
-    #   assert_equal [
-    #     "Negative johnny is",
-    #     "-4000",
-    #     "43",
-    #     "760",
-    #     "111",
-    #     "cool!",
-    #     "bar",
-    #     "baz",
-    #     "Johnny is still",
-    #     "4000",
-    #     "lord",
-    #     "hello world",
-    #   ], output
-    # end
+      assert_equal [
+        "Negative johnny is",
+        "-4000",
+        "43",
+        "760",
+        "111",
+        "cool!",
+        "bar",
+        "baz",
+        "Johnny is still",
+        "4000",
+        "lord",
+        "hello world",
+      ], output
+    end
 
-    # def test_objects
-    #   output = `./bin/noscript examples/objects.ns`.split("\\n")
+    def test_objects
+      output = `./bin/noscript examples/objects.ns`.split("\n")
 
-    #   assert_equal [
-    #     "running!",
-    #     "10",
-    #     "vroom",
-    #     "99",
-    #   ], output
-    # end
+      assert_equal [
+        "running!",
+        "10",
+        "vroom",
+        "99",
+      ], output
+    end
 
     # def test_traits
     #   output = `./bin/noscript examples/traits.ns`.split("\\n")

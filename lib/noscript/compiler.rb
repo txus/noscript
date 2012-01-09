@@ -281,6 +281,31 @@ module Noscript
       end
     end
 
+    def visit_HashLiteral(o)
+      set_line(o)
+
+      count = o.array.size
+      i = 0
+
+      g.push_cpath_top
+      g.find_const :Hash
+      g.push count / 2
+      g.send :new_from_literal, 1
+
+      while i < count
+        k = o.array[i]
+        v = o.array[i + 1]
+
+        g.dup
+        k.accept(self)
+        v.accept(self)
+        g.send :[]=, 2
+        g.pop
+
+        i += 2
+      end
+    end
+
     def visit_LocalVariableAssignment(o)
       set_line(o)
       o.value.accept(self)

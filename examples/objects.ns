@@ -1,7 +1,7 @@
 vehicle = Object.clone()
 vehicle.speed = 10
 vehicle.run = ->
-  puts('running!')
+  Object.puts('running!')
 end
 
 car = vehicle.clone({
@@ -11,6 +11,6 @@ car = vehicle.clone({
 
 car.run()
 
-puts(car.speed)
-puts(car.sound)
-puts(car.price)
+Object.puts(car.speed)
+Object.puts(car.sound)
+Object.puts(car.price)

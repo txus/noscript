@@ -1,7 +1,7 @@
 module Noscript
   module AST
     RubiniusNodes = [
-      :Node, :StringLiteral, :FixnumLiteral, :ArrayLiteral, :HashLiteral,
+      :Node, :StringLiteral, :FixnumLiteral, :ArrayLiteral,
       :TrueLiteral, :FalseLiteral, :NilLiteral, :EvalExpression,
       :ClosedScope,
     ]
@@ -85,6 +85,19 @@ module Noscript
 
       def constant?
         @name.to_s[0] =~ /[A-Z]/
+      end
+
+      def bytecode(g)
+        p "called bytecode for identifier #{@name}"
+      end
+    end
+
+    class HashLiteral < Node
+      attr_reader :array
+
+      def initialize(line, array)
+        super(line)
+        @array = array
       end
     end
 
