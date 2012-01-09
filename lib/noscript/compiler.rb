@@ -248,22 +248,26 @@ module Noscript
 
     def visit_CallNode(o)
       meth = o.method.respond_to?(:name) ? o.method.name.to_sym : o.method.to_sym
+      size = o.arguments.length + 1
 
       if o.receiver
         o.receiver.accept(self)
+        g.dup_top
       else
         meth = :call
-
-        visit_Identifier(o.method, true)
+        visit_Identifier(o.method)
+        g.push_const :Runtime
+        g.find_const :Object
       end
 
       o.arguments.each do |argument|
         argument.accept(self)
       end
-      g.noscript_send meth, o.arguments.length
+
+      g.noscript_send meth, size
     end
 
-    def visit_Identifier(o, for_method=false)
+    def visit_Identifier(o)
       set_line(o)
 
       if o.constant?

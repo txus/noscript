@@ -974,14 +974,14 @@ module_eval(<<'.,.,', 'noscript.y', 198)
 
 module_eval(<<'.,.,', 'noscript.y', 200)
   def _reduce_73(val, _values, result)
-     result = CallNode.new(lineno, val[1], '@!', []) 
+     result = CallNode.new(lineno, val[1], '!@', []) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'noscript.y', 201)
   def _reduce_74(val, _values, result)
-     result = CallNode.new(lineno, val[1], '@-', []) 
+     result = CallNode.new(lineno, val[1], '-@', []) 
     result
   end
 .,.,
