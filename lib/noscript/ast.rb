@@ -37,8 +37,8 @@ module Noscript
       def initialize(line, expressions)
         super(line)
         @expressions = expressions
-        require 'pp'
-        pp @expressions
+        # require 'pp'
+        # pp @expressions
       end
 
       def <<(exp)
@@ -89,8 +89,8 @@ module Noscript
         @name.to_s[0] =~ /[A-Z]/
       end
 
-      def bytecode(g)
-        p "called bytecode for identifier #{@name}"
+      def deref?
+        @name.to_s[0] == '@'
       end
     end
 

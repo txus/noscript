@@ -250,33 +250,52 @@ module Noscript
       meth = o.method.respond_to?(:name) ? o.method.name.to_sym : o.method.to_sym
       size = o.arguments.length + 1
 
+      # p "DOING #{meth.to_s}"
       if o.receiver
-        o.receiver.accept(self)
-        g.dup_top
+        if meth.to_s == "push" || meth.to_s == "print"
+          # p o.receiver
+          # p "before anything SIZE IS", g.size
+          o.receiver.accept(self)
+          # p "after receiver SIZE IS", g.size
+          g.dup_top
+          # p "after dup top SIZE IS", g.size
+          size += 1
+        else
+          o.receiver.accept(self)
+          g.dup_top
+        end
       else
         meth = :call
         visit_Identifier(o.method)
         g.push_self
       end
 
+      # p o.arguments
       o.arguments.each do |argument|
         argument.accept(self)
       end
+      # p "after arguments SIZE IS with method #{meth}", g.size
 
       g.noscript_send meth, size
+      # g.pop
+      # p "after sending size  IS", g.size
     end
 
     def visit_Identifier(o)
       set_line(o)
 
+      # p o.name
       if o.constant?
         g.push_const o.name.to_sym
-        return
-      end
-
-      if s.slot_for(o.name)
+      elsif o.deref?
+        g.push_self
+        g.push_literal o.name
+        g.send :get, 1
+      elsif s.slot_for(o.name)
+        # p s.variables
         visit_LocalVariableAccess(o)
       else
+        # p 'yeahhhh none'
         raise "Undefined identifier #{o.name}"
       end
     end

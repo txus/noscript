@@ -54,6 +54,10 @@ module Noscript
       assert_equal 10, compile("foo = -> a; a + a; end; foo(5)")
     end
 
+    def test_compile_function_with_call_inside
+      assert_equal 3, compile("foo = ->; '3'.print(); end; 3")
+    end
+
     def test_compile_function_with_multiple_arguments
       assert_equal 7, compile("foo = -> a, b, c; b + c; end; foo(5, 4, 3)")
     end
@@ -108,6 +112,10 @@ module Noscript
 
     def test_compile_if_else
       assert_equal 2, compile("if false; 1; else; 2; end")
+    end
+
+    def test_compile_if_else_with_multiple_statements
+      assert_equal 7, compile("if false; 1 * 7; 2 + 33; 3; else; 2 + 4; 3 + 9; 4 + 3; end")
     end
 
     def test_compile_while

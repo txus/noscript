@@ -41,7 +41,8 @@ rule
   | Expressions Terminator Expression  { result = val[0] << val[2] }
     # To ignore trailing line breaks
   | Expressions Terminator             { result = val[0].is_a?(Nodes) ? val[0] : Nodes.new(lineno, val[0]) }
-  | Terminator                         { result = Nodes.new(lineno, []) }
+  | Terminator                         { result = Nodes.new(lineno, [NilLiteral.new(lineno)]) }
+  |                                    { result = Nodes.new(lineno, [NilLiteral.new(lineno)]) }
   ;
 
   Newline:
@@ -91,8 +92,6 @@ rule
     "->" ParamList Terminator
       Expressions
     END                           { result = FunctionLiteral.new(lineno, val[1], val[3]) }
-  | "->" ParamList Terminator
-    END                           { result = FunctionLiteral.new(lineno, val[1], Nodes.new(lineno, [NilLiteral.new(lineno)])) }
   ;
 
   Array:

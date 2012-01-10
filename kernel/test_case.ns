@@ -34,7 +34,7 @@
 #
 TestCase = Object.clone({
   initialize: ->
-    @errors = Array.clone()
+    @errors = []
     @tests = 0
     @assertions = 0
     @failures = 0
@@ -59,54 +59,55 @@ TestCase = Object.clone({
   #   The object to assert the truthiness about.
   assert: -> value
     if value != false
-      print('\e[32m.\e[0m')
+      '\e[32m.\e[0m'.print()
     else
-      print('\e[31mF\e[0m')
+      '\e[31mF\e[0m'.print()
+      '\e[31mF\e[0m'.print()
+      '\e[31mF\e[0m'.print()
       @errors.push('Expected #{value} to be truthy.')
-      @failures.increment()
     end
-    @assertions.increment()
-  end,
-
-  # Asserts equality between two objects.
-  #
-  # @param [Object] expected
-  #   The expected value.
-  #
-  # @param [Object] actual
-  #   The actual value.
-  assert equal: -> expected, actual
-    if expected == actual
-      print('\e[32m.\e[0m')
-    else
-      print('\e[31mF\e[0m')
-      @errors.push('Expected #{expected}, got #{actual}.')
-      @failures.increment()
-    end
-    @assertions.increment()
-  end,
-
-  # Prints the report with the number of +tests+, +assertions+ and +failures+
-  #
-  # It also prints a failure report.
-  print report: ->
-    puts('\n\n\e[0m#{@tests} tests, #{@assertions} assertions, #{@failures} failures')
-    @errors.each(-> error
-      puts('    * #{error}')
-    end)
-  end,
-
-  # Runs the test case and prints the report afterwards.
-  run: ->
-    @each slot(-> name, test
-      if name.starts with('it')
-        @setup()
-        test()
-        @teardown()
-        @tests.increment()
-      end
-    end)
-
-    @print report()
-  end
+    # @assertions.increment()
+  end #,
+#
+#   # Asserts equality between two objects.
+#   #
+#   # @param [Object] expected
+#   #   The expected value.
+#   #
+#   # @param [Object] actual
+#   #   The actual value.
+#   assert equal: -> expected, actual
+#     if expected == actual
+#       print('\\e[32m.\\e[0m')
+#     else
+#       print('\\e[31mF\\e[0m')
+#       @errors.push('Expected #{expected}, got #{actual}.')
+#       @failures.increment()
+#     end
+#     @assertions.increment()
+#   end,
+#
+#   # Prints the report with the number of +tests+, +assertions+ and +failures+
+#   #
+#   # It also prints a failure report.
+#   print report: ->
+#     puts('\\n\\n\\e[0m#{@tests} tests, #{@assertions} assertions, #{@failures} failures')
+#     @errors.each(-> error
+#       puts('    * #{error}')
+#     end)
+#   end,
+#
+#   # Runs the test case and prints the report afterwards.
+#   run: ->
+#     @each slot(-> name, test
+#       if name.starts with('it')
+#         @setup()
+#         test()
+#         @teardown()
+#         @tests.increment()
+#       end
+#     end)
+#
+#     @print report()
+#   end
 })
