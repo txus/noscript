@@ -35,7 +35,7 @@ module Noscript
       expected = "\e[32m.\e[0m\e[32m.\e[0m\e[31mF\e[0m\n\n\e[0m3 tests, 3 assertions, 1 failures\n    * Expected false to be truthy.\n"
       assert_output expected do
         compile(code)
-      end
+      end if nil
     end
   end
 end
