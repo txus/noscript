@@ -203,6 +203,15 @@ module Noscript
       o.body.accept(self)
     end
 
+    def visit_ArrayLiteral(o)
+      set_line(o)
+      o.body.each do |x|
+        x.accept(self)
+      end
+
+      g.make_array o.body.size
+    end
+
     def visit_Nodes(o)
       set_line(o)
       size = o.expressions.length
@@ -282,6 +291,8 @@ module Noscript
         g.raise_if_nil NameError, "Object has no slot named #{o.name}"
       elsif s.slot_for(o.name)
         visit_LocalVariableAccess(o)
+      else
+        raise "CANT FIND #{o.name}"
       end
     end
 

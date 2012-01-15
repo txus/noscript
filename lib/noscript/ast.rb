@@ -59,6 +59,15 @@ module Noscript
       end
     end
 
+    class ArrayLiteral < Node
+      attr_accessor :body
+
+      def initialize(line, array)
+        @line = line
+        @body = array
+      end
+    end
+
     # Node of a method call or local variable access, can take any of these forms:
     #
     #   method # this form can also be a local variable

@@ -35,7 +35,7 @@ module Noscript
     end
 
     def test_compile_array_literal_with_variables
-      assert_equal [3], compile("foo = 3; [foo]")
+      assert_equal [3], compile("bar = 3; [bar]")
     end
 
     def test_compile_tuple_literal
