@@ -2,10 +2,6 @@ require 'test_helper'
 
 module Noscript
   class CompilerTest < MiniTest::Unit::TestCase
-    def compile(code)
-      Noscript.eval_noscript(code)
-    end
-
     def test_compile_integer_literal
       assert_equal 1, compile("1")
     end
@@ -18,12 +14,28 @@ module Noscript
       assert_equal '1', compile("'1'")
     end
 
+    def test_compile_string_interpolation
+      assert_equal '1', compile("'%s' % [1]")
+    end
+
+    def test_compile_string_interpolation_with_variables
+      assert_equal '1', compile("foo = 1; '%s' % [foo]")
+    end
+
     def test_compile_assignment
       assert_equal 1, compile("foo = 1; foo")
     end
 
+    def test_compile_constant_assignment
+      assert_equal 1, compile("Foo = 1; Foo")
+    end
+
     def test_compile_array_literal
       assert_equal 1, compile("[1,2].at(0)")
+    end
+
+    def test_compile_array_literal_with_variables
+      assert_equal [3], compile("foo = 3; [foo]")
     end
 
     def test_compile_tuple_literal

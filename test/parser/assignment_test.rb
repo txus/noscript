@@ -8,7 +8,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
 
       assert_kind_of LocalVariableAssignment, assignment
 
-      assert_equal "a", assignment.name
+      assert_equal "a", assignment.name.name
       assert_equal "foo", assignment.value.string
     end
   end
@@ -19,7 +19,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
 
       assert_kind_of LocalVariableAssignment, assignment
 
-      assert_equal 'oh my lord', assignment.name
+      assert_equal 'oh my lord', assignment.name.name
       assert_equal "foo", assignment.value.string
     end
   end
@@ -28,7 +28,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     parses 'a = (3 + 3) * 4' do |nodes|
       assignment = nodes.first
       assert_kind_of LocalVariableAssignment, assignment
-      assert_equal "a", assignment.name
+      assert_equal "a", assignment.name.name
 
       multiplication = assignment.value
       assert_kind_of CallNode, multiplication
@@ -47,12 +47,12 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     parses 'a = b = 3' do |nodes|
       assignment = nodes.first
       assert_kind_of LocalVariableAssignment, assignment
-      assert_equal "a", assignment.name
+      assert_equal "a", assignment.name.name
 
       other_assignment = assignment.value
       assert_kind_of LocalVariableAssignment, other_assignment
 
-      assert_equal "b", other_assignment.name
+      assert_equal "b", other_assignment.name.name
       assert_equal 3, other_assignment.value.value
     end
   end
@@ -61,7 +61,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     parses 'a = foo()' do |nodes|
       assignment = nodes.first
       assert_kind_of LocalVariableAssignment, assignment
-      assert_equal "a", assignment.name
+      assert_equal "a", assignment.name.name
 
       call = assignment.value
       assert_kind_of CallNode, call
@@ -75,7 +75,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     parses 'a = -> b, c; 3; end;' do |nodes|
       assignment = nodes.first
       assert_kind_of LocalVariableAssignment, assignment
-      assert_equal "a", assignment.name
+      assert_equal "a", assignment.name.name
 
       function = assignment.value
       assert_kind_of FunctionLiteral, function
@@ -90,7 +90,7 @@ class ParserAssignmentTest < MiniTest::Unit::TestCase
     parses "a = a - 3" do |nodes|
       assignment = nodes.first
       assert_kind_of LocalVariableAssignment, assignment
-      assert_equal "a", assignment.name
+      assert_equal "a", assignment.name.name
 
       exp = assignment.value
       assert_kind_of CallNode, exp

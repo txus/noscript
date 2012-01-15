@@ -32,6 +32,21 @@ class MiniTest::Unit::TestCase
     block.call(ast.body.expressions)
   end
 
+  def compile(code)
+    Noscript.eval_noscript(code)
+  end
+
+  def assert_output(stdout = nil, stderr = nil)
+    out, err = capture_io do
+      yield
+    end
+
+    y = assert_equal stderr, err, "In stderr" if stderr
+    x = assert_equal stdout, out, "In stdout" if stdout
+
+    (!stdout || x) && (!stderr || y)
+  end
+
   private
 
   def show_tokens(input)

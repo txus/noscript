@@ -45,5 +45,13 @@ module Noscript
     def set_local(name)
       g.set_local slot_for(name)
     end
+
+    def set_const(name)
+      g.push_runtime
+      g.swap
+      g.push_literal name
+      g.swap
+      g.send :const_set, 2
+    end
   end
 end

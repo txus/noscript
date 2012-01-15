@@ -14,37 +14,37 @@ module Noscript
     #   end
     # end
 
-    # def self.noscript_compiled_name(file)
-    #   if file.suffix? ".ns"
-    #     file + "c"
-    #   else
-    #     file + ".compiled.nsc"
-    #   end
-    # end
+    def self.compiled_name(file)
+      if file.suffix? ".ns"
+        file + "c"
+      else
+        file + ".compiled.nsc"
+      end
+    end
 
-    # def self.compile_fancy_file(file, output = nil, line = 1, print = false)
-    #   compiler = new :fancy_file, :compiled_file
+    def self.compile_file(file, output = nil, line = 1, print = false)
+      compiler = new :noscript_file, :compiled_file
 
-    #   parser = compiler.parser
-    #   parser.root Noscript::AST::Script
+      parser = compiler.parser
+      parser.root Rubinius::AST::EvalExpression
 
-    #   parser.input file, line
+      parser.input file, line
 
-    #   if print
-    #     parser.print
-    #     printer = compiler.packager.print
-    #     printer.bytecode = true
-    #   end
+      if print
+        parser.print
+        printer = compiler.packager.print
+        printer.bytecode = true
+      end
 
-    #   writer = compiler.writer
-    #   writer.name = output ? output : noscript_compiled_name(file)
+      writer = compiler.writer
+      writer.name = output ? output : compiled_name(file)
 
-    #   begin
-    #     compiler.run
-    #   rescue Exception => e
-    #     compiler_error "Error trying to compile noscript: #{file}", e
-    #   end
-    # end
+      begin
+        compiler.run
+      rescue Exception => e
+        compiler_error "Error trying to compile noscript: #{file}", e
+      end
+    end
 
     def self.compile_eval(string, variable_scope, file="(eval)", line=1)
       if ec = @eval_cache
@@ -125,7 +125,7 @@ module Noscript
       end
 
       def parse
-        create.parse_file
+        create.parse_file(@file)
       end
     end
 
@@ -272,19 +272,16 @@ module Noscript
     def visit_Identifier(o)
       set_line(o)
 
-      # p o.name
       if o.constant?
-        g.push_const o.name.to_sym
+        g.push_runtime
+        g.find_const o.name.to_sym
       elsif o.deref?
         g.push_self
         g.push_literal o.name
         g.send :get, 1
+        g.raise_if_nil NameError, "Object has no slot named #{o.name}"
       elsif s.slot_for(o.name)
-        # p s.variables
         visit_LocalVariableAccess(o)
-      else
-        # p 'yeahhhh none'
-        raise "Undefined identifier #{o.name}"
       end
     end
 
@@ -314,9 +311,16 @@ module Noscript
     end
 
     def visit_LocalVariableAssignment(o)
+      name = o.name.name
+
       set_line(o)
       o.value.accept(self)
-      s.set_local o.name
+
+      if o.name.constant?
+        s.set_const name
+      else
+        s.set_local name
+      end
     end
 
     AST::RubiniusNodes.each do |rbx|
@@ -329,6 +333,7 @@ module Noscript
     def visit_LocalVariableAccess(o)
       set_line(o)
       s.push_variable o.name
+      g.raise_if_nil NameError, "Undefined local variable #{o.name}"
     end
 
     def visit_SlotGet(o)

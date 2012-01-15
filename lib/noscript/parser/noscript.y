@@ -204,6 +204,7 @@ rule
   | Expression '-' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
   | Expression '*' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
   | Expression '/' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
+  | Expression '%' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
   # Unary operators
   | '!' Expression                { result = CallNode.new(lineno, val[1], '!@', []) }
   | '-' Expression                { result = CallNode.new(lineno, val[1], '-@', []) }

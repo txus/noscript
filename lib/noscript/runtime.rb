@@ -43,6 +43,7 @@ class Runtime
 
     def initialize
       @prototype = nil
+      self[:name] = "Object"
     end
 
     noscript_def("clone") do |*args|
@@ -54,6 +55,13 @@ class Runtime
         end
       end
       obj
+    end
+
+    noscript_def("each slot") do |*args|
+      fn = args.shift
+      each do |name|
+        fn.call(self, name.to_s, self[name])
+      end
     end
 
     noscript_def("puts") do |*args|
@@ -73,6 +81,8 @@ class Runtime
     def get(name)
       if self.key?(name)
         self[name]
+      elsif self.methods.include?(:"noscript:#{name}")
+        self.method(:"noscript:#{name}")
       elsif proto = prototype
         proto.get(name)
       else
@@ -97,7 +107,8 @@ class Runtime
     def method_missing(m, *args)
       fun = m.to_s.split(":").last.to_sym
       if has_property?(fun)
-        return get(fun).call(args.shift, *args)
+        this = args.shift
+        return get(fun).call(this, *args)
       end
       super
     end
@@ -118,18 +129,38 @@ class Function
     call(args.shift, *args)
   end
 end
+
+class Method
+  define_method("noscript:call") do |*args|
+    call(*args)
+  end
+end
+
+class String
+  noscript_def("starts with") do |pattern|
+    self =~ /^#{pattern}/
+  end
+end
+
 class Fixnum
   noscript_alias [:+, :-, :*, :/, :<, :>, :<=, :>=]
   noscript_def("-@") { -self }
 end
 
 class String
-  noscript_alias [:+, :*, :length]
+  noscript_alias [:+, :*, :length, :%]
   noscript_def("print") { puts self; self }
 end
 
 class Array
   noscript_alias [:first, :last, :at]
+  noscript_def("each") do |*args|
+    fn = args.shift
+    each do |element|
+      fn.call(self, element)
+    end
+    nil
+  end
 end
 
 class Hash

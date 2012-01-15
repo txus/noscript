@@ -82,15 +82,25 @@ module Noscript
 
       def initialize(line, name)
         super(line)
+        @constant = false
+        @deref = false
+
         @name = name
+
+        if name.to_s[0] =~ /[A-Z]/
+          @constant = true
+        elsif name.to_s[0] == '@'
+          @deref = true
+          @name = name[1..-1]
+        end
       end
 
       def constant?
-        @name.to_s[0] =~ /[A-Z]/
+        @constant
       end
 
       def deref?
-        @name.to_s[0] == '@'
+        @deref
       end
     end
 
@@ -107,7 +117,7 @@ module Noscript
       attr_reader :name, :value
       def initialize(line, name, value)
         super(line)
-        @name = name.is_a?(Identifier) ? name.name : name
+        @name = name.is_a?(Identifier) ? name : Identifier.new(line, name)
         @value = value
       end
     end

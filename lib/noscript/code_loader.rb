@@ -73,11 +73,11 @@ module Noscript
     end
 
     def compile_file(file, compiled)
-      if self.class.save_compiled?
-        Noscript::Compiler.compile(file, compiled)
-      else
-        Noscript::Compiler.compile_file(file)
-      end
+      # if self.class.save_compiled?
+      #   Noscript::Compiler.compile(file, compiled)
+      # else
+      Noscript::Compiler.compile_file(file)
+      # end
     end
 
     def load_compiled_file(path, signature, version)
