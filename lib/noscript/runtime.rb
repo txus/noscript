@@ -124,7 +124,8 @@ class Fixnum
 end
 
 class String
-  noscript_alias [:+, :*]
+  noscript_alias [:+, :*, :length]
+  noscript_def("print") { puts self; self }
 end
 
 class Array

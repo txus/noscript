@@ -136,7 +136,7 @@ module Noscript
       def initialize(line, condition, body, else_body=nil)
         super(line)
         @condition = condition
-        @body      = body
+        @body      = body.expressions.any? ? body : NilLiteral.new(line)
         @else_body = else_body || NilLiteral.new(line)
       end
     end

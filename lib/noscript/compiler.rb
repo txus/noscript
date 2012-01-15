@@ -205,8 +205,11 @@ module Noscript
 
     def visit_Nodes(o)
       set_line(o)
+      size = o.expressions.length
       o.expressions.each do |exp|
+        size -= 1
         exp.accept(self)
+        g.pop if size > 0
       end
     end
 
@@ -250,35 +253,20 @@ module Noscript
       meth = o.method.respond_to?(:name) ? o.method.name.to_sym : o.method.to_sym
       size = o.arguments.length + 1
 
-      # p "DOING #{meth.to_s}"
       if o.receiver
-        if meth.to_s == "push" || meth.to_s == "print"
-          # p o.receiver
-          # p "before anything SIZE IS", g.size
-          o.receiver.accept(self)
-          # p "after receiver SIZE IS", g.size
-          g.dup_top
-          # p "after dup top SIZE IS", g.size
-          size += 1
-        else
-          o.receiver.accept(self)
-          g.dup_top
-        end
+        o.receiver.accept(self)
+        g.dup_top
       else
         meth = :call
         visit_Identifier(o.method)
         g.push_self
       end
 
-      # p o.arguments
       o.arguments.each do |argument|
         argument.accept(self)
       end
-      # p "after arguments SIZE IS with method #{meth}", g.size
 
       g.noscript_send meth, size
-      # g.pop
-      # p "after sending size  IS", g.size
     end
 
     def visit_Identifier(o)

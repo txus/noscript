@@ -62,8 +62,6 @@ TestCase = Object.clone({
       '\e[32m.\e[0m'.print()
     else
       '\e[31mF\e[0m'.print()
-      '\e[31mF\e[0m'.print()
-      '\e[31mF\e[0m'.print()
       @errors.push('Expected #{value} to be truthy.')
     end
     # @assertions.increment()
@@ -78,20 +76,19 @@ TestCase = Object.clone({
 #   #   The actual value.
 #   assert equal: -> expected, actual
 #     if expected == actual
-#       print('\\e[32m.\\e[0m')
+#       print('\e[32m.\e[0m')
 #     else
-#       print('\\e[31mF\\e[0m')
+#       print('\e[31mF\e[0m')
 #       @errors.push('Expected #{expected}, got #{actual}.')
-#       @failures.increment()
 #     end
 #     @assertions.increment()
 #   end,
 #
-#   # Prints the report with the number of +tests+, +assertions+ and +failures+
+#   # Prints the report with the number of +tests+, +assertions+ and failures
 #   #
 #   # It also prints a failure report.
 #   print report: ->
-#     puts('\\n\\n\\e[0m#{@tests} tests, #{@assertions} assertions, #{@failures} failures')
+#     puts('\n\n\e[0m#{@tests} tests, #{@assertions} assertions, #{@errors.length()} failures')
 #     @errors.each(-> error
 #       puts('    * #{error}')
 #     end)
