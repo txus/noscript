@@ -56,13 +56,13 @@ TestCase = Object.clone({
   # @param [Object] value
   #   The object to assert the truthiness about.
   assert: -> value
-    if value != false
+    if value
       '\e[32m.\e[0m'.print()
     else
       '\e[31mF\e[0m'.print()
-      # @errors.push('Expected %s to be truthy.' % [value])
+      @errors.push('Expected %s to be truthy.' % value)
     end
-    # @assertions.increment()
+    @assertions = @assertions + 1
   end,
 
   # Asserts equality between two objects.
@@ -74,20 +74,20 @@ TestCase = Object.clone({
   #   The actual value.
   assert equal: -> expected, actual
     if expected == actual
-      print('\e[32m.\e[0m')
+      '\e[32m.\e[0m'.print()
     else
-      print('\e[31mF\e[0m')
-      # @errors.push('Expected %s, got %s.' % [1,2]) #[expected, actual])
+      '\e[31mF\e[0m'.print()
+      @errors.push('Expected %s, got %s.' % [expected, actual])
     end
-    # @assertions.increment()
+    @assertions = @assertions + 1
   end,
 
   # Prints the report with the number of +tests+, +assertions+ and failures
   #
   # It also prints a failure report.
   print report: ->
-    # report = '\n\n\e[0m%i tests, %i assertions, %i failures' % [1,2,3] # % [@tests, @assertions, @errors.length]
-    # report.print()
+    report = '\n\n\e[0m%i tests, %i assertions, %i failures' % [@tests, @assertions, @errors.length]
+    report.print()
     @errors.each(-> error
       '    * #{error}'.print()
     end)
@@ -100,7 +100,7 @@ TestCase = Object.clone({
         @setup()
         test()
         @teardown()
-        @tests.increment()
+        @tests = @tests + 1
       end
     end)
 

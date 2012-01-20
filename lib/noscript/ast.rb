@@ -1,7 +1,7 @@
 module Noscript
   module AST
     RubiniusNodes = [
-      :Node, :StringLiteral, :FixnumLiteral, :ArrayLiteral,
+      :Node, :StringLiteral, :FixnumLiteral,
       :TrueLiteral, :FalseLiteral, :NilLiteral, :EvalExpression,
       :ClosedScope,
     ]

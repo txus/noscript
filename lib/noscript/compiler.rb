@@ -344,6 +344,7 @@ module Noscript
     def visit_LocalVariableAccess(o)
       set_line(o)
       s.push_variable o.name
+      # p [s.variables, o.name]
       g.raise_if_nil NameError, "Undefined local variable #{o.name}"
     end
 

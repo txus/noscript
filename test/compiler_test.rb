@@ -19,7 +19,7 @@ module Noscript
     end
 
     def test_compile_string_interpolation_with_variables
-      assert_equal '1', compile("foo = 1; '%s' % [foo]")
+      assert_equal '1', compile("foo = 1; '%s' % foo")
     end
 
     def test_compile_assignment
@@ -156,6 +156,23 @@ module Noscript
 
     def test_compile_while
       assert_equal 10, compile("a = 3; while a < 10; a = a + 1; end; a")
+    end
+
+    def test_compile_edge_case
+      assert_equal 9, compile(<<-CODE)
+        foo = Object.clone({
+          setup: ->
+            @foo = 3
+          end,
+
+          add: -> b, c
+            b + c + @foo
+          end
+        })
+
+        foo.setup()
+        foo.add(3, 3)
+        CODE
     end
   end
 end
