@@ -20,11 +20,14 @@ prechigh
   right '!'
   left  '*' '/'
   left  '+' '-'
-  left  '>' '>=' '<' '<='
+  left  '<<'
+  left  '<=' '>='
+  left  '>' '<'
   left  '==' '!='
   left  '&&'
   left  '||'
   right '='
+  left  '%'
   left  ','
 preclow
 
@@ -188,26 +191,31 @@ rule
   | ArgList "," Expression        { result = val[0] << val[2] }
   ;
 
+  BinaryOperator:
+    '||'
+  | '<<'
+  | '&&'
+  | '=='
+  | '!='
+  | '>'
+  | '>='
+  | '<'
+  | '<='
+  | '+'
+  | '-'
+  | '*'
+  | '/'
+  | '%'
+  ;
+
+  UnaryOperator:
+    '!'
+  | '-'
+  ;
+
   Operator:
-    # Binary operators
-    Expression '||' Expression    { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
-  | Expression '&&' Expression    { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
-  | Expression '==' Expression    { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
-  | Expression '!=' Expression    { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
-  | Expression '>' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
-  | Expression '>=' Expression    { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
-  | Expression '<' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
-  | Expression '<=' Expression    { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
-    # 1 + 2 => 1.+(2)
-    #   1       +       2                           1       "+"      [2]
-  | Expression '+' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
-  | Expression '-' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
-  | Expression '*' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
-  | Expression '/' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
-  | Expression '%' Expression     { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
-  # Unary operators
-  | '!' Expression                { result = CallNode.new(lineno, val[1], '!@', []) }
-  | '-' Expression                { result = CallNode.new(lineno, val[1], '-@', []) }
+    UnaryOperator Expression                { result = CallNode.new(lineno, val[1], val[0] + '@', []) }
+  | Expression BinaryOperator Expression    { result = CallNode.new(lineno, val[0], val[1], [val[2]]) }
   ;
 
   ParamList:

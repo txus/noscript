@@ -113,6 +113,9 @@ class Noscript::Parser < Racc::Parser
       when (text = @ss.scan(/<=/))
          action { [text, text] }
 
+      when (text = @ss.scan(/<</))
+         action { [text, text] }
+
       when (text = @ss.scan(/->/))
          action { [text, text] }
 
