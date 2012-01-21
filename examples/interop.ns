@@ -1,2 +1,0 @@
-myvar = Ruby.eval('Integer.new(3 + 5)')
-print(myvar)
