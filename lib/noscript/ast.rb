@@ -93,6 +93,7 @@ module Noscript
         super(line)
         @constant = false
         @deref = false
+        @self = (name == 'self')
 
         @name = name
 
@@ -110,6 +111,10 @@ module Noscript
 
       def deref?
         @deref
+      end
+
+      def self?
+        @self
       end
     end
 

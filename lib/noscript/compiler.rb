@@ -127,6 +127,8 @@ module Noscript
         g.push_literal o.name
         g.send :get, 1
         g.raise_if_nil NameError, "Object has no slot named #{o.name}"
+      elsif o.self?
+        g.push_self
       elsif s.slot_for(o.name)
         visit_LocalVariableAccess(o)
       else
