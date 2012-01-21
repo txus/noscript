@@ -122,7 +122,7 @@ module Noscript
       if o.constant?
         g.push_runtime
         g.find_const o.name.to_sym
-      elsif o.deref?
+      elsif o.deref? # @foo equals to self.foo
         g.push_self
         g.push_literal o.name
         g.send :get, 1
@@ -162,13 +162,22 @@ module Noscript
     end
 
     def visit_LocalVariableAssignment(o)
-      name = o.name.name
+      identifier = o.name
+      if identifier.deref?
+        g.push_self
+      end
+
+      name = identifier.name
 
       set_line(o)
       o.value.accept(self)
 
-      if o.name.constant?
+      if identifier.constant?
         s.set_const name
+      elsif identifier.deref?
+        g.push_literal name
+        g.swap
+        g.send :put, 2
       else
         s.set_local name
       end
@@ -193,6 +202,7 @@ module Noscript
       o.receiver.accept(self)
       g.push_literal o.name
       g.send :get, 1
+      g.raise_if_nil NameError, "Object has no slot named #{o.name}"
     end
 
     def visit_SlotAssign(o)

@@ -158,21 +158,14 @@ module Noscript
       assert_equal 10, compile("a = 3; while a < 10; a = a + 1; end; a")
     end
 
-    def test_compile_edge_case
-      assert_equal 9, compile(<<-CODE)
-        foo = Object.clone({
-          setup: ->
-            @foo = 3
-          end,
+    # Warning: this permanently pollutes self for the rest of the tests.
+    def test_self_equals_deref
+      assert_equal 3, compile("self.foo = 3; @foo")
+    end
 
-          add: -> b, c
-            b + c + @foo
-          end
-        })
-
-        foo.setup()
-        foo.add(3, 3)
-        CODE
+    # Warning: this permanently pollutes self for the rest of the tests.
+    def test_self_equals_deref_on_asignment
+      assert_equal 7, compile("@foo = 7; self.foo")
     end
   end
 end
