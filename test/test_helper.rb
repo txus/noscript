@@ -5,6 +5,7 @@ require 'minitest/autorun'
 # require 'minitest/spec'
 # require 'purdytest'
 
+$: << 'lib'
 require 'noscript'
 
 class MiniTest::Unit::TestCase

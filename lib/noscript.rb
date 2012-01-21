@@ -2,6 +2,7 @@ module Noscript
   require_relative 'noscript/version'
   require_relative 'noscript/ast'
   require_relative 'noscript/parser'
+  require_relative 'noscript/stages'
   require_relative 'noscript/compiler'
   require_relative 'noscript/generator'
   require_relative 'noscript/scope'
