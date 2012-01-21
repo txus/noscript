@@ -14,6 +14,10 @@ module Noscript
       assert_equal '1', compile("'1'")
     end
 
+    def test_compile_string_literal_with_escaped_chars
+      assert_equal "\n", compile("'\n'")
+    end
+
     def test_compile_string_interpolation
       assert_equal '1', compile("'%s' % [1]")
     end
@@ -81,14 +85,14 @@ module Noscript
     def test_compile_multiple_expressions
       result = compile("
       if true != false
-        '\e[32m.\e[0m'
-        '\e[31mF\e[0m'
-        '\e[31mF\e[0m'
-        '\e[31mF\e[0m'
+        '3'
+        '3'
+        '3'
+        '3'
         1
       else
-        '\e[31mF\e[0m'
-        '\e[31mF\e[0m'
+        '3'
+        '3'
         @errors.push('Expected to be truthy.')
       end")
       assert_equal 1, result

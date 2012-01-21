@@ -190,11 +190,18 @@ module Noscript
       end
     end
 
+    def visit_StringLiteral(o)
+      set_line(o)
+      o.bytecode(g)
+    end
+
     def visit_LocalVariableAccess(o)
       set_line(o)
-      s.push_variable o.name
-      # p [s.variables, o.name]
-      g.raise_if_nil NameError, "Undefined local variable #{o.name}"
+      if s.variables.include?(o.name)
+        s.push_variable o.name
+      else
+        raise NameError, "Undefined local variable #{o.name}"
+      end
     end
 
     def visit_SlotGet(o)

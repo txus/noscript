@@ -26,8 +26,8 @@ prechigh
   left  '==' '!='
   left  '&&'
   left  '||'
-  right '='
   left  '%'
+  right '='
   left  ','
 preclow
 

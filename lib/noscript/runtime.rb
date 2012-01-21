@@ -149,11 +149,12 @@ end
 
 class String
   noscript_alias [:+, :*, :length, :%]
-  noscript_def("print") { puts self; self }
+  noscript_def("print") { print self; self }
+  noscript_def("puts") { puts self; self }
 end
 
 class Array
-  noscript_alias [:first, :last, :at]
+  noscript_alias [:first, :last, :at, :<<, :length]
   noscript_def("each") do |*args|
     fn = args.shift
     each do |element|

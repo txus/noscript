@@ -1,7 +1,7 @@
 module Noscript
   module AST
     RubiniusNodes = [
-      :Node, :StringLiteral, :FixnumLiteral,
+      :Node, :FixnumLiteral,
       :TrueLiteral, :FalseLiteral, :NilLiteral, :EvalExpression,
       :ClosedScope,
     ]
@@ -56,6 +56,18 @@ module Noscript
         super(line)
         @arguments = arguments
         @body = body
+      end
+    end
+
+    class StringLiteral < Rubinius::AST::StringLiteral
+      def initialize(line, str)
+        super(line, unescape_chars(str))
+      end
+
+      # Weird hack. Whoa.
+      def unescape_chars(str)
+        str.gsub("\\r", "\r").gsub("\\t", "\t").gsub("\\n", "\n").gsub("\\v", "\v").gsub("\\b", "\b").gsub("\\e", "\e").
+          gsub("\\f", "\f").gsub("\\a", "\a").gsub("\\\\", "\\").gsub("\\?", "\?").gsub("\\'", "\'").gsub('\\"', '\"').gsub("\\\"", "\"")
       end
     end
 
