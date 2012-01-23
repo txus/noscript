@@ -37,22 +37,15 @@ module Noscript
       ], output
     end
 
-    # def test_traits
-    #   output = `./bin/noscript examples/traits.ns`.split("\\n")
+    def test_traits
+      output = `./bin/noscript examples/traits.ns`.split("\n")
 
-    #   assert_equal [
-    #     "John is running",
-    #     "John is running a profitable business!",
-    #   ], output
-    # end
-
-    # def test_interop
-    #   output = `./bin/noscript examples/interop.ns`.split("\\n")
-
-    #   assert_equal [
-    #     "8",
-    #   ], output
-    # end
+      assert_equal [
+        "John is running a profitable business named Johnny Cash Inc.!",
+        "John is running at 10 km/h",
+        "Sir John is running a profitable business named Johnny Cash Inc.!"
+      ], output
+    end
 
     def test_conditionals
       [

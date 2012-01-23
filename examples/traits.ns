@@ -46,17 +46,17 @@
 # We are going to solve the Sports / Businessman problem using Noscript traits:
 
 # Create a Sportsman trait that implements #run at a given speed.
-Sports = trait({
+Sports = Trait.build("Sports", {
   run: -> speed
-    puts('#{@name} is running')
+    ('%s is running at %s km/h' % [@name, speed]).puts()
   end
 })
 
 # Create a Businessman trait that also implements #run, but in the sense of
 # running a particular business.
-Businessman = trait({
-  run: -> business
-    puts('#{@name} is running a profitable business!')
+Businessman = Trait.build("Businessman", {
+  run: ->
+    ('%s is running a profitable business named %s!' % [@name, @business.name]).puts()
   end
 })
 
@@ -65,24 +65,27 @@ person = Object.clone({
   business: Object.clone({name: 'Johnny Cash Inc.'})
 })
 
+person.uses(Businessman)
+person.run()
+
 # By making +person+ use Sports, now person implements Sports#run.
 person.uses(Sports)
 
-# Since we want +person+ to implement Businessman#run as well, and simply using
-# the Businessman trait would create a conflict (since both Sports and
+# Since we want +person+ to implement Businessman#run  well, and simply using
+# the Businessman trait would create a conflict (sinceoth Sports and
 # Businessman implement the same message), we need to *explicitly* resolve that
 # conflict by letting +person+ decide what #run means.
 #
-# In our case, +person+ decides that Sports#run should be ran if a speed is
-# given - otherwise, Businessman#run should be called.
+# In our case, +person+ decides that Businessman#run should be ran if his name
+# starts with "Sir" - otherwise, Sportsman#run should be called.
 #
 # Note that, in order to disambiguate, we must call each message prepended by
 # the trait name.
-person.run = -> speed=nil
-  if speed == nil # If no arguments were given, run a business
-    @Businessman run(@business)
-  else # Otherwise run at the given speed!
-    @Sports run(speed)
+person.run = ->
+  if @name.starts with("Sir")
+    @Businessman run()
+  else # Otherwise run at 10 km/h!
+    @Sports run(10)
   end
 end
 
@@ -90,7 +93,8 @@ end
 person.uses(Businessman)
 
 # Will run as a sportsman:
-person.run(10)
+person.run()
 
 # Will run as a businessman:
+person.name = "Sir John"
 person.run()

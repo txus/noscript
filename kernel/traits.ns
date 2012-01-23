@@ -1,0 +1,14 @@
+Trait = Object.clone({
+  __name__: "Trait"
+})
+
+Object.uses = -> trait
+  @traits << trait
+end
+
+# Public API to build Traits
+Trait.build = -> name, options
+  t = Trait.clone(options)
+  t.__name__ = name
+  t
+end

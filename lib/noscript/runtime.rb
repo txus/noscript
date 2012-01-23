@@ -43,7 +43,8 @@ class Runtime
 
     def initialize
       @prototype = nil
-      self[:name] = "Object"
+      self[:__name__] = "Object"
+      self[:traits] = []
     end
 
     noscript_def("clone") do |*args|
@@ -68,6 +69,14 @@ class Runtime
       puts(*args)
     end
 
+    noscript_def("put") do |k, v|
+      put(k, v)
+    end
+
+    noscript_def("get") do |slot|
+      get(slot)
+    end
+
     # def function(name, block=name)
     #   if block.is_a?(Symbol)
     #     block = method(block).executable
@@ -83,11 +92,38 @@ class Runtime
         self[name]
       elsif self.methods.include?(:"noscript:#{name}")
         self.method(:"noscript:#{name}")
+      elsif method = trait_implementation_of(name)
+        method
       elsif proto = prototype
         proto.get(name)
       else
         nil
       end
+    end
+
+    def trait_implementation_of(name)
+      # Check for an explicit call, i.e. @Businessman run()
+      explicit_method = self[:traits].map do |trait|
+        explicit_name = name.to_s.split(trait[:__name__]).last.strip.to_sym
+        if name != explicit_name && trait.key?(explicit_name)
+          trait.get(explicit_name)
+        else
+          nil
+        end
+      end.compact.first
+      return explicit_method if explicit_method
+
+      # Otherwise, check for the normal trait chain
+      matching = self[:traits].map do |trait|
+        if trait.key?(name)
+          trait.get(name)
+        else
+          nil
+        end
+      end.compact
+      return false if matching.length == 0
+      raise "Trait conflict: ##{name} is implemented by more than one trait." if matching.length > 1
+      return matching.first
     end
 
     def put(name, object)
@@ -97,6 +133,8 @@ class Runtime
     def has_property?(name)
       if result = key?(name)
         result
+      elsif trait_implementation_of(name)
+        true
       elsif proto = prototype
         proto.has_property?(name)
       else
@@ -154,16 +192,23 @@ class String
 end
 
 class Array
-  noscript_alias [:first, :last, :at, :<<, :length]
+  noscript_alias [:first, :last, :at, :<<, :length, :join]
   noscript_def("each") do |*args|
     fn = args.shift
     each do |element|
       fn.call(self, element)
     end
-    nil
+    self
   end
 end
 
 class Hash
   noscript_alias [:keys, :values, :length]
+  noscript_def("each pair") do |*args|
+    fn = args.shift
+    each_pair do |k,v|
+      fn.call(self, k, v)
+    end
+    self
+  end
 end

@@ -4,6 +4,7 @@ class LexerTest < MiniTest::Unit::TestCase
 
   def test_ignores_comments_and_whitespace
     tokenizes "  # hey  ", []
+    tokenizes "  # = hey  ", []
   end
 
   def test_newline
