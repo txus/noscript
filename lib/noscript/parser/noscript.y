@@ -98,19 +98,15 @@ rule
   ;
 
   Array:
-    '[' ArrayList ']' { result = ArrayLiteral.new(lineno, val[1]) }
+    '[]'              { p 'parsing empty array!'; result = ArrayLiteral.new(lineno, []) }
+  | '[' ArrayList ']' { result = ArrayLiteral.new(lineno, val[1]) }
   ;
 
   ArrayList:
     /* nothing */                  { result = [] }
-  | ArrayListElement               { result = [val[0]] }
-  | ArrayList "," ArrayListElement { result = val[0] += [val[2]] }
+  | Expression               { result = [val[0]] }
+  | ArrayList "," Expression { result = val[0] += [val[2]] }
   | ArrayList Newline              { result = val[0] }
-  ;
-
-  ArrayListElement:
-    Expression                 { result = val[0] }
-  | Newline Expression         { result = val[1] }
   ;
 
   Tuple:
