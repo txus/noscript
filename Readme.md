@@ -19,6 +19,13 @@ You can run your programs like this, pretty standard:
 
     noscript FILE
 
+Or execute arbitrary code:
+
+    noscript -e "123.inspect().print()"
+
+Use the `-A` and `-B` to show the AST representation and the generated Rubinius
+bytecode if you want. Fun! :)
+
 ## Object Model
 
 Noscript is [prototype-based](
@@ -27,19 +34,85 @@ clone of another object with a reference to it. An object is just a collection
 of slots that can be assigned and retrieved. These slots can contain anything:
 literals, functions and other objects.
 
+As a difference with most languages, identifiers may contain whitespace. So
+`foo`, `each pair` and `do something awesome` are all valid identifiers for
+local variables, object attributes or method names. Due to this, function
+invocations or method calls must have parens: `do something awesome` returns
+a function, whereas `do something awesome()` calls it. Just like JavaScript.
+
 `Object` is the master object to clone from, available from the main scope.
 
 To create your first object, type this:
 
 ````noscript
 greeter = Object.clone()
-greeter.salute = name ->
-  print("Hello #{name}!")
+greeter.salute = -> name
+  ("Hello %s!" % name).puts()
 end
 greeter.salute()
 ````
 
-## Installing the old interpreter (AST-walker)
+### Basic data types
+
+* `[1, 2, 3]`: Arrays. Iterable through `#each`.
+* `{a: 3, b: 9}`: Tuples. Iterable through `#each pair`.
+* `1`: Fixnums. Duh.
+* `'1'`: Strings. You can format them: `'Hello %s' % 'world'`.
+* `-> arg1, argN; foo(); end`: Function literals.
+
+### Behavior reusability through Traits
+
+Traits are like Ruby modules in the sense that they can be used to define
+composable units of behavior, but they are not included hierarchically. They
+are truly composable, meaning that are pieces that *must* either fit
+perfectly or the host object must provide a way for them to do it, normally
+resolving conflicts by explicitly redefining the conflicting methods.
+
+Create your first trait like this:
+
+````noscript
+Runnable = Trait.build("Runnable", {
+  run: ->
+    "Running!".puts()
+  end
+})
+
+Serious = Trait.build("Serious", {
+  run: ->
+    "Running a serious business.".puts()
+  end
+})
+
+person = Object.clone()
+person.uses(Runnable)
+
+# If we did this now, Noscript would raise a trait conflict error, because
+# person cannot have two traits with methods with the same names:
+#
+# person.uses(Serious)
+#
+# Instead we have to resolve the conflict defining the #run method on the host.
+
+person.run = ->
+  if @business
+    @Serious run
+  else
+    @Runnable run
+  end
+end
+
+person.uses(Serious)
+
+person.run
+# => Outputs "Running!"
+person.business = Object.clone({name: "Johnny Cash Inc."})
+person.run
+# => Outputs "Running a serious business."
+````
+
+To read more about how traits work, read `examples/traits.ns`.
+
+# Installing the old interpreter (AST-walker)
 
 Before running on the Rubinius VM, Noscript was prototyped as a simple
 AST-walker interpreter written in pure Ruby, without any Rubinius-specific
