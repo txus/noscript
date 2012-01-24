@@ -12,16 +12,17 @@ Noscript only runs on Rubinius, so you have to install it (if you use RVM,
 [here](http://beginrescueend.com/interpreters/rbx/) is how you do it). Assuming
 you have it installed:
 
-    rvm use rbx
-    gem install noscript
+    rvm use rbx-head
+    git clone git://github.com/txus/noscript.git
+    cd noscript
 
 You can run your programs like this, pretty standard:
 
-    noscript FILE
+    ./bin/noscript examples/objects.ns
 
 Or execute arbitrary code:
 
-    noscript -e "123.inspect().print()"
+    ./bin/noscript -e "123.inspect().print()"
 
 Use the `-A` and `-B` to show the AST representation and the generated Rubinius
 bytecode if you want. Fun! :)
