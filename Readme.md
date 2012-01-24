@@ -85,6 +85,7 @@ Serious = Trait.build("Serious", {
 })
 
 person = Object.clone()
+person.age = 20
 person.uses(Runnable)
 
 # If we did this now, Noscript would raise a trait conflict error, because
@@ -95,19 +96,19 @@ person.uses(Runnable)
 # Instead we have to resolve the conflict defining the #run method on the host.
 
 person.run = ->
-  if @business
-    @Serious run
+  if @age > 30
+    @Serious run()
   else
-    @Runnable run
+    @Runnable run()
   end
 end
 
 person.uses(Serious)
 
-person.run
+person.run()
 # => Outputs "Running!"
-person.business = Object.clone({name: "Johnny Cash Inc."})
-person.run
+person.age = 35
+person.run()
 # => Outputs "Running a serious business."
 ````
 
