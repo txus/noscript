@@ -8,12 +8,14 @@ module Noscript
       push_const :Runtime
     end
 
-    def raise_if_nil(exception_class, message)
+    def raise_if_empty(exception_class, message)
       ok = new_label
       done = new_label
 
       dup
-      git ok # goto the end if it's not nil
+      push_const :Empty
+      send :kind_of?, 1, false
+      gif ok # goto the end if it's not Empty
 
       # Else, raise
       push_rubinius

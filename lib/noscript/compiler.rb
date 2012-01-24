@@ -126,7 +126,7 @@ module Noscript
         g.push_self
         g.push_literal o.name
         g.send :get, 1
-        g.raise_if_nil NameError, "Object has no slot named #{o.name}"
+        g.raise_if_empty NameError, "Object has no slot named #{o.name}"
       elsif o.self?
         g.push_self
       elsif s.slot_for(o.name)
@@ -209,7 +209,7 @@ module Noscript
       o.receiver.accept(self)
       g.push_literal o.name
       g.send :get, 1
-      g.raise_if_nil NameError, "Object has no slot named #{o.name}"
+      g.raise_if_empty NameError, "Object has no slot named #{o.name}"
     end
 
     def visit_SlotAssign(o)

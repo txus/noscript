@@ -32,6 +32,9 @@ class Object
   noscript_def("respond to?") { |name| respond_to? "noscript:#{name}"}
 end
 
+class Empty
+end
+
 class Runtime
   # Object protocol:
   #
@@ -60,8 +63,8 @@ class Runtime
 
     noscript_def("each slot") do |*args|
       fn = args.shift
-      each do |name|
-        fn.call(self, name.to_s, self[name])
+      to_a.each do |k, v|
+        fn.call(self, k.to_s, v)
       end
     end
 
@@ -97,7 +100,7 @@ class Runtime
       elsif proto = prototype
         proto.get(name)
       else
-        nil
+        Empty.new
       end
     end
 

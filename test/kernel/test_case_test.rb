@@ -36,7 +36,7 @@ module Noscript
     MyTestCase.run()
   CODE
 
-      expected = "\e[31mF\e[0m\e[32m.\e[0m\e[32m.\e[0m\e[32m.\e[0m\n\n\e[0m4 tests, 4 assertions, 1 failures\n    * Expected false to be truthy.\n"
+      expected = "\e[32m.\e[0m\e[31mF\e[0m\e[32m.\e[0m\e[32m.\e[0m\n\n\e[0m4 tests, 4 assertions, 1 failures\n    * Expected false to be truthy.\n"
       assert_output expected do
         compile(code)
       end
