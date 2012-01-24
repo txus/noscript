@@ -2,7 +2,7 @@ require_relative 'nobench'
 
 benchmark(<<CODE)
 
-  MyTrait = trait({
+  MyTrait = Trait.build("MyTrait", {
     gimme my name: ->
       @name
     end
