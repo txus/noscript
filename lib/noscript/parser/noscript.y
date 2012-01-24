@@ -40,12 +40,12 @@ rule
 
   # Any list of expressions, class or method body, separated by line breaks.
   Expressions:
-    Expression                         { result = Nodes.new(lineno, val) }
+    /* nothing */                      { result = Nodes.new(lineno, [NilLiteral.new(lineno)]) }
+  | Terminator                         { result = Nodes.new(lineno, [NilLiteral.new(lineno)]) }
+  | Expression                         { result = Nodes.new(lineno, val) }
   | Expressions Terminator Expression  { result = val[0] << val[2] }
     # To ignore trailing line breaks
   | Expressions Terminator             { result = val[0].is_a?(Nodes) ? val[0] : Nodes.new(lineno, val[0]) }
-  | Terminator                         { result = Nodes.new(lineno, [NilLiteral.new(lineno)]) }
-  |                                    { result = Nodes.new(lineno, [NilLiteral.new(lineno)]) }
   ;
 
   Newline:
@@ -98,33 +98,24 @@ rule
   ;
 
   Array:
-    LBracket ArrayList RBracket { result = ArrayLiteral.new(lineno, val[1]) }
-  ;
-
-  LBracket:
-    '['
-  | '[' Newline
-  ;
-
-  RBracket:
-    ']'
-  | Newline ']'
+    '[' ArrayList ']' { result = ArrayLiteral.new(lineno, val[1]) }
   ;
 
   ArrayList:
-    /* nothing */                 { result = [] }
-  | ArrayListElement                   { result = [val[0]] }
-  | ArrayList "," ArrayListElement     { result = val[0] += [val[2]] }
+    /* nothing */                  { result = [] }
+  | ArrayListElement               { result = [val[0]] }
+  | ArrayList "," ArrayListElement { result = val[0] += [val[2]] }
+  | ArrayList Newline              { result = val[0] }
   ;
 
   ArrayListElement:
     Expression                 { result = val[0] }
   | Newline Expression         { result = val[1] }
-  | Expression Newline         { result = val[0] }
   ;
 
   Tuple:
-    LBrace TupleList RBrace { result = HashLiteral.new(lineno, val[1].flatten) }
+    '{' TupleList '}' { result = HashLiteral.new(lineno, val[1].flatten) }
+  | '{' TupleList Newline '}' { result = HashLiteral.new(lineno, val[1].flatten) }
   ;
 
   TupleList:
@@ -140,16 +131,6 @@ rule
   TupleKey:
     Identifier
   | Newline Identifier { result = val[1] }
-  ;
-
-  LBrace:
-    '{'
-  | '{' Newline
-  ;
-
-  RBrace:
-    '}'
-  | Newline '}'
   ;
 
   Identifier:
