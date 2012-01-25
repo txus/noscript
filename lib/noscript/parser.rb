@@ -4,7 +4,12 @@ module Noscript
   class Parser
     def initialize(*)
       @line = 1
+      @pre_exe = []
       super
+    end
+
+    def pre_exe
+      @pre_exe
     end
 
     def parse_file(filename, log = false)

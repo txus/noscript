@@ -12,6 +12,7 @@ module Noscript
   require_relative 'noscript/code_loader'
 
   CodeLoader.load_paths << File.expand_path('../noscript', __FILE__)
+  CodeLoader.load_paths << File.expand_path('../../', __FILE__)
   CodeLoader.run('kernel/object')
   CodeLoader.run('kernel/traits')
   CodeLoader.run('kernel/test_case')

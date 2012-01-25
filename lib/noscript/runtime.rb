@@ -184,6 +184,7 @@ class Runtime
 end
 
 class Function
+  attr_reader :executable
   def initialize(blk_env)
     @executable = blk_env.code
   end
@@ -232,7 +233,7 @@ class Array
 end
 
 class Hash
-  noscript_alias [:keys, :values, :length]
+  noscript_alias [:keys, :values, :length, :fetch]
   noscript_def("each pair") do |*args|
     fn = args.shift
     each_pair do |k,v|
