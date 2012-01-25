@@ -179,5 +179,11 @@ module Noscript
     def test_self_equals_deref_on_asignment
       assert_equal 7, compile("@foo = 7; self.foo")
     end
+
+    def test_ruby_call
+      identifier = compile("Noscript.AST.Identifier.ruby('new', 1, 'foo')")
+      assert_equal 1, identifier.line
+      assert_equal 'foo', identifier.name
+    end
   end
 end

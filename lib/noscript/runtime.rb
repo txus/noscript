@@ -22,6 +22,10 @@ class Object
     __send__ "noscript:#{send}", *args
   end
 
+  noscript_def("ruby") do |*args|
+    send *args
+  end
+
   noscript_alias [:==, :"!="]
   noscript_def("@!") { !self }
 
