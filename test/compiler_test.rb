@@ -34,6 +34,14 @@ module Noscript
       assert_equal 1, compile("Foo = 1; Foo")
     end
 
+    def test_compile_constant_lookup
+      assert_equal Rubinius, compile("Rubinius")
+    end
+
+    def test_compile_constant_lookup_with_namespace
+      assert_equal Noscript::AST::Identifier, compile("Noscript.AST.Identifier")
+    end
+
     def test_compile_array_literal
       assert_equal 1, compile("[1,2].at(0)")
     end

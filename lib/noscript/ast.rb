@@ -163,7 +163,11 @@ module Noscript
       def initialize(line, receiver, name)
         super(line)
         @receiver = receiver
-        @name     = name.name.to_sym
+        @name     = name
+      end
+
+      def constant?
+        @name.constant?
       end
     end
 

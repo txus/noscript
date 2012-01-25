@@ -8,7 +8,7 @@ class FunctionCallTest < MiniTest::Unit::TestCase
 
       assert_kind_of SlotGet, invocation
       assert_equal "a", invocation.receiver.name
-      assert_equal :foo, invocation.name
+      assert_equal :foo, invocation.name.name.to_sym
     end
   end
 

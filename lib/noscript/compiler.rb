@@ -207,8 +207,14 @@ module Noscript
     def visit_SlotGet(o)
       set_line(o)
       o.receiver.accept(self)
-      g.push_literal o.name
-      g.send :get, 1
+
+      if o.receiver.constant? && o.name.constant? # Constant lookup like Rubinius.Compiler
+        g.find_const o.name.name.to_sym
+      else
+        g.push_literal o.name.name.to_sym
+        g.send :get, 1
+      end
+
       g.raise_if_empty NameError, "Object has no slot named #{o.name}"
     end
 
