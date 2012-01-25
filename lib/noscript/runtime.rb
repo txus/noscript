@@ -101,9 +101,39 @@ class Module
 end
 
 class Object
-  # include Noscriptable
+  include Noscriptable
   def noscript_send(name, *args)
     __send__ "noscript:#{send}", *args
+  end
+
+  noscript_def("clone") do |*args|
+    obj = Object.new
+    obj.__noscript_prototype__ = self
+    if properties = args.first
+      properties.keys.each do |k|
+        obj.__noscript_put__(k.to_sym, properties[k])
+      end
+    end
+    obj
+  end
+
+  noscript_def("each slot") do |*args|
+    fn = args.shift
+    __noscript_slots__.to_a.each do |k, v|
+      fn.call(self, k.to_s, v)
+    end
+  end
+
+  noscript_def("puts") do |*args|
+    puts(*args)
+  end
+
+  noscript_def("put") do |k, v|
+    __noscript_put__(k, v)
+  end
+
+  noscript_def("get") do |slot|
+    __noscript_get__(slot)
   end
 
   noscript_def("ruby") do |*args|
@@ -124,39 +154,40 @@ class Empty
 end
 
 class Runtime
-  class ObjectKind
-    include Noscriptable
-    noscript_def("clone") do |*args|
-      obj = ObjectKind.new
-      obj.__noscript_prototype__ = self
-      if properties = args.first
-        properties.keys.each do |k|
-          obj.__noscript_put__(k.to_sym, properties[k])
-        end
-      end
-      obj
-    end
+  Object = ::Object.new
+  # class ObjectKind
+  #   include Noscriptable
+  #   noscript_def("clone") do |*args|
+  #     obj = ObjectKind.new
+  #     obj.__noscript_prototype__ = self
+  #     if properties = args.first
+  #       properties.keys.each do |k|
+  #         obj.__noscript_put__(k.to_sym, properties[k])
+  #       end
+  #     end
+  #     obj
+  #   end
 
-    noscript_def("each slot") do |*args|
-      fn = args.shift
-      __noscript_slots__.to_a.each do |k, v|
-        fn.call(self, k.to_s, v)
-      end
-    end
+  #   noscript_def("each slot") do |*args|
+  #     fn = args.shift
+  #     __noscript_slots__.to_a.each do |k, v|
+  #       fn.call(self, k.to_s, v)
+  #     end
+  #   end
 
-    noscript_def("puts") do |*args|
-      puts(*args)
-    end
+  #   noscript_def("puts") do |*args|
+  #     puts(*args)
+  #   end
 
-    noscript_def("put") do |k, v|
-      __noscript_put__(k, v)
-    end
+  #   noscript_def("put") do |k, v|
+  #     __noscript_put__(k, v)
+  #   end
 
-    noscript_def("get") do |slot|
-      __noscript_get__(slot)
-    end
-  end
-  Object = ObjectKind.new
+  #   noscript_def("get") do |slot|
+  #     __noscript_get__(slot)
+  #   end
+  # end
+  # Object = ObjectKind.new
 end
 
 class Function
