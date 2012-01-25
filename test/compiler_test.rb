@@ -136,13 +136,13 @@ module Noscript
 
     def test_compile_object_clone
       obj = compile("Object.clone()")
-      assert_kind_of Runtime::ObjectType, obj
-      assert_equal Runtime::Object, obj.prototype
+      assert_kind_of Runtime::ObjectKind, obj
+      assert_equal Runtime::Object, obj.__noscript_prototype__
     end
 
     def test_compile_object_clone_with_properties
       obj = compile("Object.clone({a: 1})")
-      assert_equal 1, obj.get(:a)
+      assert_equal 1, obj.__noscript_get__(:a)
     end
 
     def test_compile_slot_get
@@ -151,8 +151,13 @@ module Noscript
 
     def test_compile_slot_assign
       obj = compile("foo = Object.clone(); foo.a = 3; foo")
-      assert_equal 3, obj.get(:a)
+      assert_equal 3, obj.__noscript_get__(:a)
     end
+
+    # def test_compile_slot_assign_on_primitives
+    #   obj = compile("foo = 1; foo.a = 3; foo")
+    #   assert_equal 3, obj.get(:a)
+    # end
 
     def test_compile_if
       assert_equal 1, compile("if true; 1; end")

@@ -125,14 +125,14 @@ module Noscript
       elsif o.deref? # @foo equals to self.foo
         g.push_self
         g.push_literal o.name
-        g.send :get, 1
+        g.send :__noscript_get__, 1
         g.raise_if_empty NameError, "Object has no slot named #{o.name}"
       elsif o.self?
         g.push_self
       elsif s.slot_for(o.name)
         visit_LocalVariableAccess(o)
       else
-        raise "CANT FIND #{o.name}"
+        raise "BUG: CANT FIND #{o.name}"
       end
     end
 
@@ -177,7 +177,7 @@ module Noscript
       elsif identifier.deref?
         g.push_literal name
         g.swap
-        g.send :put, 2
+        g.send :__noscript_put__, 2
       else
         s.set_local name
       end
@@ -212,7 +212,7 @@ module Noscript
         g.find_const o.name.name.to_sym
       else
         g.push_literal o.name.name.to_sym
-        g.send :get, 1
+        g.send :__noscript_get__, 1
       end
 
       g.raise_if_empty NameError, "Object has no slot named #{o.name}"
@@ -223,7 +223,7 @@ module Noscript
       o.receiver.accept(self)
       g.push_literal o.name
       o.value.accept(self)
-      g.send :put, 2
+      g.send :__noscript_put__, 2
     end
 
     def visit_IfNode(o)

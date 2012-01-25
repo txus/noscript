@@ -1,3 +1,86 @@
+module Noscriptable
+  def __noscript_prototype__
+    @__noscript_prototype__
+  end
+
+  def __noscript_prototype__=(proto)
+    @__noscript_prototype__ = proto
+  end
+
+  def __noscript_slots__
+    @__noscript_slots__ ||= begin
+      slots = Rubinius::LookupTable.new
+      slots[:__name__] = "Object"
+      slots[:traits] = []
+      slots
+    end
+  end
+
+  def __noscript_get__(name)
+    if __noscript_slots__.key?(name)
+      __noscript_slots__[name]
+    elsif self.methods.include?(:"noscript:#{name}")
+      self.method(:"noscript:#{name}")
+    elsif method = __noscript_trait_has__(name)
+      method
+    elsif proto = __noscript_prototype__
+      proto.__noscript_get__(name)
+    else
+      Empty.new
+    end
+  end
+
+  def __noscript_trait_has__(name)
+    # Check for an explicit call, i.e. @Businessman run()
+    explicit_method = __noscript_slots__[:traits].map do |trait|
+      explicit_name = name.to_s.split(trait.__noscript_slots__[:__name__]).last.strip.to_sym
+      if name != explicit_name && trait.__noscript_has_property__(explicit_name, false)
+        trait.__noscript_get__(explicit_name)
+      else
+        nil
+      end
+    end.compact.first
+    return explicit_method if explicit_method
+
+    # Otherwise, check for the normal trait chain
+    matching = __noscript_slots__[:traits].map do |trait|
+      if trait.__noscript_has_property__(name, false)
+        trait.__noscript_get__(name)
+      else
+        nil
+      end
+    end.compact
+    return false if matching.length == 0
+    raise "Trait conflict: ##{name} is implemented by more than one trait." if matching.length > 1
+    return matching.first
+  end
+
+  def __noscript_has_property__(name, lookup=true)
+    if result = __noscript_slots__.key?(name)
+      result
+    elsif lookup && __noscript_trait_has__(name)
+      true
+    elsif lookup && proto = __noscript_prototype__
+      proto.__noscript_has_property__(name)
+    else
+      false
+    end
+  end
+
+  def __noscript_put__(name, object)
+    __noscript_slots__[name] = object
+  end
+
+  def method_missing(m, *args)
+    function = m.to_s.split(":").last.to_sym
+    if __noscript_has_property__(function)
+      fn = __noscript_get__(function)
+      return fn.call(*args) # First arg is this.
+    end
+    super
+  end
+end
+
 class Module
   def noscript_alias(noscript_name, ruby_name=nil)
     Array(noscript_name).each do |noscript|
@@ -18,6 +101,7 @@ class Module
 end
 
 class Object
+  # include Noscriptable
   def noscript_send(name, *args)
     __send__ "noscript:#{send}", *args
   end
@@ -40,26 +124,14 @@ class Empty
 end
 
 class Runtime
-  # Object protocol:
-  #
-  # get(name<Symbol>)        => object
-  # put(name<Symbol>, object<Object>)
-  #
-  class ObjectType < Rubinius::LookupTable
-    attr_accessor :prototype
-
-    def initialize
-      @prototype = nil
-      self[:__name__] = "Object"
-      self[:traits] = []
-    end
-
+  class ObjectKind
+    include Noscriptable
     noscript_def("clone") do |*args|
-      obj = ObjectType.new
-      obj.prototype = self
+      obj = ObjectKind.new
+      obj.__noscript_prototype__ = self
       if properties = args.first
         properties.keys.each do |k|
-          obj.put(k.to_sym, properties[k])
+          obj.__noscript_put__(k.to_sym, properties[k])
         end
       end
       obj
@@ -67,7 +139,7 @@ class Runtime
 
     noscript_def("each slot") do |*args|
       fn = args.shift
-      to_a.each do |k, v|
+      __noscript_slots__.to_a.each do |k, v|
         fn.call(self, k.to_s, v)
       end
     end
@@ -77,88 +149,14 @@ class Runtime
     end
 
     noscript_def("put") do |k, v|
-      put(k, v)
+      __noscript_put__(k, v)
     end
 
     noscript_def("get") do |slot|
-      get(slot)
-    end
-
-    # def function(name, block=name)
-    #   if block.is_a?(Symbol)
-    #     block = method(block).executable
-    #   else
-    #     block = block.code
-    #   end
-
-    #   self[name] = Function.new(name, block)
-    # end
-
-    def get(name)
-      if self.key?(name)
-        self[name]
-      elsif self.methods.include?(:"noscript:#{name}")
-        self.method(:"noscript:#{name}")
-      elsif method = trait_implementation_of(name)
-        method
-      elsif proto = prototype
-        proto.get(name)
-      else
-        Empty.new
-      end
-    end
-
-    def trait_implementation_of(name)
-      # Check for an explicit call, i.e. @Businessman run()
-      explicit_method = self[:traits].map do |trait|
-        explicit_name = name.to_s.split(trait[:__name__]).last.strip.to_sym
-        if name != explicit_name && trait.key?(explicit_name)
-          trait.get(explicit_name)
-        else
-          nil
-        end
-      end.compact.first
-      return explicit_method if explicit_method
-
-      # Otherwise, check for the normal trait chain
-      matching = self[:traits].map do |trait|
-        if trait.key?(name)
-          trait.get(name)
-        else
-          nil
-        end
-      end.compact
-      return false if matching.length == 0
-      raise "Trait conflict: ##{name} is implemented by more than one trait." if matching.length > 1
-      return matching.first
-    end
-
-    def put(name, object)
-      self[name] = object
-    end
-
-    def has_property?(name)
-      if result = key?(name)
-        result
-      elsif trait_implementation_of(name)
-        true
-      elsif proto = prototype
-        proto.has_property?(name)
-      else
-        false
-      end
-    end
-
-    def method_missing(m, *args)
-      fun = m.to_s.split(":").last.to_sym
-      if has_property?(fun)
-        this = args.shift
-        return get(fun).call(this, *args)
-      end
-      super
+      __noscript_get__(slot)
     end
   end
-  Object = ObjectType.new
+  Object = ObjectKind.new
 end
 
 class Function

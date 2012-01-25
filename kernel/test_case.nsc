@@ -478,8 +478,8 @@ US-ASCII
 6
 errors
 x
-3
-get
+16
+__noscript_get__
 x
 5
 Empty
@@ -530,8 +530,8 @@ x
 10
 noscript:+
 x
-3
-put
+16
+__noscript_put__
 p
 15
 I
@@ -750,8 +750,8 @@ US-ASCII
 6
 errors
 x
-3
-get
+16
+__noscript_get__
 x
 5
 Empty
@@ -802,8 +802,8 @@ x
 10
 noscript:+
 x
-3
-put
+16
+__noscript_put__
 p
 15
 I
@@ -1038,8 +1038,8 @@ US-ASCII
 5
 tests
 x
-3
-get
+16
+__noscript_get__
 x
 5
 Empty
@@ -1325,8 +1325,8 @@ US-ASCII
 9
 each slot
 x
-3
-get
+16
+__noscript_get__
 x
 5
 Empty
@@ -1524,8 +1524,8 @@ US-ASCII
 5
 setup
 x
-3
-get
+16
+__noscript_get__
 x
 5
 Empty
@@ -1581,8 +1581,8 @@ x
 10
 noscript:+
 x
-3
-put
+16
+__noscript_put__
 p
 17
 I
