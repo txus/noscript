@@ -100,6 +100,7 @@ class Module
   end
 end
 
+# TODO: Move all noscript_defs to Noscript.
 class Object
   include Noscriptable
   def noscript_send(name, *args)
@@ -126,14 +127,6 @@ class Object
 
   noscript_def("puts") do |*args|
     puts(*args)
-  end
-
-  noscript_def("put") do |k, v|
-    __noscript_put__(k, v)
-  end
-
-  noscript_def("get") do |slot|
-    __noscript_get__(slot)
   end
 
   noscript_def("ruby") do |*args|

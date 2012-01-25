@@ -1,0 +1,22 @@
+# Object#put puts a value into a slot.
+Object.put = -> slot, value
+  ruby('__noscript_put__', slot, value)
+end
+
+Object.get = -> slot
+  ruby('__noscript_get__', slot)
+end
+
+# Object.clone = -> properties
+#   obj = Object.ruby('class').ruby('new')
+#   obj.ruby('__noscript_prototype__=', self)
+#
+#   if properties
+#     properties.inspect().puts()
+#     properties.keys().each(-> k
+#       properties.inspect().puts()
+#       obj.put(k.ruby('to_sym'), properties.ruby('fetch', k))
+#     end)
+#   end
+#   obj
+# end
