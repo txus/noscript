@@ -16,6 +16,10 @@ you have it installed:
     git clone git://github.com/txus/noscript.git
     cd noscript
 
+You need to run noscript with Rubinius' 1.9 mode. Type this on your terminal:
+
+    echo "RBXOPT=-X19" >> ~/.bashrc
+
 You can run your programs like this, pretty standard:
 
     ./bin/noscript examples/objects.ns
