@@ -110,7 +110,7 @@ Create your first trait like this:
 
 To read more about how traits work, read `examples/traits.ns`.
 
-# Installing the old interpreter (AST-walker)
+## Installing the old interpreter (AST-walker)
 
 Before running on the Rubinius VM, Noscript was prototyped as a simple
 AST-walker interpreter written in pure Ruby, without any Rubinius-specific
