@@ -45,13 +45,11 @@ a function, whereas `do something awesome()` calls it. Just like JavaScript.
 
 To create your first object, type this:
 
-````noscript
-greeter = Object.clone()
-greeter.salute = -> name
-  ("Hello %s!" % name).puts()
-end
-greeter.salute()
-````
+    greeter = Object.clone()
+    greeter.salute = -> name
+      ("Hello %s!" % name).puts()
+    end
+    greeter.salute()
 
 ### Basic data types
 
@@ -71,46 +69,44 @@ resolving conflicts by explicitly redefining the conflicting methods.
 
 Create your first trait like this:
 
-````noscript
-Runnable = Trait.build("Runnable", {
-  run: ->
-    "Running!".puts()
-  end
-})
+    Runnable = Trait.build("Runnable", {
+      run: ->
+        "Running!".puts()
+      end
+    })
 
-Serious = Trait.build("Serious", {
-  run: ->
-    "Running a serious business.".puts()
-  end
-})
+    Serious = Trait.build("Serious", {
+      run: ->
+        "Running a serious business.".puts()
+      end
+    })
 
-person = Object.clone()
-person.age = 20
-person.uses(Runnable)
+    person = Object.clone()
+    person.age = 20
+    person.uses(Runnable)
 
-# If we did this now, Noscript would raise a trait conflict error, because
-# person cannot have two traits with methods with the same names:
-#
-# person.uses(Serious)
-#
-# Instead we have to resolve the conflict defining the #run method on the host.
+    # If we did this now, Noscript would raise a trait conflict error, because
+    # person cannot have two traits with methods with the same names:
+    #
+    # person.uses(Serious)
+    #
+    # Instead we have to resolve the conflict defining the #run method on the host.
 
-person.run = ->
-  if @age > 30
-    @Serious run()
-  else
-    @Runnable run()
-  end
-end
+    person.run = ->
+      if @age > 30
+        @Serious run()
+      else
+        @Runnable run()
+      end
+    end
 
-person.uses(Serious)
+    person.uses(Serious)
 
-person.run()
-# => Outputs "Running!"
-person.age = 35
-person.run()
-# => Outputs "Running a serious business."
-````
+    person.run()
+    # => Outputs "Running!"
+    person.age = 35
+    person.run()
+    # => Outputs "Running a serious business."
 
 To read more about how traits work, read `examples/traits.ns`.
 
