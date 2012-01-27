@@ -17,6 +17,11 @@ class InteropTest < MiniTest::Unit::TestCase
     assert_equal Fixnum, compile("Ruby.Fixnum")
   end
 
+  def test_assign_toplevel_namespace
+    compile("Ruby.Answer = 42")
+    assert_equal 42, ::Answer
+  end
+
   def test_define_ruby_method
     compile(<<-CODE)
       Ruby.Array.def('sum', ->

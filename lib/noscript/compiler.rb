@@ -221,9 +221,16 @@ module Noscript
     def visit_SlotAssign(o)
       set_line(o)
       o.receiver.accept(self)
-      g.push_literal o.name
-      o.value.accept(self)
-      g.send :__noscript_put__, 2
+
+      if o.receiver.constant? && AST::Identifier.new(1, o.name).constant? # Constant set like Rubinius.Compiler = something
+        g.push_literal o.name.to_sym
+        o.value.accept(self)
+        g.send :const_set, 2
+      else
+        g.push_literal o.name
+        o.value.accept(self)
+        g.send :__noscript_put__, 2
+      end
     end
 
     def visit_IfNode(o)
