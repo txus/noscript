@@ -122,23 +122,23 @@ Noscript.
 
 To reopening a Ruby class from Noscript, just prefix the constant with the
 namespace `Ruby`, like this: `Ruby.Array`. This is the actual `Array` class. To
-call an arbitrary ruby method on an object, we use the special method `ruby`,
+call an arbitrary ruby method on an object, we use the special method `send`,
 which acts like ruby `send`:
 
-    Ruby.Array.ruby('name') # => "Array"
+    Ruby.Array.send('name') # => "Array"
 
-There are a couple of convenience methods that bypass the `#ruby` convention,
+There are a couple of convenience methods that bypass the `#send` convention,
 namely `#def`, `#include` and `#extend`. Let's reopen Array and define a new
 method:
 
     Ruby.Array.def('sum', ->
-      @ruby('reduce', '+')
+      @send('reduce', '+')
     end)
 
 Since Noscript arrays are instances of the ruby Array class, `#sum` should be
-also available to them using the `#ruby` convention:
+also available to them using the `#send` convention:
 
-    [1,2,3].ruby('sum') # => 6
+    [1,2,3].send('sum') # => 6
 
 ### Defining new classes and modules
 
@@ -150,10 +150,10 @@ This is useful if, for example, you want to develop a Rails application but
 want to write the model layer entirely in Noscript. Let's do this:
 
     Ruby.Post = Ruby.Class.create(Ruby.ActiveRecord.Base, ->
-      @ruby('validates_presence_of', 'title', 'body')
+      @send('validates_presence_of', 'title', 'body')
 
       @def('upcase_title', ->
-        @ruby('title').ruby('upcase')
+        @send('title').send('upcase')
       end)
     end)
 
@@ -166,7 +166,7 @@ You can also create mixins and include/extend them in your objects:
     Ruby.Post.include(mixin)
 
     post = Ruby.Post.new()
-    post.ruby('answer') # => 42
+    post.send('answer') # => 42
 
 Last but not least, let's use this Post model from Ruby. Imagine we had this
 post saved in `post.ns`. In our Ruby script we have to do this:

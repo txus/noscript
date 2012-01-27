@@ -25,7 +25,7 @@ class InteropTest < MiniTest::Unit::TestCase
   def test_define_ruby_method
     compile(<<-CODE)
       Ruby.Array.def('sum', ->
-        @ruby('reduce', '+')
+        @send('reduce', '+')
       end)
     CODE
 

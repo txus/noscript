@@ -199,7 +199,7 @@ module Noscript
     end
 
     def test_ruby_call
-      identifier = compile("Noscript.AST.Identifier.ruby('new', 1, 'foo')")
+      identifier = compile("Noscript.AST.Identifier.send('new', 1, 'foo')")
       assert_equal 1, identifier.line
       assert_equal 'foo', identifier.name
     end

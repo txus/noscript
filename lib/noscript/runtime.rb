@@ -167,7 +167,7 @@ class Object
     __noscript_put__(slot)
   end
 
-  noscript_def("ruby") do |*args|
+  noscript_def("send") do |*args|
     send *args
   end
 
@@ -187,39 +187,6 @@ end
 
 class Runtime
   Object = ::Object.new
-  # class ObjectKind
-  #   include Noscriptable
-  #   noscript_def("clone") do |*args|
-  #     obj = ObjectKind.new
-  #     obj.__noscript_prototype__ = self
-  #     if properties = args.first
-  #       properties.keys.each do |k|
-  #         obj.__noscript_put__(k.to_sym, properties[k])
-  #       end
-  #     end
-  #     obj
-  #   end
-
-  #   noscript_def("each slot") do |*args|
-  #     fn = args.shift
-  #     __noscript_slots__.to_a.each do |k, v|
-  #       fn.call(self, k.to_s, v)
-  #     end
-  #   end
-
-  #   noscript_def("puts") do |*args|
-  #     puts(*args)
-  #   end
-
-  #   noscript_def("put") do |k, v|
-  #     __noscript_put__(k, v)
-  #   end
-
-  #   noscript_def("get") do |slot|
-  #     __noscript_get__(slot)
-  #   end
-  # end
-  # Object = ObjectKind.new
 end
 
 class Function
