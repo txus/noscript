@@ -89,6 +89,12 @@ module Noscriptable
   end
 end
 
+module Kernel
+  def noscript_require(file)
+    Noscript::CodeLoader.run(file)
+  end
+end
+
 class Module
   def noscript_alias(noscript_name, ruby_name=nil)
     Array(noscript_name).each do |noscript|
