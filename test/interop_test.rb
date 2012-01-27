@@ -47,4 +47,20 @@ class InteropTest < MiniTest::Unit::TestCase
     assert_respond_to foo, :mixin_method
     assert_equal 1234, foo.mixin_method
   end
+
+  def test_create_ruby_module
+    mod = compile(<<-CODE)
+      Ruby.Module.create(->
+        @def('answer', ->
+          42
+        end)
+      end)
+    CODE
+
+    foo = Foo.new
+    foo.extend(mod)
+
+    assert_respond_to foo, :answer
+    assert_equal 42, foo.answer
+  end
 end

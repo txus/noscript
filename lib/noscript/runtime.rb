@@ -102,6 +102,12 @@ end
 
 class Class
   noscript_alias [:new]
+end
+
+class Module
+  noscript_def 'create' do |implementation|
+    Module.new(&implementation)
+  end
   noscript_def 'def' do |name, implementation|
     define_method(name, &implementation)
   end
