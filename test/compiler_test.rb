@@ -90,6 +90,19 @@ module Noscript
       assert_equal 1, compile("'3'.length(); '3'.length()")
     end
 
+    # TODO: Fix this
+    # def test_compile_function_scope
+    #   assert_equal 3, compile(<<-CODE)
+    #     hey = -> foo
+    #       ho = -> bar
+    #         foo + bar
+    #       end
+    #       ho(2)
+    #     end
+    #     hey(1)
+    #   CODE
+    # end
+
     def test_compile_multiple_expressions
       result = compile("
       if true != false
