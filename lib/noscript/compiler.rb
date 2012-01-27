@@ -197,11 +197,7 @@ module Noscript
 
     def visit_LocalVariableAccess(o)
       set_line(o)
-      if s.variables.include?(o.name)
-        s.push_variable o.name
-      else
-        raise NameError, "Undefined local variable #{o.name}"
-      end
+      s.push_variable o.name
     end
 
     def visit_SlotGet(o)

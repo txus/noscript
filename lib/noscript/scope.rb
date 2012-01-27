@@ -43,7 +43,8 @@ module Noscript
     end
 
     def set_local(name)
-      g.set_local slot_for(name)
+      slot = slot_for(name)
+      g.set_local slot
     end
 
     def set_const(name)
