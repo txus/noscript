@@ -7,7 +7,7 @@ n
 n
 n
 i
-159
+161
 45
 0
 1
@@ -158,13 +158,15 @@ i
 49
 30
 2
-44
-12
-7
+45
+0
 31
 12
-49
+7
 32
+12
+49
+33
 2
 11
 I
@@ -179,7 +181,7 @@ I
 0
 n
 p
-33
+34
 x
 7
 Runtime
@@ -1674,6 +1676,7 @@ p
 x
 14
 noscript:clone
+n
 s
 E
 8
@@ -1738,7 +1741,7 @@ I
 I
 6c
 I
-9f
+a1
 x
 45
 /Users/txus/Code/noscript/kernel/test_case.ns

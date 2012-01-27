@@ -121,6 +121,10 @@ module Noscript
         @constant
       end
 
+      def ruby?
+        @name == "Ruby"
+      end
+
       def deref?
         @deref
       end

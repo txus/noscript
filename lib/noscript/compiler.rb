@@ -120,8 +120,12 @@ module Noscript
       set_line(o)
 
       if o.constant?
-        g.push_runtime
-        g.find_const o.name.to_sym
+        if o.ruby?
+          g.push_cpath_top
+        else
+          g.push_runtime
+          g.find_const o.name.to_sym
+        end
       elsif o.deref? # @foo equals to self.foo
         g.push_self
         g.push_literal o.name
