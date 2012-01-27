@@ -64,7 +64,7 @@ class InteropTest < MiniTest::Unit::TestCase
     assert_equal 42, foo.answer
   end
 
-  def test_create_ruby_clas
+  def test_create_ruby_class
     kls = compile(<<-CODE)
       Ruby.Class.create(->
         @def('answer', ->
