@@ -132,7 +132,7 @@ namely `#def`, `#include` and `#extend`. Let's reopen Array and define a new
 method:
 
     Ruby.Array.def('sum', ->
-      self.ruby('reduce', '+')
+      @ruby('reduce', '+')
     end)
 
 Since Noscript arrays are instances of the ruby Array class, `#sum` should be
