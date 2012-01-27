@@ -72,10 +72,18 @@ module Noscriptable
   end
 
   def method_missing(m, *args)
-    function = m.to_s.split(":").last.to_sym
-    if __noscript_has_property__(function)
-      fn = __noscript_get__(function)
-      return fn.call(*args) # First arg is this.
+    from_ruby = !(m =~ /^noscript:/)
+    name = from_ruby ? m : m.to_s.split(":").last.to_sym
+    if __noscript_has_property__(name)
+      property = __noscript_get__(name)
+      if property.is_a?(Function)
+        if from_ruby
+          args.unshift self
+        end
+        return property.call(*args) # First arg is this.
+      else
+        return property
+      end
     end
     super
   end

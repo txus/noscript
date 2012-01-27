@@ -78,4 +78,22 @@ class InteropTest < MiniTest::Unit::TestCase
     assert_respond_to foo, :answer
     assert_equal 42, foo.answer
   end
+
+  def test_call_noscript_from_ruby
+    john = compile(<<-CODE)
+      Object.clone({
+        name: 'John',
+        age: ->
+          20
+        end,
+        money: -> day of month
+          30 - day of month
+        end
+      })
+    CODE
+
+    assert_equal "John", john.name
+    assert_equal 20, john.age
+    assert_equal 10, john.money(20)
+  end
 end
