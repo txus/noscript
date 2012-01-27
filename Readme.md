@@ -114,6 +114,102 @@ Create your first trait like this:
 
 To read more about how traits work, read `examples/traits.ns`.
 
+## Interoperating with the Ruby world
+
+Noscript can easily talk to Ruby thanks to its interoperativity API, and
+viceversa. This enables you to write nice polyglot applications in Ruby +
+Noscript.
+
+To reopening a Ruby class from Noscript, just prefix the constant with the
+namespace `Ruby`, like this: `Ruby.Array`. This is the actual `Array` class. To
+call an arbitrary ruby method on an object, we use the special method `ruby`,
+which acts like ruby `send`:
+
+    Ruby.Array.ruby('name') # => "Array"
+
+There are a couple of convenience methods that bypass the `#ruby` convention,
+namely `#def`, `#include` and `#extend`. Let's reopen Array and define a new
+method:
+
+    Ruby.Array.def('sum', ->
+      self.ruby('reduce', '+')
+    end)
+
+Since Noscript arrays are instances of the ruby Array class, `#sum` should be
+also available to them using the `#ruby` convention:
+
+    [1,2,3].ruby('sum') # => 6
+
+### Defining new classes and modules
+
+You can also define new classes and modules in the Ruby world from Noscript.
+This is done via `Module#create` and `Class#create` rather than `#new`, to
+avoid some naming conflicts.
+
+This is useful if, for example, you want to develop a Rails application but
+want to write the model layer entirely in Noscript. Let's do this:
+
+    Ruby.Post = Ruby.Class.create(Ruby.ActiveRecord.Base, ->
+      @ruby('validates_presence_of', 'title', 'body')
+
+      @def('upcase_title', ->
+        @ruby('title').ruby('upcase')
+      end)
+    end)
+
+You can also create mixins and include/extend them in your objects:
+
+    mixin = Ruby.Module.create(->
+      @def('answer', ->; 42; end)
+    end)
+
+    Ruby.Post.include(mixin)
+
+    post = Ruby.Post.new()
+    post.ruby('answer') # => 42
+
+Last but not least, let's use this Post model from Ruby. Imagine we had this
+post saved in `post.ns`. In our Ruby script we have to do this:
+
+    # my_script.rb
+    require 'activerecord'
+    require 'noscript'
+    noscript_require 'post'
+
+    post = Post.new
+    post.valid? # => false
+    post.answer # => 42
+
+### Using native Noscript objects from Ruby
+
+Let's create a native, you know, prototype-based Noscript object and use it
+form a Ruby script.
+
+    # foo.ns
+    # We must put it somewhere where Ruby can see it. Let's store it in the
+    # toplevel constant Foo, what a great idea!
+    Ruby.Foo = Object.clone({
+      name: 'John',
+      age: ->
+        20
+      end,
+      money: -> day of month
+        30 - day of month
+      end
+    })
+
+Now the Ruby script:
+
+    # ruby_script.rb
+    require 'noscript'
+    noscript_require 'foo'
+
+    Foo.name      # => "John"
+    Foo.age       # => 20
+    Foo.money(20) # => 10
+
+It's all CONNECTED!!!
+
 ## Installing the old interpreter (AST-walker)
 
 Before running on the Rubinius VM, Noscript was prototyped as a simple
