@@ -100,6 +100,13 @@ class Module
   end
 end
 
+class Class
+  noscript_alias [:new]
+  noscript_def 'def' do |name, implementation|
+    define_method(name, &implementation)
+  end
+end
+
 class Object
   include Noscriptable
   def noscript_send(name, *args)
@@ -141,6 +148,7 @@ class Object
   end
 
   noscript_alias [:==, :"!="]
+  noscript_alias [:include, :extend, :def]
   noscript_def("@!") { !self }
 
   noscript_alias :nil?
@@ -193,11 +201,16 @@ end
 class Function
   attr_reader :executable
   def initialize(blk_env)
+    @block_environment = blk_env
     @executable = blk_env.code
   end
 
   def call(this, *args)
     @executable.invoke(:anonymous, @executable.scope.module, this, args, nil)
+  end
+
+  def to_proc
+    Proc.__from_block__(@block_environment)
   end
 
   define_method("noscript:call") do |*args|
