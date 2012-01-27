@@ -5,6 +5,7 @@ module Noscript
 
     class << self
       attr_reader :load_paths, :loaded_files
+      attr_writer :load_paths
 
       def check_version?
         Rubinius::CodeLoader.check_version

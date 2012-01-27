@@ -91,7 +91,11 @@ end
 
 module Kernel
   def noscript_require(file)
+    here = File.dirname(caller.first.split(":").first)
+    old_paths = Noscript::CodeLoader.load_paths
+    Noscript::CodeLoader.load_paths.unshift(here)
     Noscript::CodeLoader.run(file)
+    Noscript::CodeLoader.load_paths = old_paths
   end
 end
 
