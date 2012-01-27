@@ -25,7 +25,7 @@ class InteropTest < MiniTest::Unit::TestCase
   def test_define_ruby_method
     compile(<<-CODE)
       Ruby.Array.def('sum', ->
-        @ruby('reduce', '+'.ruby('to_sym'))
+        @ruby('reduce', '+')
       end)
     CODE
 
@@ -81,6 +81,22 @@ class InteropTest < MiniTest::Unit::TestCase
     foo = kls.new
 
     assert_respond_to foo, :answer
+    assert_equal 42, foo.answer
+  end
+
+  def test_create_ruby_class_inheriting
+    kls = compile(<<-CODE)
+      Ruby.Class.create(Ruby.Array, ->
+        @def('answer', ->
+          42
+        end)
+      end)
+    CODE
+
+    foo = kls.new
+
+    assert_respond_to foo, :answer
+    assert_kind_of Array, foo
     assert_equal 42, foo.answer
   end
 

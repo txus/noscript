@@ -116,8 +116,9 @@ end
 
 class Class
   noscript_alias [:new]
-  noscript_def 'create' do |implementation|
-    Class.new(&implementation)
+  noscript_def 'create' do |*args|
+    implementation = args.pop
+    Class.new(*args, &implementation)
   end
 end
 
