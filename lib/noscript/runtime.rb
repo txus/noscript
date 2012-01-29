@@ -90,8 +90,8 @@ module Noscriptable
 end
 
 module Kernel
-  def noscript_require(file)
-    here = File.dirname(caller.first.split(":").first)
+  def noscript_require(file, backtrace=caller)
+    here = File.dirname(backtrace.first.split(":").first)
     old_paths = Noscript::CodeLoader.load_paths
     Noscript::CodeLoader.load_paths.unshift(here)
     Noscript::CodeLoader.run(file)
@@ -175,9 +175,24 @@ class Object
     send *args
   end
 
+  noscript_def("require") do |file|
+    backtrace = [caller.detect {|line| line =~ /eval_noscript/}]
+    noscript_require(file, backtrace)
+  end
+
+  noscript_def("ruby require") do |file|
+    require file
+  end
+
+  noscript_def("ruby require relative") do |file|
+    backtrace = [caller.detect {|line| line =~ /eval_noscript/}]
+    here = File.dirname(backtrace.first.split(":").first)
+    require File.expand_path(File.join(here, file))
+  end
+
   noscript_alias [:==, :"!="]
   noscript_alias [:include, :extend, :def]
-  noscript_def("@!") { !self }
+  noscript_def("!") { !self }
 
   noscript_alias :nil?
   noscript_alias :inspect
