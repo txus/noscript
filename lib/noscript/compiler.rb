@@ -6,10 +6,8 @@ module Noscript
     alias g generator
     alias s scope
 
-    def initialize(parent=nil)
+    def initialize
       @generator = Generator.new
-      parent_scope = parent ? parent.scope : nil
-      @scope = Scope.new(@generator, parent_scope)
     end
 
     def compile(ast, debugging=false)
@@ -27,6 +25,8 @@ module Noscript
       end
 
       g.set_line ast.line || 1
+
+      g.push_state Rubinius::AST::ClosedScope.new(ast.line || 1)
 
       ast.accept(self)
 
@@ -51,49 +51,101 @@ module Noscript
     end
 
     def visit_Nodes(o)
+      p "visit nodes #{o}"
       set_line(o)
       size = o.expressions.length
       o.expressions.each do |exp|
         size -= 1
+        p "accepting #{exp}"
         exp.accept(self)
         g.pop if size > 0
       end
     end
 
+    # def visit_FunctionLiteral(o)
+    #   set_line(o)
+    #   # Get a new compiler
+    #   p "COMPILING #{o} with parent scope #{@scope}"
+    #   block = BytecodeCompiler.new(@scope)
+
+    #   # Configures the new generator
+    #   # TODO Move this to a method on the compiler
+    #   block.generator.for_block = true
+    #   block.generator.total_args = o.arguments.size
+    #   block.generator.required_args = o.arguments.size
+    #   block.generator.post_args = o.arguments.size
+    #   block.generator.cast_for_multi_block_arg unless o.arguments.empty?
+    #   block.generator.set_line o.line if o.line
+
+    #   # scope = Rubinius::AST::ClosedScope.new(o.line)
+    #   # block.generator.push_state scope
+    #   # block.generator.push_runtime
+    #   # block.generator.add_scope
+
+    #   block.visit_arguments(o.arguments)
+    #   o.body.accept(block)
+
+    #   block.generator.ret
+
+    #   g.push_const :Function
+
+    #   # Invoke the create block instruction
+    #   # with the generator of the block compiler
+    #   g.create_block block.finalize
+    #   g.send :new, 1
+    # end
+
     def visit_FunctionLiteral(o)
-      set_line(o)
-      # Get a new compiler
-      block = BytecodeCompiler.new(self)
-
-      # Configures the new generator
-      # TODO Move this to a method on the compiler
-      block.generator.for_block = true
-      block.generator.total_args = o.arguments.size
-      block.generator.required_args = o.arguments.size
-      block.generator.post_args = o.arguments.size
-      block.generator.cast_for_multi_block_arg unless o.arguments.empty?
-      block.generator.set_line o.line if o.line
-
-      block.visit_arguments(o.arguments)
-      o.body.accept(block)
-
-      block.generator.ret
-
       g.push_const :Function
 
-      # Invoke the create block instruction
-      # with the generator of the block compiler
-      g.create_block block.finalize
-      g.send :new, 1
-    end
+      state = g.state
+      state.scope.nest_scope o
 
-    def visit_arguments(args)
-      args.each_with_index do |a, i|
-        g.shift_array
-        s.set_local a
-        g.pop
-      end
-      g.pop unless args.empty?
+      args_len = o.arguments.arguments.args.size
+
+      block = BytecodeCompiler.new
+      block.generator.for_block = true
+      block.generator.total_args = args_len
+      block.generator.required_args = args_len
+      block.generator.post_args = args_len
+      block.generator.cast_for_multi_block_arg unless o.arguments.arguments.args.empty?
+      block.generator.set_line o.line if o.line
+
+      # blk = new_block_generator g, @arguments
+
+      block.generator.push_state o
+      block.generator.state.push_super state.super
+      block.generator.state.push_eval state.eval
+
+      block.generator.state.push_name block.generator.name
+
+      # Push line info down.
+      # pos(blk)
+
+      o.arguments.bytecode(block.generator)
+
+      block.generator.state.push_block
+      block.generator.push_modifiers
+      block.generator.break = nil
+      block.generator.next = nil
+      block.generator.redo = block.generator.new_label
+      block.generator.redo.set!
+
+      o.body.accept(block)
+
+      block.generator.pop_modifiers
+      block.generator.state.pop_block
+      block.generator.ret
+      block.generator.close
+
+      block.generator.splat_index = o.arguments.splat_index
+      block.generator.local_count = o.local_count
+      block.generator.local_names = o.local_names
+
+
+      g.create_block block.generator
+
+      g.send :new, 1
     end
 
     def visit_CallNode(o)
@@ -119,6 +171,9 @@ module Noscript
     def visit_Identifier(o)
       set_line(o)
 
+      p g.state.scope.variables
+      p g.state.scope.search_local(o.name)
+
       if o.constant?
         if o.ruby?
           g.push_cpath_top
@@ -133,7 +188,10 @@ module Noscript
         g.raise_if_empty NameError, "Object has no slot named #{o.name}"
       elsif o.self?
         g.push_self
-      elsif s.slot_for(o.name)
+
+
+        g.set_local(g.state.scope.new_local(name).reference.slot)
+      elsif g.state.scope.search_local(o.name)
         visit_LocalVariableAccess(o)
       else
         raise "BUG: CANT FIND #{o.name}"
@@ -177,13 +235,20 @@ module Noscript
       o.value.accept(self)
 
       if identifier.constant?
-        s.set_const name
+        g.push_runtime
+        g.swap
+        g.push_literal name
+        g.swap
+        g.send :const_set, 2
       elsif identifier.deref?
         g.push_literal name
         g.swap
         g.send :__noscript_put__, 2
       else
-        s.set_local name
+        # s.set_local name
+        p g.size
+        g.set_local(g.state.scope.new_local(name).reference.slot)
+        p g.size
       end
     end
 
@@ -201,7 +266,7 @@ module Noscript
 
     def visit_LocalVariableAccess(o)
       set_line(o)
-      s.push_variable o.name
+      g.push_local g.state.scope.search_local(o.name).slot
     end
 
     def visit_SlotGet(o)
@@ -271,8 +336,10 @@ module Noscript
     end
 
     def finalize
-      g.local_names = s.variables
-      g.local_count = s.variables.size
+      variables = p g.state.scope.variables
+      g.local_names = variables.keys
+      g.local_count = variables.keys.size
+      g.pop_state
       g.close
       g
     end

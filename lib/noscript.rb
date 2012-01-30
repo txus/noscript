@@ -13,8 +13,8 @@ module Noscript
 
   CodeLoader.load_paths << File.expand_path('../noscript', __FILE__)
   CodeLoader.load_paths << File.expand_path('../../', __FILE__)
-  noscript_require('kernel/traits')
-  noscript_require('kernel/test_case')
+  # noscript_require('kernel/traits')
+  # noscript_require('kernel/test_case')
 
   def self.eval_noscript(code, *args)
     file, line, binding, instance = '(eval)', 1, Runtime::Object.send(:binding), Runtime::Object
