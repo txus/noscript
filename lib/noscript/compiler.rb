@@ -26,7 +26,8 @@ module Noscript
 
       g.set_line ast.line || 1
 
-      g.push_state Rubinius::AST::ClosedScope.new(ast.line || 1)
+      @scope = Rubinius::AST::ClosedScope.new(ast.line || 1)
+      g.push_state @scope
 
       ast.accept(self)
 
@@ -51,49 +52,14 @@ module Noscript
     end
 
     def visit_Nodes(o)
-      p "visit nodes #{o}"
       set_line(o)
       size = o.expressions.length
       o.expressions.each do |exp|
         size -= 1
-        p "accepting #{exp}"
         exp.accept(self)
         g.pop if size > 0
       end
     end
-
-    # def visit_FunctionLiteral(o)
-    #   set_line(o)
-    #   # Get a new compiler
-    #   p "COMPILING #{o} with parent scope #{@scope}"
-    #   block = BytecodeCompiler.new(@scope)
-
-    #   # Configures the new generator
-    #   # TODO Move this to a method on the compiler
-    #   block.generator.for_block = true
-    #   block.generator.total_args = o.arguments.size
-    #   block.generator.required_args = o.arguments.size
-    #   block.generator.post_args = o.arguments.size
-    #   block.generator.cast_for_multi_block_arg unless o.arguments.empty?
-    #   block.generator.set_line o.line if o.line
-
-    #   # scope = Rubinius::AST::ClosedScope.new(o.line)
-    #   # block.generator.push_state scope
-    #   # block.generator.push_runtime
-    #   # block.generator.add_scope
-
-    #   block.visit_arguments(o.arguments)
-    #   o.body.accept(block)
-
-    #   block.generator.ret
-
-    #   g.push_const :Function
-
-    #   # Invoke the create block instruction
-    #   # with the generator of the block compiler
-    #   g.create_block block.finalize
-    #   g.send :new, 1
-    # end
 
     def visit_FunctionLiteral(o)
       g.push_const :Function
@@ -111,16 +77,13 @@ module Noscript
       block.generator.cast_for_multi_block_arg unless o.arguments.arguments.args.empty?
       block.generator.set_line o.line if o.line
 
-      # blk = new_block_generator g, @arguments
-
-      block.generator.push_state o
+      block.generator.push_state o # Enter the Iter scope
       block.generator.state.push_super state.super
       block.generator.state.push_eval state.eval
 
       block.generator.state.push_name block.generator.name
 
-      # Push line info down.
-      # pos(blk)
+      block.set_line(o)
 
       o.arguments.bytecode(block.generator)
 
@@ -137,11 +100,11 @@ module Noscript
       block.generator.state.pop_block
       block.generator.ret
       block.generator.close
+      block.generator.pop_state
 
       block.generator.splat_index = o.arguments.splat_index
       block.generator.local_count = o.local_count
       block.generator.local_names = o.local_names
-
 
       g.create_block block.generator
 
@@ -171,30 +134,24 @@ module Noscript
     def visit_Identifier(o)
       set_line(o)
 
-      p g.state.scope.variables
-      p g.state.scope.search_local(o.name)
+      name = o.name
 
       if o.constant?
         if o.ruby?
           g.push_cpath_top
         else
           g.push_runtime
-          g.find_const o.name.to_sym
+          g.find_const name
         end
       elsif o.deref? # @foo equals to self.foo
         g.push_self
-        g.push_literal o.name
+        g.push_literal name
         g.send :__noscript_get__, 1
-        g.raise_if_empty NameError, "Object has no slot named #{o.name}"
+        g.raise_if_empty NameError, "Object has no slot named #{name}"
       elsif o.self?
         g.push_self
-
-
-        g.set_local(g.state.scope.new_local(name).reference.slot)
-      elsif g.state.scope.search_local(o.name)
-        visit_LocalVariableAccess(o)
       else
-        raise "BUG: CANT FIND #{o.name}"
+        AST::LocalVariableAccess.new(o.line, o).accept(self)
       end
     end
 
@@ -224,7 +181,7 @@ module Noscript
     end
 
     def visit_LocalVariableAssignment(o)
-      identifier = o.name
+      identifier = o.identifier
       if identifier.deref?
         g.push_self
       end
@@ -245,10 +202,24 @@ module Noscript
         g.swap
         g.send :__noscript_put__, 2
       else
-        # s.set_local name
-        p g.size
-        g.set_local(g.state.scope.new_local(name).reference.slot)
-        p g.size
+        unless o.variable
+          g.state.scope.assign_local_reference o
+        end
+
+        p ["SETTING", g.state.scope.class, g.state.scope.search_local(:a)] if o.name.to_sym == :a
+        o.variable.set_bytecode(g)
+
+        # if existing = g.state.scope.search_local(name)
+        #   if existing.depth > 0
+        #     # g.set_local_depth(existing.depth, existing.slot)
+        #     g.set_local(existing.slot)
+        #   else
+        #     g.set_local(existing.slot)
+        #   end
+        # else
+        #   new_var = g.state.scope.new_local(name)
+        #   g.set_local(new_var.reference.slot)
+        # end
       end
     end
 
@@ -266,7 +237,27 @@ module Noscript
 
     def visit_LocalVariableAccess(o)
       set_line(o)
-      g.push_local g.state.scope.search_local(o.name).slot
+      unless o.variable
+        g.state.scope.assign_local_reference o
+      end
+
+      p ["GETTING", g.state.scope.class, g.state.scope.search_local(:a)] if o.name.to_sym == :a
+      if !g.state.scope.is_a?(Rubinius::AST::ClosedScope)
+        p g.state.scope.parent
+      end
+      # p [g.state, o.name, o.variable] if o.variable.is_a?(Rubinius::Compiler::NestedLocalReference)
+      # o.variable.get_bytecode(g)
+      if !o.variable.respond_to?(:depth) || o.variable.depth == 0
+        if o.name.to_sym == :a
+          p "PUSHING :a WITHOUT DEPTH"
+        end
+        g.push_local o.variable.slot
+      else
+        if o.name.to_sym == :a
+          p "PUSHING :a WITH DEPTH #{o.variable.depth}"
+        end
+        g.push_local_depth o.variable.depth, o.variable.slot
+      end
     end
 
     def visit_SlotGet(o)
@@ -274,9 +265,9 @@ module Noscript
       o.receiver.accept(self)
 
       if o.receiver.constant? && o.name.constant? # Constant lookup like Rubinius.Compiler
-        g.find_const o.name.name.to_sym
+        g.find_const o.name.name
       else
-        g.push_literal o.name.name.to_sym
+        g.push_literal o.name.name
         g.send :__noscript_get__, 1
       end
 
@@ -288,7 +279,7 @@ module Noscript
       o.receiver.accept(self)
 
       if o.receiver.constant? && AST::Identifier.new(1, o.name).constant? # Constant set like Rubinius.Compiler = something
-        g.push_literal o.name.to_sym
+        g.push_literal o.name
         o.value.accept(self)
         g.send :const_set, 2
       else
@@ -336,7 +327,7 @@ module Noscript
     end
 
     def finalize
-      variables = p g.state.scope.variables
+      variables = g.state.scope.variables
       g.local_names = variables.keys
       g.local_count = variables.keys.size
       g.pop_state

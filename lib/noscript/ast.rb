@@ -110,7 +110,7 @@ module Noscript
 
     class StringLiteral < Rubinius::AST::StringLiteral
       def initialize(line, str)
-        super(line, unescape_chars(str))
+        super(line, unescape_chars(str.to_s))
       end
 
       # Weird hack. Whoa.
@@ -156,13 +156,13 @@ module Noscript
         @deref = false
         @self = (name == 'self')
 
-        @name = name
+        @name = name.to_sym
 
         if name.to_s[0] =~ /[A-Z]/
           @constant = true
         elsif name.to_s[0] == '@'
           @deref = true
-          @name = name[1..-1]
+          @name = name[1..-1].to_sym
         end
       end
 
@@ -192,12 +192,27 @@ module Noscript
       end
     end
 
-    class LocalVariableAssignment < Node
-      attr_reader :name, :value
-      def initialize(line, name, value)
+    class LocalVariableAccess < Node
+      attr_reader :name, :identifier
+      attr_accessor :variable
+
+      def initialize(line, identifier)
         super(line)
-        @name = name.is_a?(Identifier) ? name : Identifier.new(line, name)
+        @identifier = identifier.is_a?(Identifier) ? identifier : Identifier.new(line, identifier)
+        @name = @identifier.name
+        @variable = nil
+      end
+    end
+
+    class LocalVariableAssignment < Node
+      attr_reader :identifier, :value, :name
+      attr_accessor :variable
+      def initialize(line, identifier, value)
+        super(line)
+        @identifier = identifier.is_a?(Identifier) ? identifier : Identifier.new(line, identifier)
+        @name = @identifier.name
         @value = value
+        @variable = nil
       end
     end
 

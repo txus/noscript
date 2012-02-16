@@ -5,7 +5,6 @@ module Noscript
   require_relative 'noscript/stages'
   require_relative 'noscript/compiler'
   require_relative 'noscript/generator'
-  require_relative 'noscript/scope'
   require_relative 'noscript/code'
   require_relative 'noscript/runtime'
   require_relative 'noscript/signature'

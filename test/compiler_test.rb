@@ -25,10 +25,10 @@ module Noscript
     # def test_compile_string_interpolation_with_variables
     #   assert_equal '1', compile("foo = 1; '%s' % foo")
     # end
-#
-#     def test_compile_assignment
-#       assert_equal 1, compile("foo = 1; foo")
-#     end
+
+    # def test_compile_assignment
+    #   assert_equal 1, compile("foo = 1; foo")
+    # end
 
     # def test_compile_constant_assignment
     #   assert_equal 1, compile("Foo = 1; Foo")
@@ -74,34 +74,34 @@ module Noscript
     #   assert_equal 3, compile("foo = -> a; 3; end; foo(5)")
     # end
 
-    def test_compile_function_with_used_arguments
-      assert_equal 10, compile("foo = -> a; a + a; end; foo(5)")
-    end
-
-    # def test_compile_function_with_call_inside
-    #   assert_equal 1, compile("foo = ->; '3'.length(); '3'.length(); end; foo()")
+    # def test_compile_function_with_used_arguments
+    #   assert_equal 10, compile("foo = -> a; a + a; end; foo(5)")
     # end
 
-    # def test_compile_function_call_twice
-    #   assert_equal 3, compile("foo = ->; 3; end; '3'.length(); foo()")
-    # end
+    # # def test_compile_function_with_call_inside
+    # #   assert_equal 1, compile("foo = ->; '3'.length(); '3'.length(); end; foo()")
+    # # end
 
-    # def test_compile_function_call_twice_again
-    #   assert_equal 1, compile("'3'.length(); '3'.length()")
-    # end
+    # # def test_compile_function_call_twice
+    # #   assert_equal 3, compile("foo = ->; 3; end; '3'.length(); foo()")
+    # # end
 
-    # TODO: Fix this
-    def test_compile_function_scope
-      assert_equal 3, compile(<<-CODE)
-        hey = -> foo
-          ho = -> bar
-            foo + bar
-          end
-          ho(2)
-        end
-        hey(1)
-      CODE
-    end if nil
+    # # def test_compile_function_call_twice_again
+    # #   assert_equal 1, compile("'3'.length(); '3'.length()")
+    # # end
+
+    # # TODO: Fix this
+    # def test_compile_function_scope
+    #   assert_equal 3, compile(<<-CODE)
+    #     hey = -> foo
+    #       ho = -> bar
+    #         foo + bar
+    #       end
+    #       ho(2)
+    #     end
+    #     hey(1)
+    #   CODE
+    # end if nil
 
     # def test_compile_multiple_expressions
     #   result = compile("
@@ -146,6 +146,18 @@ module Noscript
     # def test_compile_local_assign
     #   assert_equal 3, compile("a = 3")
     # end
+
+    # def test_compile_local_assign_with_depth
+    #   assert_equal 4, compile("a = 3; if a == 3; a = 4; end; a")
+    # end
+
+    # def test_compile_local_assign_with_modification_inside_new_scope
+    #   assert_equal 4, compile("a = 3; foo = ->; a + 1; end; foo(); a")
+    # end
+
+    def test_local_assign
+      assert_equal 4, compile("a = 4; foo = ->; a; end; foo()")
+    end
 
     # def test_compile_object_clone
     #   obj = compile("Object.clone()")
@@ -201,7 +213,7 @@ module Noscript
     # def test_ruby_call
     #   identifier = compile("Noscript.AST.Identifier.send('new', 1, 'foo')")
     #   assert_equal 1, identifier.line
-    #   assert_equal 'foo', identifier.name
+    #   assert_equal :foo, identifier.name
     # end
   end
 end

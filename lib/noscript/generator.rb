@@ -1,3 +1,5 @@
+require 'rubinius/debugger'
+
 module Noscript
   class Generator < Rubinius::Generator
     def noscript_send(name, args = 0)
@@ -38,6 +40,12 @@ module Noscript
       swap_stack
       send :print_stack, 1, true
       pop
+    end
+
+    def start_debugger
+      push_rubinius
+      find_const :Debugger
+      send :start, 0, true
     end
   end
 end
