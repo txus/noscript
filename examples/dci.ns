@@ -1,0 +1,35 @@
+# DCI (Data-Context-Interaction)
+# ------------------------------
+
+# Models - plain, dumb data containers define what the system **is**.
+User = Object.clone({
+  cart: []
+})
+Book = Object.clone()
+
+# Roles - define what the system **does**.
+Customer = Trait.build('Customer', {
+  add to cart: -> book
+    @cart << book
+  end
+})
+
+# Define the use case (a Context): A user adds a book to his cart.
+add to cart context = -> user, book
+  user.uses(Customer)
+  user.add to cart(book)
+end
+
+# Runtime program (what a controller would do in a web application)
+# ---------------
+
+# We initialize the objects:
+john = User.clone()
+book = Book.clone()
+
+# We apply the context on these objects.
+add to cart context(john, book) # Execute the context
+
+# And now John has one item in his cart!
+msg = 'John has now %i elements in his cart' % john.cart.length()
+msg.puts()

@@ -37,6 +37,14 @@ module Noscript
       ], output
     end
 
+    def test_dci
+      output = `./bin/noscript examples/dci.ns`.split("\n")
+
+      assert_equal [
+        "John has now 1 elements in his cart"
+      ], output
+    end
+
     def test_traits
       output = `./bin/noscript examples/traits.ns`.split("\n")
 
