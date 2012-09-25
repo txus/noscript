@@ -152,7 +152,7 @@ module Noscript
     end
 
     def test_compile_local_assign_with_modification_inside_new_scope
-      assert_equal 4, compile("a = 3; foo = ->; a + 1; end; foo(); a")
+      assert_equal 4, compile("a = 3; foo = ->; a = a + 1; end; foo(); a")
     end
 
     def test_local_assign

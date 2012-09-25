@@ -191,10 +191,9 @@ module Noscript
         g.swap
         g.send :__noscript_put__, 2
       else
-        unless local = g.state.scope.search_local(name)
-          local = g.state.scope.new_local(name)
-        end
-        g.set_local local.slot
+        local = g.state.scope.search_local(name) || g.state.scope.new_local(name).reference
+
+        local.set_bytecode(g)
       end
     end
 
