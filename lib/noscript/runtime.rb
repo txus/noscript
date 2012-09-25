@@ -214,6 +214,7 @@ class Function
   end
 
   def call(*args)
+    args.shift
     @block_environment.call(*args)
   end
 
@@ -222,7 +223,6 @@ class Function
   end
 
   define_method("noscript:call") do |*args|
-    args.shift
     call(*args)
   end
 end
