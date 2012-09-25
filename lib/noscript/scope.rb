@@ -1,70 +1,63 @@
 module Noscript
-  class Scope
-    attr_reader :variables, :generator
-    alias g generator
+  module Scope
+    attr_accessor :parent
 
-    def initialize(generator, parent=nil)
-      if parent
-        p "Initializing new scope. Parent is #{parent.variables}"
-      else
-        p "Initializing new scopeiwthout parent."
-      end
-      @parent    = parent
-      @variables = []
-      @generator = generator
+    def self.included(base)
+      base.send :include, Rubinius::Compiler::LocalVariables
     end
 
-    def local?(name)
-      @variables.index(name) || @parent.local?(name)
+    def nest_scope(scope)
+      scope.parent = self
     end
 
-    def slot_for(name)
-      if existing = @variables.index(name)
-        existing
-      else
-        @variables << name
-        @variables.size - 1
-      end
-    end
-
-    def push_variable(name, current_depth = 0, g = self.g)
-      p "Tring to evaluate #{name} (depth #{current_depth}) (#{@variables.join(', ')})"
-      if existing = @variables.index(name)
-        p "Exists."
-        if current_depth.zero?
-          g.push_local existing
-        else
-          g.push_local_depth current_depth, existing
-        end
-      else
-        p "Does not exist. Going to parent"
-        @parent.push_variable(name, current_depth + 1, g)
+    # A nested scope is looking up a local variable. If the variable exists
+    # in our local variables hash, return a nested reference to it. If it
+    # exists in an enclosing scope, increment the depth of the reference
+    # when it passes through this nested scope (i.e. the depth of a
+    # reference is a function of the nested scopes it passes through from
+    # the scope it is defined in to the scope it is used in).
+    def search_local(name)
+      if variable = variables[name]
+        variable.nested_reference
+      elsif block_local?(name)
+        new_local name
+      elsif reference = @parent.search_local(name)
+        reference.depth += 1
+        reference
       end
     end
 
-    def set_variable(name, current_depth = 0, g = self.g)
-      if existing = @variables.index(name)
-        if current_depth.zero?
-          g.set_local existing
-        else
-          g.set_local_depth current_depth, existing
-        end
+    def block_local?(name)
+      @locals.include?(name) if @locals
+    end
+
+    def new_local(name)
+      variable = Rubinius::Compiler::LocalVariable.new allocate_slot
+      variables[name] = variable
+    end
+
+    def new_nested_local(name)
+      new_local(name).nested_reference
+    end
+
+    # If the local variable exists in this scope, set the local variable
+    # node attribute to a reference to the local variable. If the variable
+    # exists in an enclosing scope, set the local variable node attribute to
+    # a nested reference to the local variable. Otherwise, create a local
+    # variable in this scope and set the local variable node attribute.
+    def assign_local_reference(var)
+      if variable = variables[var.name]
+        var.variable = variable.reference
+      elsif block_local?(var.name)
+        variable = new_local var.name
+        var.variable = variable.reference
+      elsif reference = @parent.search_local(var.name)
+        reference.depth += 1
+        var.variable = reference
       else
-        @parent.set_variable(name, current_depth + 1, g)
+        variable = new_local var.name
+        var.variable = variable.reference
       end
-    end
-
-    def set_local(name)
-      slot = slot_for(name)
-      g.set_local slot
-    end
-
-    def set_const(name)
-      g.push_runtime
-      g.swap
-      g.push_literal name
-      g.swap
-      g.send :const_set, 2
     end
   end
 end

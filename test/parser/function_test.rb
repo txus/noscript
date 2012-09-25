@@ -7,7 +7,7 @@ class FunctionLiteralTest < MiniTest::Unit::TestCase
       fun = nodes.first
 
       assert_kind_of FunctionLiteral, fun
-      assert_equal [], fun.arguments
+      assert_equal [], fun.arguments.arguments
 
       body = fun.body.expressions
       assert_equal [3], body.map(&:value)
@@ -19,7 +19,7 @@ class FunctionLiteralTest < MiniTest::Unit::TestCase
       fun = nodes.first
 
       assert_kind_of FunctionLiteral, fun
-      assert_equal ["bar"], fun.arguments
+      assert_equal [:bar], fun.arguments.arguments
 
       body = fun.body.expressions
       assert_equal [3], body.map(&:value)
@@ -31,7 +31,7 @@ class FunctionLiteralTest < MiniTest::Unit::TestCase
       fun = nodes.first
 
       assert_kind_of FunctionLiteral, fun
-      assert_equal ["bar", "baz"], fun.arguments
+      assert_equal [:bar, :baz], fun.arguments.arguments
 
       body = fun.body.expressions
       assert_equal [3], body.map(&:value)
@@ -43,7 +43,7 @@ class FunctionLiteralTest < MiniTest::Unit::TestCase
       fun = nodes.first
 
       assert_kind_of FunctionLiteral, fun
-      assert_equal ["bar", "baz"], fun.arguments
+      assert_equal [:bar, :baz], fun.arguments.arguments
 
       body = fun.body.expressions.first
       assert_kind_of NilLiteral, body

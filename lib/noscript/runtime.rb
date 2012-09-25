@@ -212,7 +212,7 @@ class Function
   attr_reader :executable
   def initialize(blk_env)
     @block_environment = blk_env
-    @executable = blk_env.code
+    @executable = blk_env.compiled_code
   end
 
   def call(this, *args)

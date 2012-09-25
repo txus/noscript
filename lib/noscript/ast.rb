@@ -1,3 +1,5 @@
+require_relative 'scope'
+
 module Noscript
   module AST
     RubiniusNodes = [
@@ -37,8 +39,6 @@ module Noscript
       def initialize(line, expressions)
         super(line)
         @expressions = expressions
-        # require 'pp'
-        # pp @expressions
       end
 
       def <<(exp)
@@ -50,61 +50,26 @@ module Noscript
       end
     end
 
-    # class FunctionLiteral < Node
-    #   attr_reader :arguments, :body
-    #   def initialize(line, arguments, body)
-    #     super(line)
-    #     @arguments = arguments
-    #     @body = body
-    #   end
-    # end
-    class FunctionLiteral < Rubinius::AST::Iter
-      def initialize(line, args, body)
-        @args = BlockArgs.new(line, *args)
-        body = body || Rubinius::AST::NilLiteral.new(line)
+    class FunctionLiteral < Node
+      include Scope
+      attr_reader :arguments, :body
 
-        if body.empty?
-          body.unshift_expression Rubinius::AST::NilLiteral.new(line)
-        end
-
-        super(line, @args, body)
-        @args.create_locals(self)
-
-        if @args.total_args == 0
-          @arguments.prelude = nil
-        end
-        if @args.total_args > 1
-          @arguments.prelude = :multi
-        end
-        @arguments.required_args = @args.required_args
-      end
-
-      def bytecode(g)
-        g.push_state self
-        super(g)
+      def initialize(line, arguments, body)
+        @line = line
+        @arguments = FunctionArguments.new(line, arguments)
+        @body = body
       end
     end
 
-    class BlockArgs < Node
-      attr_accessor :args, :block
-
-      def initialize(line, *args)
-        super(line)
-        @args = args.map{|a| a.to_sym}
+    class FunctionArguments < Node
+      attr_reader :arguments
+      def initialize(line, arguments)
+        @line = line
+        @arguments = arguments
       end
 
-      def total_args
-        @args.size
-      end
-
-      def required_args
-        total_args
-      end
-
-      def create_locals(block)
-        @args.each do |a|
-          block.new_local(a)
-        end
+      def count
+        @arguments.count
       end
     end
 
@@ -171,7 +136,7 @@ module Noscript
       end
 
       def ruby?
-        @name == "Ruby"
+        @name == :Ruby
       end
 
       def deref?

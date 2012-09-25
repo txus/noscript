@@ -7,7 +7,7 @@ class BooleanExpressionsTest < MiniTest::Unit::TestCase
         exp = nodes.first
 
         assert_kind_of CallNode, exp
-        assert_equal "foo", exp.receiver.name
+        assert_equal :foo, exp.receiver.name
         assert_equal operator, exp.method
         assert_equal 3, exp.arguments.first.value
       end

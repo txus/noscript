@@ -2,12 +2,11 @@ require 'rexpl'
 
 module Noscript
   class BytecodeCompiler
-    attr_reader :generator, :scope
+    attr_reader :generator
     alias g generator
-    alias s scope
 
-    def initialize
-      @generator = Generator.new
+    def initialize(generator=nil)
+      @generator = generator || Noscript::Generator.new
     end
 
     def compile(ast, debugging=false)
@@ -24,10 +23,10 @@ module Noscript
         g.file = :"(noscript)"
       end
 
-      g.set_line ast.line || 1
+      line = ast.line || 1
+      g.set_line line
 
-      @scope = Rubinius::AST::ClosedScope.new(ast.line || 1)
-      g.push_state @scope
+      g.push_state Rubinius::AST::ClosedScope.new(line)
 
       ast.accept(self)
 
@@ -62,53 +61,43 @@ module Noscript
     end
 
     def visit_FunctionLiteral(o)
+      set_line(o)
+
       g.push_const :Function
 
       state = g.state
       state.scope.nest_scope o
 
-      args_len = o.arguments.arguments.args.size
+      blk_compiler = BytecodeCompiler.new(new_block_generator g, o.arguments)
+      blk = blk_compiler.generator
 
-      block = BytecodeCompiler.new
-      block.generator.for_block = true
-      block.generator.total_args = args_len
-      block.generator.required_args = args_len
-      block.generator.post_args = args_len
-      block.generator.cast_for_multi_block_arg unless o.arguments.arguments.args.empty?
-      block.generator.set_line o.line if o.line
+      blk.push_state o
+      blk.state.push_super state.super
+      blk.state.push_eval state.eval
 
-      block.generator.push_state o # Enter the Iter scope
-      block.generator.state.push_super state.super
-      block.generator.state.push_eval state.eval
+      blk.state.push_name blk.name
 
-      block.generator.state.push_name block.generator.name
+      o.arguments.accept(blk_compiler)
+      blk.state.push_block
+      o.body.accept(blk_compiler)
+      blk.state.pop_block
+      blk.ret
+      blk_compiler.finalize
 
-      block.set_line(o)
-
-      o.arguments.bytecode(block.generator)
-
-      block.generator.state.push_block
-      block.generator.push_modifiers
-      block.generator.break = nil
-      block.generator.next = nil
-      block.generator.redo = block.generator.new_label
-      block.generator.redo.set!
-
-      o.body.accept(block)
-
-      block.generator.pop_modifiers
-      block.generator.state.pop_block
-      block.generator.ret
-      block.generator.close
-      block.generator.pop_state
-
-      block.generator.splat_index = o.arguments.splat_index
-      block.generator.local_count = o.local_count
-      block.generator.local_names = o.local_names
-
-      g.create_block block.generator
+      g.create_block blk
 
       g.send :new, 1
+    end
+
+    def visit_FunctionArguments(o)
+      args = o.arguments
+      args.each_with_index do |a, i|
+        g.shift_array
+        local = g.state.scope.new_local(a)
+        g.set_local local.slot
+        g.pop
+      end
+      g.pop unless args.empty?
     end
 
     def visit_CallNode(o)
@@ -202,24 +191,10 @@ module Noscript
         g.swap
         g.send :__noscript_put__, 2
       else
-        unless o.variable
-          g.state.scope.assign_local_reference o
+        unless local = g.state.scope.search_local(name)
+          local = g.state.scope.new_local(name)
         end
-
-        p ["SETTING", g.state.scope.class, g.state.scope.search_local(:a)] if o.name.to_sym == :a
-        o.variable.set_bytecode(g)
-
-        # if existing = g.state.scope.search_local(name)
-        #   if existing.depth > 0
-        #     # g.set_local_depth(existing.depth, existing.slot)
-        #     g.set_local(existing.slot)
-        #   else
-        #     g.set_local(existing.slot)
-        #   end
-        # else
-        #   new_var = g.state.scope.new_local(name)
-        #   g.set_local(new_var.reference.slot)
-        # end
+        g.set_local local.slot
       end
     end
 
@@ -241,23 +216,8 @@ module Noscript
         g.state.scope.assign_local_reference o
       end
 
-      p ["GETTING", g.state.scope.class, g.state.scope.search_local(:a)] if o.name.to_sym == :a
-      if !g.state.scope.is_a?(Rubinius::AST::ClosedScope)
-        p g.state.scope.parent
-      end
-      # p [g.state, o.name, o.variable] if o.variable.is_a?(Rubinius::Compiler::NestedLocalReference)
-      # o.variable.get_bytecode(g)
-      if !o.variable.respond_to?(:depth) || o.variable.depth == 0
-        if o.name.to_sym == :a
-          p "PUSHING :a WITHOUT DEPTH"
-        end
-        g.push_local o.variable.slot
-      else
-        if o.name.to_sym == :a
-          p "PUSHING :a WITH DEPTH #{o.variable.depth}"
-        end
-        g.push_local_depth o.variable.depth, o.variable.slot
-      end
+      local = g.state.scope.search_local(o.name)
+      local.get_bytecode(g)
     end
 
     def visit_SlotGet(o)
@@ -327,9 +287,8 @@ module Noscript
     end
 
     def finalize
-      variables = g.state.scope.variables
-      g.local_names = variables.keys
-      g.local_count = variables.keys.size
+      g.local_names = g.state.scope.local_names
+      g.local_count = g.state.scope.local_count
       g.pop_state
       g.close
       g
@@ -348,6 +307,20 @@ module Noscript
         puts instruct.name
       end
       p '**end**'
+    end
+
+    def new_block_generator(g, arguments)
+      blk = g.class.new
+      blk.name = g.state.name || :__block__
+      blk.file = g.file
+      blk.for_block = true
+
+      blk.required_args = arguments.count
+      blk.post_args = arguments.count
+      blk.total_args = arguments.count
+      blk.cast_for_multi_block_arg unless arguments.count.zero?
+
+      blk
     end
   end
 end

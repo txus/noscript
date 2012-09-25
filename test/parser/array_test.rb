@@ -34,7 +34,7 @@ class ArrayTest < MiniTest::Unit::TestCase
       array = nodes.first
 
       assert_kind_of ArrayLiteral, array
-      assert_equal(['foo', 'bar'], array.body.map(&:name))
+      assert_equal([:foo, :bar], array.body.map(&:name))
     end
   end
 
